@@ -4,5 +4,12 @@
   "private": true,
   "description": "Syncs Fossil's tokens with Figma Variables through the Figma MCP server. Runs from the repository and is not published.",
   "license": "MIT",
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
 }
