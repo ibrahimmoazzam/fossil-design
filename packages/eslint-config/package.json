@@ -1,0 +1,33 @@
+{
+  "name": "@fossil-design/eslint-config",
+  "version": "0.0.1",
+  "description": "Shared ESLint config that keeps JSX on Fossil's system: layout goes through Box, never raw layout elements.",
+  "keywords": [
+    "design-system",
+    "eslint",
+    "eslintconfig",
+    "eslint-config"
+  ],
+  "homepage": "https://github.com/ibrahimmoazzam/fossil/tree/main/packages/eslint-config#readme",
+  "bugs": "https://github.com/ibrahimmoazzam/fossil/issues",
+  "license": "MIT",
+  "author": "Ibrahim Moazzam (https://github.com/ibrahimmoazzam)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ibrahimmoazzam/fossil.git",
+    "directory": "packages/eslint-config"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

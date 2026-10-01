@@ -1,0 +1,34 @@
+{
+  "name": "@fossil-design/react",
+  "version": "0.0.1",
+  "description": "Fossil's React components, styled only with design tokens and precompiled to plain JavaScript and one stylesheet.",
+  "keywords": [
+    "design-system",
+    "react",
+    "components",
+    "css-modules",
+    "accessibility"
+  ],
+  "homepage": "https://github.com/ibrahimmoazzam/fossil/tree/main/packages/react#readme",
+  "bugs": "https://github.com/ibrahimmoazzam/fossil/issues",
+  "license": "MIT",
+  "author": "Ibrahim Moazzam (https://github.com/ibrahimmoazzam)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ibrahimmoazzam/fossil.git",
+    "directory": "packages/react"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

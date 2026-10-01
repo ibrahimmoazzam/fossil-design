@@ -1,0 +1,34 @@
+{
+  "name": "@fossil-design/tokens",
+  "version": "0.0.1",
+  "description": "Fossil's design tokens: DTCG source files and the Style Dictionary build that turns them into CSS, JSON and TypeScript.",
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "dtcg",
+    "style-dictionary",
+    "css-custom-properties"
+  ],
+  "homepage": "https://github.com/ibrahimmoazzam/fossil/tree/main/packages/tokens#readme",
+  "bugs": "https://github.com/ibrahimmoazzam/fossil/issues",
+  "license": "MIT",
+  "author": "Ibrahim Moazzam (https://github.com/ibrahimmoazzam)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ibrahimmoazzam/fossil.git",
+    "directory": "packages/tokens"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
