@@ -33,7 +33,8 @@
   },
   "scripts": {
     "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepack": "pnpm run build"
   },
   "devDependencies": {
     "typescript": "catalog:"

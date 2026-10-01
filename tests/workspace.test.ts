@@ -9,6 +9,7 @@ interface Manifest {
   license?: string;
   repository?: { type?: string; url?: string; directory?: string };
   publishConfig?: { access?: string };
+  scripts?: Record<string, string>;
 }
 
 const packagesDir = new URL('../packages/', import.meta.url);
@@ -46,6 +47,10 @@ describe.each(published)('$manifest.name', ({ dir, manifest }) => {
     expect(manifest.publishConfig?.access).toBe('public');
     expect(manifest.license).toBe('MIT');
     expect(existsSync(new URL(`${dir}/LICENSE`, packagesDir))).toBe(true);
+  });
+
+  it('builds before packing, so a tarball never ships a stale dist', () => {
+    expect(manifest.scripts?.prepack).toBe('pnpm run build');
   });
 
   // Trusted publishing rejects a package whose repository URL differs from the publishing repo.

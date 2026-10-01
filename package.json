@@ -18,9 +18,11 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc && pnpm -r typecheck",
-    "test": "vitest run"
+    "test": "vitest run",
+    "changeset": "changeset"
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.4",
     "eslint": "^10.11.0",
