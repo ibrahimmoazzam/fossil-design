@@ -15,12 +15,18 @@
   },
   "scripts": {
     "build": "pnpm -r build",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
     "typecheck": "tsc && pnpm -r typecheck",
     "test": "vitest run"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.4",
+    "eslint": "^10.11.0",
+    "prettier": "^3.9.9",
     "typescript": "catalog:",
+    "typescript-eslint": "^8.71.0",
     "vitest": "^5.0.3"
   }
 }

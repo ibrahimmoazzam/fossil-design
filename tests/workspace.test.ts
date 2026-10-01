@@ -22,7 +22,9 @@ const workspaces = readdirSync(packagesDir, { withFileTypes: true })
     ) as Manifest,
   }));
 
-const published = workspaces.filter(({ manifest }) => manifest.private !== true);
+const published = workspaces.filter(
+  ({ manifest }) => manifest.private !== true,
+);
 
 describe('fossil.config.json', () => {
   it('names the system, CSS prefix and npm scope', () => {
@@ -31,9 +33,12 @@ describe('fossil.config.json', () => {
     expect(config.npmScope).toMatch(/^@[a-z0-9][a-z0-9._~-]*$/);
   });
 
-  it.each(workspaces)('names packages/$dir after its folder, under the scope', ({ dir, manifest }) => {
-    expect(manifest.name).toBe(`${config.npmScope}/${dir}`);
-  });
+  it.each(workspaces)(
+    'names packages/$dir after its folder, under the scope',
+    ({ dir, manifest }) => {
+      expect(manifest.name).toBe(`${config.npmScope}/${dir}`);
+    },
+  );
 });
 
 describe.each(published)('$manifest.name', ({ dir, manifest }) => {

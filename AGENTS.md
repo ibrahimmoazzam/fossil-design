@@ -51,11 +51,13 @@ docs/decisions         ADRs
 ## Boundaries
 
 **Always**
+
 - Use semantic tokens, `Box` and `Stack`, and existing components before building new ones.
 - Run every check in the definition of done before calling a change done.
 - Write an ADR for an architectural decision and a changeset for a change to a package's public surface.
 
 **Ask first**
+
 - Any margin other than `0`. If approved, it gets a lint-disable comment with the reason.
 - Adding a dependency.
 - Adding, renaming or deleting a token.
@@ -64,6 +66,7 @@ docs/decisions         ADRs
 - Anything that publishes to npm or changes the release workflow.
 
 **Never**
+
 - Hand-write Figma Plugin API code for variables. Use the generated scripts.
 - Edit a generated file: token build outputs, CSS Module types, `Box`'s CSS, bundled docs.
 - Upgrade TypeScript to 7.
