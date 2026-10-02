@@ -2,7 +2,7 @@
 
 Fossil is an open-source design system for agentic coding: tokens in git flow into CSS, typed React components, Figma variables and a generated Figma component library, with lint configs and agent docs that keep generated UI on-system. Teams adopt it by forking it as a template. The published `@fossil-design/*` packages are the reference brand, harvested from the author's portfolio site.
 
-The repo foundation is in place; the packages are placeholders until their phases land. `PRD.md` is the spec: phases, tasks and exit criteria. `Learnings.md` holds the research and the reason behind each decision.
+The repo foundation is in place; the packages are placeholders until their phases land. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
 
 ## Commands
 
@@ -46,6 +46,8 @@ packages/react         components (CSS Modules), stories, bundled agent docs
 packages/eslint-config, packages/stylelint-config
 packages/figma-sync    Figma sync core and scripts (private)
 tests/                 workspace-wide tests, such as package names against fossil.config.json
+docs/PRD.md            the spec: phases, tasks, exit criteria
+docs/Learnings.md      the research behind each decision
 docs/decisions         ADRs
 .changeset/            pending release notes
 .github/workflows      CI on every pull request; releases from main
@@ -53,7 +55,7 @@ docs/decisions         ADRs
 
 ## Before deciding anything
 
-- Read the relevant phase of `PRD.md` and its rationale in `Learnings.md`. Decisions there are deliberate. If one looks wrong, say so and ask; don't quietly diverge.
+- Read the relevant phase of `docs/PRD.md` and its rationale in `docs/Learnings.md`. Decisions there are deliberate. If one looks wrong, say so and ask; don't quietly diverge.
 - Verify claims about tools, libraries, APIs and products against current sources (docs, npm, changelogs) before relying on them. Training data is out of date for this stack. Say what you verified and what you inferred.
 - Figma work must run on a Professional or Education plan: no Code Connect, no Variables REST API.
 
@@ -81,7 +83,7 @@ docs/decisions         ADRs
 - Adding a dependency.
 - Adding, renaming or deleting a token.
 - Running `figma:apply`, or any `use_figma` write, against the real Figma file.
-- Changing a decision recorded in `PRD.md` or `Learnings.md`.
+- Changing a decision recorded in `docs/PRD.md` or `docs/Learnings.md`.
 - Anything that publishes to npm or changes the release workflow.
 
 **Never**

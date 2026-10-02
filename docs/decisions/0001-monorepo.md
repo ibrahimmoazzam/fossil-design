@@ -9,7 +9,7 @@ Fossil has five packages: the tokens, the React components, an ESLint config, a 
 
 Teams adopt Fossil by copying the repository as a template and replacing the token values with their own brand. The portfolio site, Fossil's first consumer, lives in its own repository and installs the packages from npm.
 
-Established systems split both ways (`Learnings.md`, section 3.11). Carbon, Fluent UI and Atlassian keep tokens and components in one monorepo. Primer and Spectrum split across repositories, because their tokens feed several implementations: React and CSS for Primer, React, CSS and web components for Spectrum.
+Established systems split both ways ([`Learnings.md`](../Learnings.md), section 3.11). Carbon, Fluent UI and Atlassian keep tokens and components in one monorepo. Primer and Spectrum split across repositories, because their tokens feed several implementations: React and CSS for Primer, React, CSS and web components for Spectrum.
 
 ## Options
 
@@ -25,7 +25,7 @@ Option 2, with pnpm workspaces.
 - A token change and everything it affects land in one pull request, checked by one CI run.
 - GitHub's "Use this template" copies one repository. `fossil.config.json` renames the system in one place only if there is one place.
 
-Option 3 is rejected. Workspace symlinks would hide the bugs that a published package exposes: a wrong `exports` map, declarations that don't resolve for a consumer, build output that only runs under Fossil's own bundler config (`PRD.md`, section 2, "Distribution").
+Option 3 is rejected. Workspace symlinks would hide the bugs that a published package exposes: a wrong `exports` map, declarations that don't resolve for a consumer, build output that only runs under Fossil's own bundler config ([`PRD.md`](../PRD.md), section 2, "Distribution").
 
 pnpm, rather than npm or Yarn workspaces, because:
 

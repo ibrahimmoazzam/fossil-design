@@ -2,7 +2,7 @@
 
 An open-source design system for agentic coding. Tokens live in git and flow into CSS, typed React components, Figma variables and a Figma component library generated from code. Shared lint configs and docs bundled into the packages keep the UI that coding agents write on-system.
 
-> **Status: pre-release, built in public.** The repository foundation is in place. Tokens, components, the Figma sync and the lint configs arrive phase by phase, as set out in the [PRD](./PRD.md). Packages publish as `0.x` until the token taxonomy has survived a real migration.
+> **Status: pre-release, built in public.** The repository foundation is in place. Tokens, components, the Figma sync and the lint configs arrive phase by phase, as set out in the [PRD](./docs/PRD.md). Packages publish as `0.x` until the token taxonomy has survived a real migration.
 
 ## Why
 
@@ -67,8 +67,8 @@ pnpm build && pnpm lint && pnpm typecheck && pnpm test
 
 Every decision has a written reason:
 
-- [`PRD.md`](./PRD.md): the phases, tasks and exit criteria.
-- [`Learnings.md`](./Learnings.md): the research behind each decision, including a survey of how Primer, Carbon, Atlassian, Spectrum, Polaris, Fluent and Material are built.
+- [`docs/PRD.md`](./docs/PRD.md): the phases, tasks and exit criteria.
+- [`docs/Learnings.md`](./docs/Learnings.md): the research behind each decision, including a survey of how Primer, Carbon, Atlassian, Spectrum, Polaris, Fluent and Material are built.
 - [`docs/decisions/`](./docs/decisions): architecture decision records.
 
 ## License

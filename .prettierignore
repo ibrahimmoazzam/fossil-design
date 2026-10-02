@@ -1,5 +1,5 @@
 pnpm-lock.yaml
 
 # Hand-maintained specs: reflowing their tables would bury content changes in whitespace.
-PRD.md
-Learnings.md
+docs/PRD.md
+docs/Learnings.md
