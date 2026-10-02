@@ -1,6 +1,6 @@
 # @fossil-design/react
 
-React components for [Fossil](https://github.com/ibrahimmoazzam/fossil-design), an open-source design system for agentic coding.
+React components for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-design), an open-source design system for agentic coding.
 
 > **Not ready for use yet.** Versions 0.0.x reserve the package name and prove the release pipeline, and contain no working code. Components land in Phase 4 of the [roadmap](https://github.com/ibrahimmoazzam/fossil-design/blob/main/docs/PRD.md).
 

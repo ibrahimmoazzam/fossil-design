@@ -1,4 +1,4 @@
-# Fossil
+# Fossil Design
 
 An open-source design system for agentic coding. Tokens live in git and flow into CSS, typed React components, Figma variables and a Figma component library generated from code. Shared lint configs and docs bundled into the packages keep the UI that coding agents write on-system.
 

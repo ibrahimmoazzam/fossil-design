@@ -1,7 +1,7 @@
 {
   "name": "@fossil-design/react",
   "version": "0.0.1",
-  "description": "Fossil's React components, styled only with design tokens and precompiled to plain JavaScript and one stylesheet.",
+  "description": "React components for Fossil Design, styled only with design tokens and precompiled to plain JavaScript and one stylesheet.",
   "keywords": [
     "design-system",
     "react",

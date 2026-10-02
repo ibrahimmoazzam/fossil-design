@@ -1,4 +1,4 @@
-# Fossil: Research and Competitive Analysis
+# Fossil Design: Research and Competitive Analysis
 
 **Status:** Living document
 **Purpose:** Capture the research and reasoning behind Fossil's architecture, for later use as source material in a written case study.
@@ -8,7 +8,7 @@
 
 ## 1. Why this project exists
 
-Fossil is a personal, open-source design system built for agentic coding workflows.
+Fossil Design, or Fossil for short, is a personal, open-source design system built for agentic coding workflows.
 
 **Origin.** The author designed and built a portfolio website directly in code. Once it was finished, its tokens and components were extracted to start a code-based design system. That system makes the next stage possible: designing in Figma and having agents write the code, with their output constrained to what the system defines. The portfolio is then rebuilt on Fossil, installed from npm. This is also how many design systems begin: harvested from a product that already ships, with code, not a design file, as the source of truth.
 
@@ -506,6 +506,7 @@ Trusted publishing from GitHub Actions is the correct setup, and is cheap to con
 | Figma Make | Kept in v1 | Prototyping with the real package from day one; its guidelines are generated from the same bundled docs |
 | TypeScript | Pinned to `~6.0.3` | TypeScript 7 has no JavaScript API yet, which `typescript-eslint` and docgen need |
 | Site location | Separate repository | Forces the packages to be genuinely consumable and dogfoods the upgrade path |
+| Name | Fossil Design, or Fossil for short | A bare "Fossil" competes in search with Fossil the version control system and Fossil the watch brand. The full name matches the npm scope and the repository, as Ant Design's does; Carbon Design System and Carbon follow the same full-and-short pattern. The CSS prefix stays `fossil`, as Ant Design's stays `ant` |
 | npm scope | `@fossil-design` | `@fossil` unavailable; `-design` follows `@ant-design` precedent, stays legible to non-specialists, and disambiguates from Fossil the version control system |
 | Repository | `fossil-design` under a personal account | Matches the npm scope, so the packages and the code are found by the same words, as with `@ant-design` and `ant-design/ant-design`. The first name, `fossil`, read like Fossil the version control system in a developer context. A personal account keeps the work attributed to a person |
 | Package naming | Scoped, system-name-as-scope | One org reserves the whole namespace permanently; the lint configs take the conventional `@scope/eslint-config` and `@scope/stylelint-config` names |
