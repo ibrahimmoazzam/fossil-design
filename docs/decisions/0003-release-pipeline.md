@@ -1,6 +1,6 @@
 # 0003. Release with Changesets and npm trusted publishing
 
-- **Status:** Accepted
+- **Status:** Accepted. Its note on CI for the version pull request is superseded by [0004](./0004-protect-main.md).
 - **Date:** 2026-10-01
 
 ## Context
@@ -39,5 +39,5 @@ Each package's first version is bootstrapped by hand:
 - The repository holds no npm secret.
 - The repository must stay public for npm to generate provenance.
 - GitHub Actions must be allowed to create pull requests (repository settings, Actions, General).
-- Pull requests opened with the workflow's own token don't trigger other workflows, so CI doesn't run on the version pull request. If branch protection later requires CI, switch the version job to a GitHub App token.
+- Pull requests opened with the workflow's own token don't trigger other workflows, so CI doesn't run on the version pull request. If branch protection later requires CI, switch the version job to a GitHub App token. _Superseded by [0004](./0004-protect-main.md)._
 - A fork that publishes under its own scope repeats the bootstrap. The Phase 8 adoption guide covers this.
