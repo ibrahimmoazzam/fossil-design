@@ -1,6 +1,6 @@
 {
   "name": "@fossil-design/eslint-config",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Shared ESLint config for Fossil Design: layout goes through Box, never raw layout elements.",
   "keywords": [
     "design-system",
