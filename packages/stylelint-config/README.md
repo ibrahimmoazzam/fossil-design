@@ -12,4 +12,4 @@ The shared Stylelint config for [Fossil Design](https://github.com/ibrahimmoazza
 
 ## License
 
-[MIT](./LICENSE)
+MIT © 2026 Ibrahim Moazzam. See [LICENSE](./LICENSE).

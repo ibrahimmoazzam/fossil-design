@@ -12,4 +12,4 @@ React components for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-de
 
 ## License
 
-[MIT](./LICENSE)
+MIT © 2026 Ibrahim Moazzam. See [LICENSE](./LICENSE).

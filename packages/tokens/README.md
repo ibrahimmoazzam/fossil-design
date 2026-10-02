@@ -12,4 +12,4 @@ Design tokens for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-desig
 
 ## License
 
-[MIT](./LICENSE)
+MIT © 2026 Ibrahim Moazzam. See [LICENSE](./LICENSE).

@@ -11,4 +11,4 @@ The shared ESLint config for [Fossil Design](https://github.com/ibrahimmoazzam/f
 
 ## License
 
-[MIT](./LICENSE)
+MIT © 2026 Ibrahim Moazzam. See [LICENSE](./LICENSE).

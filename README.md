@@ -73,4 +73,4 @@ Every decision has a written reason:
 
 ## License
 
-[MIT](./LICENSE) © 2026 Ibrahim Moazzam
+MIT © 2026 Ibrahim Moazzam. See [LICENSE](./LICENSE).
