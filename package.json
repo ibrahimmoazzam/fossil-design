@@ -1,12 +1,12 @@
 {
-  "name": "fossil",
+  "name": "fossil-design",
   "private": true,
   "description": "An open-source design system for agentic coding: tokens in git flow into CSS, typed React components, Figma variables and lint configs that keep generated UI on-system.",
   "license": "MIT",
   "author": "Ibrahim Moazzam (https://github.com/ibrahimmoazzam)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ibrahimmoazzam/fossil.git"
+    "url": "git+https://github.com/ibrahimmoazzam/fossil-design.git"
   },
   "type": "module",
   "packageManager": "pnpm@12.8.1",

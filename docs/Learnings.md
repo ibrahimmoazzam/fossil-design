@@ -507,6 +507,7 @@ Trusted publishing from GitHub Actions is the correct setup, and is cheap to con
 | TypeScript | Pinned to `~6.0.3` | TypeScript 7 has no JavaScript API yet, which `typescript-eslint` and docgen need |
 | Site location | Separate repository | Forces the packages to be genuinely consumable and dogfoods the upgrade path |
 | npm scope | `@fossil-design` | `@fossil` unavailable; `-design` follows `@ant-design` precedent, stays legible to non-specialists, and disambiguates from Fossil the version control system |
+| Repository | `fossil-design` under a personal account | Matches the npm scope, so the packages and the code are found by the same words, as with `@ant-design` and `ant-design/ant-design`. The first name, `fossil`, read like Fossil the version control system in a developer context. A personal account keeps the work attributed to a person |
 | Package naming | Scoped, system-name-as-scope | One org reserves the whole namespace permanently; the lint configs take the conventional `@scope/eslint-config` and `@scope/stylelint-config` names |
 | Rejected | Unscoped `fossil-*` names | Available, but every future package is a fresh gamble; the squatted `fossil` package shows the risk is real |
 | Rejected | `@fossil-ds` | Terser, but "ds" is insider shorthand and a portfolio artifact is read by generalists too |

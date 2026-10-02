@@ -9,13 +9,13 @@
     "css-modules",
     "accessibility"
   ],
-  "homepage": "https://github.com/ibrahimmoazzam/fossil/tree/main/packages/react#readme",
-  "bugs": "https://github.com/ibrahimmoazzam/fossil/issues",
+  "homepage": "https://github.com/ibrahimmoazzam/fossil-design/tree/main/packages/react#readme",
+  "bugs": "https://github.com/ibrahimmoazzam/fossil-design/issues",
   "license": "MIT",
   "author": "Ibrahim Moazzam (https://github.com/ibrahimmoazzam)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ibrahimmoazzam/fossil.git",
+    "url": "git+https://github.com/ibrahimmoazzam/fossil-design.git",
     "directory": "packages/react"
   },
   "type": "module",

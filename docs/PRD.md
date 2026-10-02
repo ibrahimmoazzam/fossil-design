@@ -108,7 +108,7 @@ There is no separate contract for the outputs to disagree with. Every output com
 Monorepo, pnpm workspaces.
 
 ```
-fossil/
+fossil-design/
   fossil.config.json     system name, CSS prefix and npm scope: what a fork changes first
   packages/
     tokens/              DTCG source, Style Dictionary build, generated outputs
@@ -127,7 +127,7 @@ The portfolio site is **not** in this repo. It is a separate repository that ins
 
 ### Naming
 
-The npm scope is **`@fossil-design`**. The GitHub repository is `fossil` under a personal account. These deliberately do not match, which is normal and keeps the work attributed to a person rather than to an org that looks like a company.
+The npm scope is **`@fossil-design`**, and the GitHub repository is `fossil-design` under a personal account. Scope and repository match, so the packages and the code are found by the same words, as Ant Design's are (`@ant-design`, `ant-design/ant-design`). A personal account rather than a GitHub org keeps the work attributed to a person rather than to an org that looks like a company.
 
 | Workspace | Package name | Published |
 |---|---|---|

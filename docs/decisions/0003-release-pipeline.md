@@ -31,7 +31,7 @@ Each package's `prepack` script runs its build, so a tarball can't contain a sta
 Each package's first version is bootstrapped by hand:
 
 1. Publish `0.0.1` from a local machine with 2FA.
-2. Link the package to the workflow with `npm trust github <package> --file release.yml --repository ibrahimmoazzam/fossil --allow-publish`.
+2. Link the package to the workflow with `npm trust github <package> --file release.yml --repository ibrahimmoazzam/fossil-design --allow-publish`.
 3. Every later version, starting with `0.0.2`, goes through the workflow.
 
 ## Consequences
