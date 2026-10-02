@@ -1,4 +1,4 @@
-# Fossil: Product Requirements Document
+# Fossil Design: Product Requirements Document
 
 **Status:** Draft for implementation, revised after the Phase 2 and Phase 4 dry run (1 October 2026)
 **Audience:** Claude Code, and any human contributor
@@ -8,9 +8,9 @@
 
 ## 1. Introduction
 
-### What Fossil is
+### What Fossil Design is
 
-Fossil is an open-source design system built for agentic coding workflows. It is a personal project, built to open-source standards: high code quality, and a stated rationale for every architectural decision.
+Fossil Design, or Fossil for short, is an open-source design system built for agentic coding workflows. It is a personal project, built to open-source standards: high code quality, and a stated rationale for every architectural decision.
 
 It starts from a finished product. The portfolio website was designed and built directly in code. Once it was done, its tokens and components were extracted to seed a code-based design system. From then on, design happens in Figma and agents write the code, constrained to what Fossil defines. The portfolio is then rebuilt on Fossil, installed from npm like any other consumer.
 
@@ -108,7 +108,7 @@ There is no separate contract for the outputs to disagree with. Every output com
 Monorepo, pnpm workspaces.
 
 ```
-fossil/
+fossil-design/
   fossil.config.json     system name, CSS prefix and npm scope: what a fork changes first
   packages/
     tokens/              DTCG source, Style Dictionary build, generated outputs
@@ -127,7 +127,9 @@ The portfolio site is **not** in this repo. It is a separate repository that ins
 
 ### Naming
 
-The npm scope is **`@fossil-design`**. The GitHub repository is `fossil` under a personal account. These deliberately do not match, which is normal and keeps the work attributed to a person rather than to an org that looks like a company.
+The system is called **Fossil Design**, or Fossil for short. The full name goes wherever people search: titles, package descriptions, the README and the docs site. The CSS prefix stays `fossil` (`--fossil-*`), as Ant Design keeps `ant-`.
+
+The npm scope is **`@fossil-design`**, and the GitHub repository is `fossil-design` under a personal account. Scope and repository match, so the packages and the code are found by the same words, as Ant Design's are (`@ant-design`, `ant-design/ant-design`). A personal account rather than a GitHub org keeps the work attributed to a person rather than to an org that looks like a company.
 
 | Workspace | Package name | Published |
 |---|---|---|
@@ -137,7 +139,7 @@ The npm scope is **`@fossil-design`**. The GitHub repository is `fossil` under a
 | `packages/stylelint-config` | `@fossil-design/stylelint-config` | Yes |
 | `packages/figma-sync` | `@fossil-design/figma-sync` | No. It runs from the repo, and a fork runs its own copy |
 
-`-design` disambiguates from Fossil the version control system, which is a real discoverability concern for anything named Fossil in a developer context.
+`-design` disambiguates from Fossil the version control system and Fossil the watch brand, a real discoverability concern for anything named Fossil. The full name, the npm scope and the repository now say the same thing.
 
 Rejected: `@fossil` (unavailable), unscoped `fossil-*` names (available but require claiming each package individually, forever, and the squatted `fossil` package is evidence that people do), `@fossil-ds` (terser but "ds" is insider shorthand, and a portfolio artifact gets read by non-specialists).
 

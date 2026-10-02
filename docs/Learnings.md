@@ -1,14 +1,14 @@
-# Fossil: Research and Competitive Analysis
+# Fossil Design: Research and Competitive Analysis
 
 **Status:** Living document
 **Purpose:** Capture the research and reasoning behind Fossil's architecture, for later use as source material in a written case study.
-**Last updated:** 1 October 2026 (after the Phase 2 and Phase 4 dry run, section 5)
+**Last updated:** 1 October 2026 (repository layout survey, section 3.11; before that, the Phase 2 and Phase 4 dry run, section 5)
 
 ---
 
 ## 1. Why this project exists
 
-Fossil is a personal, open-source design system built for agentic coding workflows.
+Fossil Design, or Fossil for short, is a personal, open-source design system built for agentic coding workflows.
 
 **Origin.** The author designed and built a portfolio website directly in code. Once it was finished, its tokens and components were extracted to start a code-based design system. That system makes the next stage possible: designing in Figma and having agents write the code, with their output constrained to what the system defines. The portfolio is then rebuilt on Fossil, installed from npm. This is also how many design systems begin: harvested from a product that already ships, with code, not a design file, as the source of truth.
 
@@ -74,7 +74,7 @@ Nobody frames layer 3 as a pillar, but everyone has it. Storybook shipped it as 
 | **ADS** (Atlassian) | `@atlaskit/tokens` in code | Custom | 2 ESLint plugins + Stylelint plugin + codemods | `llms.txt` family + public remote MCP + agent skill |
 | **Spectrum** (Adobe) | `spectrum-design-data`, proprietary JSON schema | Custom | JSON schemas + validation rule catalogue + conformance fixtures | Two MCP servers + agent skills |
 | **Carbon** (IBM) | `@carbon/themes` | Custom | `stylelint-plugin-carbon-tokens` | First-party `carbon-mcp` |
-| **Polaris** (Shopify) | `polaris-tokens` package | Custom | `stylelint-polaris` | None found |
+| **Polaris** (Shopify; React version archived 2026) | `polaris-tokens` package | Custom | `stylelint-polaris` | None found |
 | **Fluent** (Microsoft) | Designer-maintained JSON | "Token pipeline inspired by Style Dictionary" | TypeScript types via Griffel | None official |
 | **Material 3** (Google) | Spec plus algorithmic generation | Theme Builder | None | Community only |
 
@@ -204,6 +204,29 @@ Fossil doesn't adopt it, for four reasons:
 - **Too new.** It was weeks old at the time of writing, with one author and a format likely to change.
 
 Fossil borrows its contract fields and gap format now. At the end of Phase 6 it revisits the skill, to consider generating contracts in its format as one more rendering.
+
+### 3.11 Repository layout follows the number of implementations
+
+Checked in October 2026 against each project's repositories:
+
+| System | Layout |
+|---|---|
+| **Atlassian** | One company-wide monorepo, mirrored publicly. Its `design-system/` folder holds tokens, ESLint and Stylelint plugins, codemods, an MCP server and every component, beside Jira and Confluence |
+| **Fluent UI** | One monorepo: tokens, React and web components, an ESLint plugin and codemods. Griffel, its styling engine, is a separate repo |
+| **Carbon** | One monorepo: tokens (themes, colours, type, layout, motion), React and web components, and the upgrade CLI. Its Stylelint plugin is a separate repo |
+| **Polaris React** | One monorepo: tokens, components, a Stylelint config, a migrator and the docs site. Archived and marked deprecated by October 2026 |
+| **Primer** | Split by layer: `primer/primitives` for tokens, `primer/react` for components and an MCP server, `primer/css`, and separate repos for the ESLint plugin and the Stylelint config |
+| **Spectrum** | Split by implementation: `spectrum-design-data` for tokens, then `react-spectrum`, `spectrum-css` and `spectrum-web-components` |
+| **Material** | Split: `material-web` for components; Theme Builder had its own repo, now archived |
+
+The split tracks two things. Tokens that feed several component libraries get a repo of their own, because no one implementation owns them: Primer's feed React and CSS, Spectrum's feed React, CSS and web components. Separate teams with separate release cadences also get separate repos. The monorepos keep a token change and the components that use it in one pull request.
+
+Fossil sits on the monorepo side for three reasons, and the last is decisive:
+- **React only.** No implementation-neutral token repo is needed.
+- **One token build feeds everything.** The CSS, the lint lists, `Box`'s generated CSS and the Figma sync all read it, so a token rename is one reviewed, CI-checked pull request instead of several released in order.
+- **Adoption is by template.** GitHub's "Use this template" copies one repository, and `fossil.config.json` renames the system in one place only if there is one place. A split Fossil would hand a team five repositories to copy and re-link.
+
+The portfolio stays out on purpose (section 6, "Site location"). Atlassian's monorepo includes its products; Fossil's one consumer installs from npm like anyone else's.
 
 ---
 
@@ -447,7 +470,7 @@ Trusted publishing from GitHub Actions is the correct setup, and is cheap to con
 | Tiers | Primitive and semantic only | Component tokens are in retreat industry-wide (Adobe v12, Fluent ratios) |
 | Transform | Style Dictionary v5 | De facto standard; first-class DTCG; Node 22+ acceptable |
 | Styling | React + CSS Modules, with strict generated class-name types and a typed variant map per component | Reversed from vanilla-extract after the dry run: the same accuracy from off-the-shelf tools, one Stylelint config shared by Fossil and every consumer, and plain CSS that forks and agents already know. Primer made the same move |
-| Repo | Monorepo, pnpm workspaces | Solo maintainer; lint rules must know the token set; Polaris precedent of separate workspaces in one repo |
+| Repo | Monorepo, pnpm workspaces | Solo maintainer; one token build feeds the CSS, lint lists, `Box`'s CSS and the Figma sync, so a token change is one PR; template adoption copies one repo. Carbon, Fluent UI and Atlassian keep tokens and components in one monorepo; Primer and Spectrum split because their tokens feed several implementations (section 3.11) |
 | Style linter | Stylelint, via `@fossil-design/stylelint-config` | Consumers author CSS, so the linter matches their format. `declaration-strict-value`, `value-no-unknown-custom-properties` and core rules with generated token lists; no custom rules |
 | JSX linter | ESLint, via `@fossil-design/eslint-config` | The raw-element ban is a JSX rule Stylelint can't express; core `no-restricted-syntax` does it without a custom plugin |
 | Figma sync | Fossil's own sync core and scripts, carried to Figma by an agent through `use_figma` | The REST API is Enterprise-gated and the MCP server only accepts approved agents; the logic must be deterministic, so only the transport is delegated; keeps tokens as native Variables so Dev Mode and the Figma MCP output keep working |
@@ -483,7 +506,9 @@ Trusted publishing from GitHub Actions is the correct setup, and is cheap to con
 | Figma Make | Kept in v1 | Prototyping with the real package from day one; its guidelines are generated from the same bundled docs |
 | TypeScript | Pinned to `~6.0.3` | TypeScript 7 has no JavaScript API yet, which `typescript-eslint` and docgen need |
 | Site location | Separate repository | Forces the packages to be genuinely consumable and dogfoods the upgrade path |
+| Name | Fossil Design, or Fossil for short | A bare "Fossil" competes in search with Fossil the version control system and Fossil the watch brand. The full name matches the npm scope and the repository, as Ant Design's does; Carbon Design System and Carbon follow the same full-and-short pattern. The CSS prefix stays `fossil`, as Ant Design's stays `ant` |
 | npm scope | `@fossil-design` | `@fossil` unavailable; `-design` follows `@ant-design` precedent, stays legible to non-specialists, and disambiguates from Fossil the version control system |
+| Repository | `fossil-design` under a personal account | Matches the npm scope, so the packages and the code are found by the same words, as with `@ant-design` and `ant-design/ant-design`. The first name, `fossil`, read like Fossil the version control system in a developer context. A personal account keeps the work attributed to a person |
 | Package naming | Scoped, system-name-as-scope | One org reserves the whole namespace permanently; the lint configs take the conventional `@scope/eslint-config` and `@scope/stylelint-config` names |
 | Rejected | Unscoped `fossil-*` names | Available, but every future package is a fresh gamble; the squatted `fossil` package shows the risk is real |
 | Rejected | `@fossil-ds` | Terser, but "ds" is insider shorthand and a portfolio artifact is read by generalists too |
@@ -550,6 +575,8 @@ Trusted publishing from GitHub Actions is the correct setup, and is cheap to con
 - Storybook `addon-mcp` documentation
 - vanilla-extract global API documentation
 - DTCG Format Module 2025.10
+- Repository layouts, through the GitHub REST API and the Bitbucket API (October 2026): `carbon-design-system/carbon` and its Stylelint plugin, `microsoft/fluentui`, `Shopify/polaris` (archived), `primer/react`, `primer/primitives` and Primer's lint repos, `adobe/react-spectrum`, `adobe/spectrum-design-data`, `material-components/material-web`, `atlassian/atlassian-frontend-mirror`
+- GitHub docs: About forks; Creating a repository from a template
 
 **AI design tools**
 - Figma Help Center: Get started with Make kits; Bring your design system package to a Make kit; Write design system guidelines for Make kits; Copy a Figma Make preview as design layers
