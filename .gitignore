@@ -1,5 +1,6 @@
 node_modules/
 dist/
+**/src/generated/
 coverage/
 *.tsbuildinfo
 *.tgz
@@ -7,3 +8,4 @@ coverage/
 .env
 .env.*
 .claude/settings.local.json
+
