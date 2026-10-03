@@ -20,6 +20,7 @@ pnpm changeset                   # record a release note for a package change
 
 - One package: `pnpm --filter <folder> <script>`, for example `pnpm --filter tokens build`.
 - One test project: `pnpm test --project workspace`. Watch mode: `pnpm exec vitest`.
+- Check the token source without building: `pnpm --filter tokens validate`. Token files live in `packages/tokens/src/primitive/` and `src/semantic/`; ADR 0005 holds their rules.
 - Build before type-checking. A package's types resolve through the built declarations of the packages it depends on.
 - Add a dependency to one package with `pnpm --filter <folder> add <name>`, and to the root with `pnpm add -D -w <name>`. TypeScript comes from the `catalog:` in `pnpm-workspace.yaml`.
 
@@ -98,13 +99,13 @@ docs/decisions         ADRs
 
 A change is done when all of these pass. Run them in this order: `pnpm build && pnpm lint && pnpm typecheck && pnpm test`.
 
-| Check                                                                                                                                             | Command                                            | Covers today                                                          |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------- |
-| The token build, with its validation                                                                                                              | `pnpm --filter tokens build`, part of `pnpm build` | Arrives in Phases 1 and 2                                             |
-| ESLint and Stylelint, with Fossil's shared configs                                                                                                | `pnpm lint`                                        | ESLint and Prettier; Fossil's configs and Stylelint arrive in Phase 5 |
-| Type-checking, after generating CSS Module types                                                                                                  | `pnpm typecheck`                                   | All packages; CSS Module type generation joins it in Phase 4          |
-| Tests: Storybook interaction tests, axe checks with zero violations, real-input browser tests for native behaviour such as Escape on a `<dialog>` | `pnpm test`                                        | Workspace tests; Storybook and browser tests arrive in Phase 4        |
-| A changeset, if a package's public surface changed                                                                                                | `pnpm changeset`                                   | Yes                                                                   |
+| Check                                                                                                                                             | Command                                            | Covers today                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| The token build, with its validation                                                                                                              | `pnpm --filter tokens build`, part of `pnpm build` | Validation of the DTCG source; Style Dictionary outputs arrive in Phase 2           |
+| ESLint and Stylelint, with Fossil's shared configs                                                                                                | `pnpm lint`                                        | ESLint and Prettier; Fossil's configs and Stylelint arrive in Phase 5               |
+| Type-checking, after generating CSS Module types                                                                                                  | `pnpm typecheck`                                   | All packages; CSS Module type generation joins it in Phase 4                        |
+| Tests: Storybook interaction tests, axe checks with zero violations, real-input browser tests for native behaviour such as Escape on a `<dialog>` | `pnpm test`                                        | Workspace and token-validation tests; Storybook and browser tests arrive in Phase 4 |
+| A changeset, if a package's public surface changed                                                                                                | `pnpm changeset`                                   | Yes                                                                                 |
 
 ## Conventions
 
