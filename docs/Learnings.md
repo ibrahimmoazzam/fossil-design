@@ -313,6 +313,14 @@ The DTCG Format Module 2025.10 was published as a Final Community Group Report o
 
 Style Dictionary v4 shipped first-class DTCG support. v5 (5.5.5 as of September 2026) adopted 2025.10 as its base, requires Node 22+, and tightened reference rules, though its own docs note full 2025.10 support remains a work in progress.
 
+Checked again in October 2026, while authoring the Phase 1 tokens:
+- **Colours are objects.** A 2025.10 colour `$value` is `{ colorSpace, components, alpha?, hex? }`, and `hex` is a 6-digit fallback. A hex string isn't valid, so transparency goes in `alpha`, not in 8-digit hex.
+- **Dimensions take `px` or `rem` only.** `em` letter-spacing has to become `rem`, which is exact inside a typography token because its size is fixed.
+- **Composites.** Typography needs all five parts: `fontFamily`, `fontSize`, `fontWeight`, `letterSpacing` and `lineHeight`. `border` is `{ color, width, style }`, with `style` a `strokeStyle`. `shadow` is an object or an array of them. Every part may be a reference.
+- **Modes aren't in the format module.** Theming belongs to DTCG's Resolver module, which Style Dictionary 5.5.5 doesn't read.
+- **Style Dictionary 5.5.5's source** converts DTCG colour objects through colorjs in its colour transforms, and ships `border/css/shorthand` and `strokeStyle/css/shorthand`.
+- **Spacing in other systems.** Carbon applies one spacing scale to margin, padding and gap between elements. Atlassian uses one `space.*` set everywhere, named as a percentage of an 8px base (`space.025` is 2px, `space.100` is 8px).
+
 ### Storybook already ships a component MCP server
 
 Storybook 10.6 is current, and `storybook init` (10.4+) adds `@storybook/addon-mcp` automatically when AI features are enabled. Once running, the server is available at `localhost:6006/mcp`. It exposes three toolsets:
@@ -495,6 +503,11 @@ Trusted publishing from GitHub Actions is the correct setup, and is cheap to con
 | Margins | No margin prop on `Box`; a margin in CSS fails lint unless it's `0` or carries a disable comment with a reason | Harvested from the portfolio's rule: spacing comes from padding and `gap`, and a margin needs permission and a reason. A lint error that only a written reason can pass keeps the original "ask first" exception, and every use shows up in the escape count |
 | Figma mapping key | Shared plugin data under a `fossil` namespace | Agents writing through `use_figma` run as a different plugin and cannot read private plugin data |
 | Lifecycle metadata | DTCG `$deprecated`, plus `$extensions` for `replacedBy` and `since` | `$deprecated` is standard in 2025.10; the extra fields stay in the sanctioned escape |
+| Vendor key | `com.ibrahimmoazzam.fossil`, kept by forks | DTCG recommends reverse domain names; built on a domain the author owns; it names Fossil's extension format, not a brand (ADR 0005) |
+| Modes | Dark values as aliases under the vendor key on each semantic token | DTCG's format has no modes and Style Dictionary 5.5.5 doesn't read the Resolver module; one token keeps both values in one diff |
+| Spacing | One semantic scale for padding and gap; primitives named as a percentage of 8px | The portfolio uses every step for both; Carbon and Atlassian do the same; the 8px percentage has room for 2px |
+| Colour values | DTCG colour objects, transparency in `alpha` | 2025.10 doesn't accept hex strings; Style Dictionary 5.5.5 reads the objects natively |
+| Inventory record | In the portfolio repository, not in Fossil | The Phase 8 migration runs there, the record only serves that site, and the repository is private |
 | Component context | Markdown docs bundled in `@fossil-design/react`, indexed by a generated `AGENTS.md` block; Storybook `addon-mcp` for Fossil's own development | The Next.js pattern: version-matched, offline, no server to run. Vercel's evals found an always-on index beat skill-based retrieval (100% vs 53–79%) |
 | Token context | `tokens.json`, a `tokens.md` in the bundled docs, and foundation rules in the `AGENTS.md` block | Foundations must be always-on; one token build feeds every rendering |
 | Distribution | Public npm, `0.x` during development, `1.0.0` at Phase 8. Each package's first version is published by hand, then OIDC | Separate site repo removes `workspace:`; `0.x` keeps renames cheap while the taxonomy churns; `npm trust` needs the package to exist first |
@@ -502,7 +515,7 @@ Trusted publishing from GitHub Actions is the correct setup, and is cheap to con
 | Adoption model | A template to fork, with the published packages as the reference brand | The Figma round trip needs a team to own its token source, which only a fork gives it |
 | Behaviour layer | Harvested from the portfolio, native elements first; Fossil owns the accessibility | The portfolio's versions exist and use native `<dialog>` and scroll-snap. A fork can swap a headless library in per component without touching the pipeline |
 | Animation | CSS transitions in Fossil; Motion added by the consumer through extension points | Every portfolio component's core behaviour is native and Motion only polishes it, so it shouldn't be a dependency every fork inherits |
-| Fonts | None shipped; font tokens name stacks, and the reference brand uses open fonts | Roobert is commercial, `use_figma` can't load custom fonts, and forks shouldn't inherit a licence question |
+| Fonts | None shipped; font tokens name stacks, and the reference brand uses open fonts: Space Grotesk, Space Mono and Figtree | Roobert is commercial, `use_figma` can't load custom fonts, and forks shouldn't inherit a licence question. The portfolio keeps Roobert by pointing `font.family.heading` and `font.family.mono` at it |
 | Figma Make | Kept in v1 | Prototyping with the real package from day one; its guidelines are generated from the same bundled docs |
 | TypeScript | Pinned to `~6.0.3` | TypeScript 7 has no JavaScript API yet, which `typescript-eslint` and docgen need |
 | Site location | Separate repository | Forces the packages to be genuinely consumable and dogfoods the upgrade path |

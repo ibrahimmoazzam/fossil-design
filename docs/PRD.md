@@ -248,28 +248,30 @@ Phases are ordered by dependency. Each has an explicit exit criterion. Do not st
    - List its CSS custom properties (the `--p-*` and `--s-*` sets in `globals.css`), the literal values repeated across its `.module.css` files, and the components in `src/components/ui/`.
    - Give every value one of three recorded outcomes, so the Phase 8 migration is mechanical:
      - **Fossil token.** Generic and reused.
-     - **Stays in the component.** A literal with a reason, such as a 1px hairline or a 44px touch target.
+     - **Stays in the component.** A literal with a reason, such as a 44px touch target or a fluid `clamp()` size.
      - **Site token.** It belongs to the portfolio and lives in its site-tokens file (Phase 5).
    - Expect a large site-token share. The dry run found about half of the 54 semantic tokens are site- or component-specific: coffee, heart, sun, cursor, nav, card, tabs. It also found 520 unit values across 59 CSS files.
    - Record which `src/components/ui/` components move into Fossil (Phase 4). App-aware compositions such as `NavBar`, `Footer` and `CaseStudyCard` stay in the portfolio.
    - Breakpoints need extra care. Custom properties can't be used in media conditions, and the portfolio already works around this, so Phase 2 also emits breakpoints as TypeScript constants.
 2. **Define the token taxonomy.** Two tiers only, decided by folder: `src/primitive/` and `src/semantic/`. The same path in both tiers is a build error.
-   - **Primitive:** raw values with no semantic meaning. `color.gray.100`, `space.4`, `radius.md`, `font.size.3`.
-   - **Semantic:** references to primitive tokens, named by intent. `color.background.card`, `color.text.muted`, `space.inset.m`. A semantic token holding a literal value fails the build.
+   - **Primitive:** raw values with no semantic meaning. `color.gray.100`, `space.200`, `radius.md`, `font.size.3`.
+   - **Semantic:** references to primitive tokens, named by intent. `color.background.surface`, `color.text.muted`, `space.m`. A semantic token holding a literal value fails the build.
+   - **Composite tokens** (typography, shadow, border) follow the same rule part by part: a semantic composite's parts are all references, and a primitive contains none.
    - **Type scale.** The portfolio has one type token and about 30 distinct font sizes in its CSS, so define a primitive size scale and a semantic text scale. Its 8 fluid `clamp()` sizes stay in components: DTCG and Figma can't express them.
-   - **Values the portfolio writes as expressions.** A raw value in a semantic slot (`48rem`, `rgb(255 255 255 / 0.55)`) becomes a primitive with an explicit value, using 8-digit hex for transparency. A `calc()` (`--s-nav-height`) or a `color-mix()` tint (11 of them) becomes a primitive with the computed value, or stays in the component or site tokens.
+     - DTCG dimensions accept only `px` and `rem`, so the portfolio's `em` letter-spacing becomes `rem` at each text style's size. The conversion is exact, because a text style has a fixed size.
+   - **Values the portfolio writes as expressions.** A raw value in a semantic slot (`48rem`, `rgb(255 255 255 / 0.55)`) becomes a primitive with an explicit value. A translucent colour is a DTCG colour object with its transparency in the `alpha` field; DTCG 2025.10 doesn't accept hex strings, and its `hex` field is a 6-digit fallback. A `calc()` (`--s-nav-height`) or a `color-mix()` tint (11 of them) becomes a primitive with the computed value, or stays in the component or site tokens.
 3. Author `*.tokens.json` files in DTCG format (`.tokens.json` is the extension DTCG 2025.10 recommends). Use `$value` and `$type`. Every semantic token requires a `$description`.
 4. **Modes.** A semantic token's dark value goes under `$extensions["<vendor>"].modes.dark`, as an alias. Only semantic tokens vary by mode.
    - Style Dictionary 5.5.5 has no concept of modes and does not read DTCG's Resolver module, so the Phase 2 build handles this key.
 5. **Validation lives in the token build,** not in a separate schema. Before writing any output, the build fails if:
-   - a semantic token isn't an alias, or lacks a `$description`;
-   - a primitive is an alias;
+   - a semantic token isn't an alias (or, for a composite, has a part that isn't one), or lacks a `$description`;
+   - a primitive contains a reference;
    - a non-semantic token has a mode value, or a mode value isn't an alias;
    - a file sits outside both tier folders.
 6. **Lifecycle metadata.** Use the standard DTCG `$deprecated` property with an explanatory string. Put the machine-readable `replacedBy` and `since` fields under `$extensions`, with a reverse-DNS vendor key chosen in this phase's ADR.
 7. Run the token build in CI as a required check.
 
-**Scope guidance:** aim for roughly 40 to 60 primitives and 25 to 40 semantics. If the semantic layer grows past about 60, the taxonomy is too granular.
+**Scope guidance:** size each tier from what the portfolio actually uses, not from a target count. The harvest comes to about 80 primitives and 70 semantic tokens, 19 of them composites. A semantic token that serves a single component is the sign of a taxonomy grown too granular: that value belongs in the component or in site tokens.
 
 **Exit criterion:** token files exist, every portfolio value has a recorded outcome, the build passes in CI, and a deliberately broken token (a semantic holding a literal) fails it.
 
@@ -414,12 +416,14 @@ Build against the Phase 1 inventory of the finished portfolio, not a guessed pag
      - `Icon` ships the Material Symbols it uses as prebuilt React components, so consumers need no SVGR.
      - `VisuallyHidden` uses the `clip-path` pattern, with no negative margin.
      - `SkipLink`.
+     - `Figure`, as a container: Fossil owns the `<figure>`, the caption and the hairline frame, and the app passes in its own image, such as `next/image` or a plain `<img>`.
    - **Interactive:**
      - `Modal`, on native `<dialog>`;
      - `Tabs`;
      - `Carousel`, on native scrolling with scroll-snap;
-     - `Popover` and `Tooltip`, which bring Floating UI and `focus-trap-react` as dependencies.
-   - **Stays in the portfolio:** `Reveal`, which is purely animation; anything built on `next/image`, such as `Figure` and `ComparisonSlider`; and the app-specific rest of `src/components/ui/`, as decided in the inventory.
+     - `Popover` and `Tooltip`, which bring Floating UI and `focus-trap-react` as dependencies. They share one internal stylesheet for the floating surface, harvested from the portfolio's `Floating`.
+     - `Clip`, as a container: Fossil owns the play and pause control, the reduced-motion behaviour (through `matchMedia`, not Motion) and the caption, and the app passes in its own video source.
+   - **Stays in the portfolio:** `Reveal`, which is purely animation; `ComparisonSlider`, which is built on `next/image`; and the app-specific rest of `src/components/ui/`, as recorded in the inventory.
 5. **Motion-free, with extension points.**
    - Fossil's components animate with CSS transitions (`@starting-style`, `data-state`) and honour `prefers-reduced-motion`. Fossil has no animation-library dependency.
    - The portfolio adds Motion on top through extension points defined in this phase's ADR. The dry run validated the pattern on `Modal`, in Next 16 and on React 18:

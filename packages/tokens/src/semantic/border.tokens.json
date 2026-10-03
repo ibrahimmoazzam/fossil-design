@@ -1,0 +1,50 @@
+{
+  "border": {
+    "$type": "border",
+    "default": {
+      "$value": {
+        "color": "{color.border.default}",
+        "width": "{border.width.1}",
+        "style": "{border.style.solid}"
+      },
+      "$description": "Container edges: cards, inputs, controls."
+    },
+    "strong": {
+      "$value": {
+        "color": "{color.border.strong}",
+        "width": "{border.width.1}",
+        "style": "{border.style.solid}"
+      },
+      "$description": "A border that must read as a line: tags, table blocks, dividers."
+    },
+    "hairline": {
+      "$value": {
+        "color": "{color.border.default}",
+        "width": "{border.width.half}",
+        "style": "{border.style.solid}"
+      },
+      "$description": "The thin frame around images and video."
+    },
+    "focus": {
+      "$value": {
+        "color": "{color.focus.ring}",
+        "width": "{border.width.2}",
+        "style": "{border.style.solid}"
+      },
+      "$description": "Focus outlines. Pair with focus.ring.offset."
+    }
+  },
+  "focus": {
+    "$type": "dimension",
+    "ring": {
+      "width": {
+        "$value": "{border.width.2}",
+        "$description": "The width of a focus ring drawn with box-shadow; border.focus covers outlines."
+      },
+      "offset": {
+        "$value": "{border.width.2}",
+        "$description": "The gap between an element and its focus ring."
+      }
+    }
+  }
+}

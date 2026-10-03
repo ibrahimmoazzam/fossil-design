@@ -1,0 +1,42 @@
+{
+  "shadow": {
+    "$type": "shadow",
+    "raised": {
+      "$value": {
+        "color": "{color.shadow.default}",
+        "offsetX": "{space.0}",
+        "offsetY": "{space.025}",
+        "blur": "{space.100}",
+        "spread": "{space.0}"
+      },
+      "$description": "A small lift: tiles and media."
+    },
+    "floating": {
+      "$value": {
+        "color": "{color.shadow.default}",
+        "offsetX": "{space.0}",
+        "offsetY": "{space.050}",
+        "blur": "{space.200}",
+        "spread": "{space.0}"
+      },
+      "$description": "Floating surfaces: popovers and tooltips."
+    },
+    "overlay": {
+      "$value": {
+        "color": "{color.shadow.default}",
+        "offsetX": "{space.0}",
+        "offsetY": "{space.300}",
+        "blur": "{space.600}",
+        "spread": "{space.0}"
+      },
+      "$description": "A modal panel over the page."
+    }
+  },
+  "layer": {
+    "$type": "number",
+    "overlay": {
+      "$value": "{z-index.100}",
+      "$description": "Above page content: popovers, tooltips, the skip link."
+    }
+  }
+}
