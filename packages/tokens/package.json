@@ -32,8 +32,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc",
-    "typecheck": "tsc --noEmit",
+    "validate": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/validate.ts",
+    "build": "pnpm run validate && node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
+    "typecheck": "tsc",
     "prepack": "pnpm run build"
   },
   "devDependencies": {
