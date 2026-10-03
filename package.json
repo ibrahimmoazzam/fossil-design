@@ -19,6 +19,9 @@
     "format": "prettier --write .",
     "typecheck": "tsc && pnpm -r typecheck",
     "test": "vitest run",
+    "figma:apply": "pnpm --filter figma-sync apply",
+    "figma:read": "pnpm --filter figma-sync read",
+    "figma:diff": "pnpm --filter figma-sync diff",
     "changeset": "changeset"
   },
   "devDependencies": {

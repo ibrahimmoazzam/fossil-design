@@ -205,6 +205,9 @@ importers:
 
   packages/figma-sync:
     devDependencies:
+      prettier:
+        specifier: ^3.9.9
+        version: 3.9.9
       typescript:
         specifier: 'catalog:'
         version: 6.0.3

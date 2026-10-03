@@ -1,0 +1,74 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import ts from 'typescript';
+import type { Spec } from './runtime.ts';
+
+export const hash = (text: string): string =>
+  createHash('sha256').update(text, 'utf8').digest('hex');
+
+/**
+ * The runtime's functions as plain JavaScript, by name. Figma's plugin sandbox isn't guaranteed
+ * past ES2017. Indentation is dropped to keep scripts small; the runtime has no multi-line
+ * strings, so that changes nothing else.
+ */
+const functions = (() => {
+  const js = ts
+    .transpileModule(
+      readFileSync(new URL('runtime.ts', import.meta.url), 'utf8'),
+      {
+        compilerOptions: {
+          target: ts.ScriptTarget.ES2017,
+          module: ts.ModuleKind.ESNext,
+          removeComments: true,
+        },
+      },
+    )
+    .outputText.replaceAll(/^export /gm, '')
+    .replaceAll(/^[ \t]+/gm, '');
+  const starts = [...js.matchAll(/^(?:async )?function (\w+)\(/gm)];
+  return new Map(
+    starts.map((match, i) => [
+      String(match[1]),
+      js.slice(match.index, starts[i + 1]?.index ?? js.length).trimEnd(),
+    ]),
+  );
+})();
+
+/** The function a script runs, and every runtime function it calls, in the runtime's order. */
+const included = (entry: string): string[] => {
+  const names = new Set([entry, 'sha256']);
+  for (let grew = true; grew;) {
+    grew = false;
+    for (const [name] of functions)
+      if (
+        !names.has(name) &&
+        [...names].some((n) =>
+          new RegExp(`\\b${name}\\(`).test(functions.get(n) ?? ''),
+        )
+      ) {
+        names.add(name);
+        grew = true;
+      }
+  }
+  return [...functions.keys()].filter((name) => names.has(name));
+};
+
+export const CHANGED =
+  'This script was changed after Fossil generated it. Generate it again and pass it to use_figma exactly as it is.';
+
+/** A script for use_figma that refuses to run if anything in it was changed. */
+export function script(spec: Spec, title: string): string {
+  const names = included(spec.kind);
+  const code = names.map((name) => functions.get(name) ?? '');
+  const data = JSON.stringify(spec);
+  return [
+    `// Fossil Design figma-sync: ${title}.`,
+    '// Pass this script to use_figma exactly as it is. It checks its own hash before it runs.',
+    `const integrity = ${JSON.stringify(hash(code.join('\n') + data))};`,
+    `const spec = ${data};`,
+    ...code,
+    `if (sha256([${names.join(', ')}].map(String).join('\\n') + JSON.stringify(spec)) !== integrity) throw new Error(${JSON.stringify(CHANGED)});`,
+    `return await ${spec.kind}(spec, figma);`,
+    '',
+  ].join('\n');
+}
