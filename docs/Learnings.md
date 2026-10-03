@@ -321,6 +321,12 @@ Checked again in October 2026, while authoring the Phase 1 tokens:
 - **Style Dictionary 5.5.5's source** converts DTCG colour objects through colorjs in its colour transforms, and ships `border/css/shorthand` and `strokeStyle/css/shorthand`.
 - **Spacing in other systems.** Carbon applies one spacing scale to margin, padding and gap between elements. Atlassian uses one `space.*` set everywhere, named as a percentage of an 8px base (`space.025` is 2px, `space.100` is 8px).
 
+Checked again in October 2026, while building Phase 2 (ADR 0006):
+- **`outputReferences` corrupts composites.** For an object value, Style Dictionary 5.5.5 replaces each referenced token's resolved value inside the transformed string. A shadow with a `5rem` blur and a `0.25rem` offset became `0.2var(--fossil-space-1000) 5rem`, with no warning. Fossil's CSS format writes references itself.
+- **`expand` drops aliases.** It resolves references to object values (font families, dimensions) before splitting typography, so those parts become literals. Fossil keeps `expand` for the names and takes the references from the source.
+- **Font weight names aren't converted.** DTCG 2025.10 maps names to numbers (`semi-bold` is 600, `extra-black` 950), and no Style Dictionary transform does it. `time/seconds` only matches the legacy `time` type, which is why durations print as `[object Object]`.
+- **`formatPlatform` renders without writing,** and runs the same name-collision check as a build, so every output can be checked before any file changes.
+
 ### Storybook already ships a component MCP server
 
 Storybook 10.6 is current, and `storybook init` (10.4+) adds `@storybook/addon-mcp` automatically when AI features are enabled. Once running, the server is available at `localhost:6006/mcp`. It exposes three toolsets:

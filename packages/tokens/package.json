@@ -23,8 +23,23 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./tokens.css": {
+      "types": "./dist/tokens.css.d.ts",
+      "default": "./dist/tokens.css"
+    },
+    "./tokens.json": {
+      "types": "./dist/tokens.json.d.cts",
+      "default": "./dist/tokens.json"
+    },
+    "./lint.json": {
+      "types": "./dist/lint.json.d.cts",
+      "default": "./dist/lint.json"
     }
   },
+  "sideEffects": [
+    "*.css"
+  ],
   "files": [
     "dist"
   ],
@@ -33,11 +48,13 @@
   },
   "scripts": {
     "validate": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/validate.ts",
-    "build": "pnpm run validate && node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
+    "build": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/build.ts && tsc -p tsconfig.build.json",
+    "deprecations": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/deprecations.ts",
     "typecheck": "tsc",
     "prepack": "pnpm run build"
   },
   "devDependencies": {
+    "style-dictionary": "^5.5.5",
     "typescript": "catalog:"
   }
 }

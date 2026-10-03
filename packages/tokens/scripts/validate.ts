@@ -117,10 +117,11 @@ const COMPOSITES: Record<string, Record<string, string>> = {
 
 const REFERENCE = /^\{([^{}]+)\}$/;
 
-const isRecord = (v: unknown): v is Record<string, unknown> =>
+export const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
 
-const referenceOf = (v: unknown): string | undefined =>
+/** The path a value references, such as `color.gray.600` for `"{color.gray.600}"`. */
+export const referenceOf = (v: unknown): string | undefined =>
   typeof v === 'string' ? REFERENCE.exec(v)?.[1] : undefined;
 
 const isNumber = (v: unknown): v is number =>
@@ -209,7 +210,7 @@ function checkLiteral(type: string, v: unknown): string | undefined {
 }
 
 /** Every reference inside a value, at any depth. */
-function referencesIn(v: unknown): string[] {
+export function referencesIn(v: unknown): string[] {
   const own = referenceOf(v);
   if (own !== undefined) return [own];
   if (Array.isArray(v)) return v.flatMap(referencesIn);

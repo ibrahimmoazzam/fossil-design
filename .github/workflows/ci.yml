@@ -33,6 +33,13 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      # The token build rewrites the foundations block in AGENTS.md, which is committed.
+      - name: Check the build changed no committed files
+        run: |
+          git diff --exit-code || {
+            echo "::error::The build changed committed files. Run pnpm build and commit the result."
+            exit 1
+          }
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
