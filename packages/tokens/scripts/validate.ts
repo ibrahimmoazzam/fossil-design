@@ -66,26 +66,27 @@ const COLOR_SPACES = new Set([
   'xyz-d65',
   'xyz-d50',
 ]);
-const FONT_WEIGHTS = new Set([
-  'thin',
-  'hairline',
-  'extra-light',
-  'ultra-light',
-  'light',
-  'normal',
-  'regular',
-  'book',
-  'medium',
-  'semi-bold',
-  'demi-bold',
-  'bold',
-  'extra-bold',
-  'ultra-bold',
-  'black',
-  'heavy',
-  'extra-black',
-  'ultra-black',
-]);
+/** DTCG's font weight names, and the number each one means. */
+export const FONT_WEIGHTS: Readonly<Record<string, number>> = {
+  thin: 100,
+  hairline: 100,
+  'extra-light': 200,
+  'ultra-light': 200,
+  light: 300,
+  normal: 400,
+  regular: 400,
+  book: 400,
+  medium: 500,
+  'semi-bold': 600,
+  'demi-bold': 600,
+  bold: 700,
+  'extra-bold': 800,
+  'ultra-bold': 800,
+  black: 900,
+  heavy: 900,
+  'extra-black': 950,
+  'ultra-black': 950,
+};
 const STROKE_STYLES = new Set([
   'solid',
   'dashed',
@@ -184,7 +185,7 @@ function checkLiteral(type: string, v: unknown): string | undefined {
         : 'A font family is a name or an array of names';
     case 'fontWeight':
       return (isNumber(v) && v >= 1 && v <= 1000) ||
-        (typeof v === 'string' && FONT_WEIGHTS.has(v))
+        (typeof v === 'string' && Object.hasOwn(FONT_WEIGHTS, v))
         ? undefined
         : 'A font weight is a number from 1 to 1000 or a DTCG weight name';
     case 'number':

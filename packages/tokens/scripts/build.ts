@@ -5,34 +5,17 @@ import StyleDictionary from 'style-dictionary';
 import type { Dictionary, Transform } from 'style-dictionary/types';
 import * as render from './formats.ts';
 import { BuildError } from './formats.ts';
-import { isRecord, readTokenFiles, validate } from './validate.ts';
+import {
+  FONT_WEIGHTS,
+  isRecord,
+  readTokenFiles,
+  validate,
+} from './validate.ts';
 
 export { BuildError };
 
 export const DURATION = 'fossil/duration/css';
 export const FONT_WEIGHT = 'fossil/fontWeight/css';
-
-/** DTCG's font weight names, as CSS numbers. */
-const WEIGHTS: Record<string, number> = {
-  thin: 100,
-  hairline: 100,
-  'extra-light': 200,
-  'ultra-light': 200,
-  light: 300,
-  normal: 400,
-  regular: 400,
-  book: 400,
-  medium: 500,
-  'semi-bold': 600,
-  'demi-bold': 600,
-  bold: 700,
-  'extra-bold': 800,
-  'ultra-bold': 800,
-  black: 900,
-  heavy: 900,
-  'extra-black': 950,
-  'ultra-black': 950,
-};
 
 // Style Dictionary 5.5.5 leaves both of these as they are, which isn't valid CSS.
 const TRANSFORM_HOOKS: Record<string, Omit<Transform, 'name'>> = {
@@ -52,7 +35,7 @@ const TRANSFORM_HOOKS: Record<string, Omit<Transform, 'name'>> = {
       token.$type === 'fontWeight' && typeof token.$value === 'string',
     transform: (token) => {
       const name: unknown = token.$value;
-      return WEIGHTS[String(name)] ?? name;
+      return FONT_WEIGHTS[String(name)] ?? name;
     },
   },
 };
