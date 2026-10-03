@@ -23,6 +23,7 @@ pnpm changeset                   # record a release note for a package change
 - Check the token source without building: `pnpm --filter tokens validate`. Token files live in `packages/tokens/src/primitive/` and `src/semantic/`; ADR 0005 holds their rules.
 - The token build writes `tokens.css`, `tokens.json` and `lint.json` to `packages/tokens/dist/`, the TypeScript in `src/generated/`, and the foundations block in this file. Commit the block with the token change; CI fails if the build changes it. ADR 0006 covers each output.
 - List deprecated tokens and their replacements: `pnpm --filter tokens deprecations`, after a build.
+- Sync tokens with Figma: `pnpm figma:apply`, `pnpm figma:read` and `pnpm figma:diff` write scripts and compare their results. Run a sync through the `fossil-figma-sync` skill in `.claude/skills/`, which needs the Figma MCP server. `packages/figma-sync/AGENTS.md` covers working on the sync itself.
 - Build before type-checking. A package's types resolve through the built declarations of the packages it depends on.
 - Add a dependency to one package with `pnpm --filter <folder> add <name>`, and to the root with `pnpm add -D -w <name>`. TypeScript comes from the `catalog:` in `pnpm-workspace.yaml`.
 
@@ -48,6 +49,7 @@ packages/tokens        DTCG source and the Style Dictionary build
 packages/react         components (CSS Modules), stories, bundled agent docs
 packages/eslint-config, packages/stylelint-config
 packages/figma-sync    Figma sync core and scripts (private)
+.claude/skills         the fossil-figma-sync skill
 tests/                 workspace-wide tests, such as package names against fossil.config.json
 docs/PRD.md            the spec: phases, tasks, exit criteria
 docs/Learnings.md      the research behind each decision

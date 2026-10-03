@@ -297,6 +297,14 @@ Since February 2026 the remote Figma MCP server has had write tools. It now cove
 
 What doesn't disappear is the logic. None of Figma's tools cover the push direction, rename detection by stable identity, or write-boundary enforcement, and all three must be deterministic. So Fossil's sync is its own tested code. The agent's only job is to carry the generated scripts to `use_figma` unchanged, because the allowlist means only the agent can make that call. A plugin becomes an optional later adapter over the same core, worth building if `use_figma` pricing, rate limits or a designer without an agent make it necessary.
 
+Checked again in October 2026, while building Phase 3 (ADR 0007):
+- **`use_figma` runs plain JavaScript** with top-level `await`, and returns the script's return value as JSON. No state persists between calls, so every script finds Fossil's variables again by their stamps. Figma's `figma-use` skill must be named in the call's `skillNames`.
+- **Responses are cut off at about 20 KB with no error,** according to a third-party report (CruGlobal's cornerstone-design-system, issue 23). Reads page, and every page carries a hash.
+- **Failed scripts aren't atomic any more.** `figma-use` replaced its atomicity guarantee with a per-error `safeToRetryWithoutCanvasRead` flag. Fossil's apply scripts check everything before writing, and are safe to run again.
+- **Collections and scopes:** a Professional or Education file allows four modes per collection, and an empty `scopes` list hides a variable from every picker.
+- **Motion variables:** `TIMING` (seconds) and `EASING` arrived in Plugin API Update 133 (August 2026). An easing value is `{ type, easingFunctionCubicBezier?: { x1, y1, x2, y2 } }`, with `CUSTOM_CUBIC_BEZIER` for a custom curve. Figma refuses scopes on both types, as a third-party project measured live (figwright, pull request 261).
+- **Setup in Claude Code:** `claude plugin install figma@claude-plugins-official` installs the server and Figma's skills together; `/mcp` signs in.
+
 The same split applies to generating the component library (PRD Phase 5b). A script derives each component's name, variants and variable bindings from code, and a second script reads the result back and checks it. The agent does the part that needs judgment, turning JSX and styles into Figma frames. `figma-generate-library` alone would leave names and bindings to the agent.
 
 ### Code Connect is Organization and Enterprise only
