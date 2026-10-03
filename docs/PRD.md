@@ -289,9 +289,9 @@ Phases are ordered by dependency. Each has an explicit exit criterion. Do not st
    - Dark mode gets two identical override blocks, each also setting `color-scheme: dark`:
      - `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { … } }` follows the OS when no theme is chosen;
      - `:root[data-theme="dark"]` covers an explicit choice.
-   - Dark values must keep their aliases. Style Dictionary resolves references inside `$extensions`, so read the original reference from `token.original`.
+   - Dark values must keep their aliases. Style Dictionary resolves references inside `$extensions`, and in the parts of a split typography token, so read every reference from the validated source and take only names and literal values from Style Dictionary. Write the `var()` references in Fossil's own format: `outputReferences` finds references in a composite by replacing resolved values, which can corrupt the CSS (ADR 0006).
 3. **Build assertions.**
-   - Run with `log.warnings: 'error'`, so name collisions fail rather than warn. `color.text.muted` and `color.text-muted` both become `--fossil-color-text-muted`.
+   - Fail on a name collision with a message naming both tokens: `color.text.muted` and `color.text-muted` both become `--fossil-color-text-muted`. Also run with `log.warnings: 'error'`. Otherwise Style Dictionary only warns, and by default its message names neither token.
    - Fail on any emitted value containing `[object Object]`, `undefined` or `NaN`.
    - Add a value transform for DTCG duration objects (`{ "value": 150, "unit": "ms" }`), which Style Dictionary 5.5.5 does not convert.
 4. **Output 2: `tokens.json`.** For each token:

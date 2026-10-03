@@ -2,7 +2,7 @@
 
 An open-source design system for agentic coding. Tokens live in git and flow into CSS, typed React components, Figma variables and a Figma component library generated from code. Shared lint configs and docs bundled into the packages keep the UI that coding agents write on-system.
 
-> **Status: pre-release, built in public.** The repository foundation is in place. Tokens, components, the Figma sync and the lint configs arrive phase by phase, as set out in the [PRD](./docs/PRD.md). Packages publish as `0.x` until the token taxonomy has survived a real migration.
+> **Status: pre-release, built in public.** The repository foundation and the token build are in place. Components, the Figma sync and the lint configs arrive phase by phase, as set out in the [PRD](./docs/PRD.md). Packages publish as `0.x` until the token taxonomy has survived a real migration.
 
 ## Why
 
@@ -35,13 +35,13 @@ Everything runs on a Figma Professional or Education plan and free tiers elsewhe
 
 ## Packages
 
-| Package                                                          | What it is                                                     | Status      |
-| ---------------------------------------------------------------- | -------------------------------------------------------------- | ----------- |
-| [`@fossil-design/tokens`](./packages/tokens)                     | DTCG token source and the build that turns it into CSS         | Placeholder |
-| [`@fossil-design/react`](./packages/react)                       | React components, precompiled to JavaScript and one stylesheet | Placeholder |
-| [`@fossil-design/eslint-config`](./packages/eslint-config)       | Keeps JSX on-system                                            | Placeholder |
-| [`@fossil-design/stylelint-config`](./packages/stylelint-config) | Keeps CSS on-system                                            | Placeholder |
-| [`@fossil-design/figma-sync`](./packages/figma-sync)             | Syncs tokens with Figma; runs from the repo, not published     | Placeholder |
+| Package                                                          | What it is                                                                  | Status      |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------- |
+| [`@fossil-design/tokens`](./packages/tokens)                     | DTCG token source and the build that turns it into CSS, JSON and TypeScript | Early (0.x) |
+| [`@fossil-design/react`](./packages/react)                       | React components, precompiled to JavaScript and one stylesheet              | Placeholder |
+| [`@fossil-design/eslint-config`](./packages/eslint-config)       | Keeps JSX on-system                                                         | Placeholder |
+| [`@fossil-design/stylelint-config`](./packages/stylelint-config) | Keeps CSS on-system                                                         | Placeholder |
+| [`@fossil-design/figma-sync`](./packages/figma-sync)             | Syncs tokens with Figma; runs from the repo, not published                  | Placeholder |
 
 ## Make it your own
 
