@@ -1,6 +1,8 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { mediaQueries, tokenKeys } from '@fossil-design/tokens';
 import tokensJson from '@fossil-design/tokens/tokens.json' with { type: 'json' };
+import iconNames from '../icons.json' with { type: 'json' };
 import { boxVariants, surfaceTokens } from '../src/components/Box/variants.ts';
 
 const { tokens } = tokensJson;
@@ -95,3 +97,33 @@ const css = [
 
 mkdirSync(out, { recursive: true });
 writeFileSync(new URL('box.module.css', out), `${css}\n`);
+
+// Icons: each Material Symbol named in icons.json becomes a component, so consumers need no SVGR.
+const require = createRequire(import.meta.url);
+
+const pascal = (name: string) =>
+  name.replace(/(?:^|[_-])([a-z0-9])/g, (_, c: string) => c.toUpperCase());
+
+const icons = iconNames.map((name) => {
+  const svg = readFileSync(
+    require.resolve(`@material-symbols/svg-400/rounded/${name}.svg`),
+    'utf8',
+  );
+  const viewBox = /viewBox="([^"]+)"/.exec(svg)?.[1];
+  const paths = [...svg.matchAll(/<path d="([^"]+)"/g)].map(([, d]) => d);
+  if (!viewBox || paths.length === 0) {
+    throw new Error(`Can't read the Material Symbol ${name}`);
+  }
+  return `export const ${pascal(name)}Icon = createIcon('${pascal(name)}Icon', '${viewBox}', ${JSON.stringify(paths)});`;
+});
+
+writeFileSync(
+  new URL('icons.ts', out),
+  [
+    "// Material Symbols (Apache-2.0, Google), generated from icons.json by scripts/generate.ts. Don't edit this file.",
+    "import { createIcon } from '../components/Icon/createIcon.js';",
+    '',
+    ...icons,
+    '',
+  ].join('\n'),
+);

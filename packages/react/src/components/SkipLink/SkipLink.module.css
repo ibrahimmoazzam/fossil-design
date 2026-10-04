@@ -1,0 +1,36 @@
+/* Parked above the viewport until focused, but never removed from the tab order. */
+.skipLink {
+  position: absolute;
+  inset-block-start: var(--fossil-space-xs);
+  inset-inline-start: var(--fossil-space-xs);
+  z-index: var(--fossil-layer-overlay);
+  padding-block: var(--fossil-space-xs);
+  padding-inline: var(--fossil-space-m);
+  border-radius: var(--fossil-radius-compact);
+  background-color: var(--fossil-color-background-page);
+  color: var(--fossil-color-text-default);
+  font-family: var(--fossil-text-body-font-family);
+  font-size: var(--fossil-text-body-font-size);
+  font-weight: var(--fossil-font-weight-strong);
+  letter-spacing: var(--fossil-text-body-letter-spacing);
+  line-height: var(--fossil-text-body-line-height);
+  text-decoration: none;
+  transform: translateY(-150%);
+  transition: transform var(--fossil-motion-duration-fast)
+    var(--fossil-motion-easing-standard);
+}
+
+.skipLink:focus {
+  transform: none;
+}
+
+.skipLink:focus-visible {
+  outline: var(--fossil-border-focus);
+  outline-offset: var(--fossil-focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skipLink {
+    transition: none;
+  }
+}

@@ -29,6 +29,20 @@ export default mergeConfig(
         },
         {
           extends: true,
+          test: {
+            name: 'browser',
+            include: ['src/**/*.browser.test.tsx'],
+            setupFiles: ['.storybook/vitest.setup.ts'],
+            browser: {
+              enabled: true,
+              headless: true,
+              provider: playwright(),
+              instances: [{ browser: 'chromium', name: 'react-browser' }],
+            },
+          },
+        },
+        {
+          extends: true,
           plugins: [
             storybookTest({
               configDir: fileURLToPath(new URL('.storybook', import.meta.url)),

@@ -1,0 +1,8 @@
+.card {
+  border: var(--fossil-border-default);
+}
+
+/* A card without a title leads with a bold opening, which does a title's job in the title's colour. */
+.body strong {
+  color: var(--fossil-color-text-default);
+}
