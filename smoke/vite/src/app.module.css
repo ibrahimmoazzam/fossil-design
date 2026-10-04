@@ -1,0 +1,4 @@
+.app {
+  background-color: var(--fossil-color-background-page);
+  color: var(--fossil-color-text-default);
+}
