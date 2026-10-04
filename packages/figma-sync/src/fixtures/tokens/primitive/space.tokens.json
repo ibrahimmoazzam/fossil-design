@@ -1,0 +1,66 @@
+{
+  "space": {
+    "$type": "dimension",
+    "$description": "Named as a percentage of an 8px base: space.100 is 8px, space.025 is 2px.",
+    "0": {
+      "$value": {
+        "value": 0,
+        "unit": "px"
+      }
+    },
+    "025": {
+      "$value": {
+        "value": 0.125,
+        "unit": "rem"
+      }
+    },
+    "050": {
+      "$value": {
+        "value": 0.25,
+        "unit": "rem"
+      }
+    },
+    "100": {
+      "$value": {
+        "value": 0.5,
+        "unit": "rem"
+      }
+    },
+    "150": {
+      "$value": {
+        "value": 0.75,
+        "unit": "rem"
+      }
+    },
+    "200": {
+      "$value": {
+        "value": 1,
+        "unit": "rem"
+      }
+    },
+    "300": {
+      "$value": {
+        "value": 1.5,
+        "unit": "rem"
+      }
+    },
+    "400": {
+      "$value": {
+        "value": 2,
+        "unit": "rem"
+      }
+    },
+    "600": {
+      "$value": {
+        "value": 3,
+        "unit": "rem"
+      }
+    },
+    "1000": {
+      "$value": {
+        "value": 5,
+        "unit": "rem"
+      }
+    }
+  }
+}

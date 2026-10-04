@@ -22,6 +22,7 @@ The CLIs run through Node's type stripping, so there's no build step. `pnpm --fi
 - `src/snapshot.ts` checks saved read results.
 - `src/diff.ts` is the three-way diff. `src/write.ts` writes Figma's values into the token files.
 - `src/cli.ts` holds the three commands. `src/fake-figma.ts` stands in for Figma in tests.
+- `src/fixtures/tokens/` is a frozen copy of the reference token source, which the tests run on. A value changed in Figma, or a fork's own brand, therefore can't break them. Refresh the copy only when the token format changes. Tests that check the live source read `packages/tokens/src` directly.
 
 The token source is read with the validator in `packages/tokens/scripts/validate.ts`, so both packages agree on what a valid token is.
 

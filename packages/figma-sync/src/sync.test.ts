@@ -19,7 +19,10 @@ import { readSnapshot } from './snapshot.ts';
 import { applySpecs, scopesOf, variableSpecs } from './spec.ts';
 import { applyEdits } from './write.ts';
 
-const SOURCE = fileURLToPath(new URL('../../tokens/src', import.meta.url));
+// A frozen copy of the reference token source, so a value changed in Figma or by a fork doesn't
+// break these tests. The live source has its own tests below.
+const SOURCE = fileURLToPath(new URL('fixtures/tokens', import.meta.url));
+const LIVE = fileURLToPath(new URL('../../tokens/src', import.meta.url));
 const FORMAT_FROM = `${SOURCE}/semantic/color.tokens.json`;
 const COMMIT = 'c0ffee0000000000000000000000000000000000';
 const source = readTokenFiles(SOURCE);
@@ -266,20 +269,6 @@ describe('applying to a fresh file', () => {
     );
   });
 
-  it('takes code syntax from tokens.json', () => {
-    const { model } = modelOf(source);
-    const built = JSON.parse(
-      readFileSync(
-        new URL('../../tokens/dist/tokens.json', import.meta.url),
-        'utf8',
-      ),
-    ) as TokensFile;
-    for (const spec of variableSpecs(model, built))
-      expect(spec.code).toBe(
-        `var(${JSON.stringify(built.tokens[spec.path]?.cssVar).replaceAll('"', '')})`,
-      );
-  });
-
   it('aliases each semantic variable to the variable it references, in each mode', () => {
     const muted = figma.variable('color.text.muted');
     expect(muted.valuesByMode[figma.mode(muted, 'Light')]).toEqual({
@@ -345,6 +334,26 @@ describe('applying to a fresh file', () => {
     expect(
       diff(modelOf(source).model, modelOf(source).model, snapshot),
     ).toEqual({ edits: [], pending: [], conflicts: [], refused: [] });
+  });
+});
+
+describe('the live token source', () => {
+  it('syncs without problems', () => {
+    expect(modelOf(readTokenFiles(LIVE)).model.length).toBeGreaterThan(0);
+  });
+
+  it('takes code syntax from tokens.json', () => {
+    const { model } = modelOf(readTokenFiles(LIVE));
+    const built = JSON.parse(
+      readFileSync(
+        new URL('../../tokens/dist/tokens.json', import.meta.url),
+        'utf8',
+      ),
+    ) as TokensFile;
+    for (const spec of variableSpecs(model, built))
+      expect(spec.code).toBe(
+        `var(${JSON.stringify(built.tokens[spec.path]?.cssVar).replaceAll('"', '')})`,
+      );
   });
 });
 

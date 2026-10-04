@@ -1,0 +1,21 @@
+{
+  "radius": {
+    "$type": "dimension",
+    "compact": {
+      "$value": "{radius.sm}",
+      "$description": "Small elements: tooltips, the skip link, media."
+    },
+    "control": {
+      "$value": "{radius.md}",
+      "$description": "Controls and small containers: tags, suggestion buttons, code blocks."
+    },
+    "surface": {
+      "$value": "{radius.lg}",
+      "$description": "Surfaces: cards, panels, modals, popovers."
+    },
+    "pill": {
+      "$value": "{radius.full}",
+      "$description": "Fully rounded ends: pills, round buttons, dots."
+    }
+  }
+}
