@@ -82,6 +82,10 @@
             }
           }
         }
+      },
+      "veil": {
+        "$value": "{color.alpha.black-500-60}",
+        "$description": "A fill over images and video, such as a clip's play button. The same in both modes, because the footage is."
       }
     },
     "text": {
@@ -146,6 +150,18 @@
             },
             "contrast": {
               "against": ["{color.highlight.default}"],
+              "minimum": 4.5
+            }
+          }
+        }
+      },
+      "on-veil": {
+        "$value": "{color.white.500}",
+        "$description": "Text and icons on the veil, in both modes.",
+        "$extensions": {
+          "com.ibrahimmoazzam.fossil": {
+            "contrast": {
+              "against": ["{color.background.veil}"],
               "minimum": 4.5
             }
           }

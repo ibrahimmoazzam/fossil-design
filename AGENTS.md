@@ -175,10 +175,12 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 | `--fossil-color-background-hover` | The wash behind a hovered row, pill or link. |
 | `--fossil-color-background-wash` | A tint that marks a row without filling it, such as a table header. |
 | `--fossil-color-background-scrim` | Behind a modal. |
+| `--fossil-color-background-veil` | A fill over images and video, such as a clip's play button. The same in both modes, because the footage is. |
 | `--fossil-color-text-default` | Body text. Contrast in light / dark: 17.59:1 / 18.16:1 on `color.background.page`, 19.15:1 / 17.36:1 on `color.background.surface`. Needs 4.5:1. |
 | `--fossil-color-text-muted` | Secondary text. Contrast in light / dark: 7.38:1 / 12.69:1 on `color.background.page`, 8.03:1 / 12.14:1 on `color.background.surface`. Needs 4.5:1. |
 | `--fossil-color-text-on-accent` | Text and icons on an accent fill. Contrast in light / dark: 5.91:1 / 7.69:1 on `color.accent.default`. Needs 4.5:1. |
 | `--fossil-color-text-on-highlight` | Text and icons on a highlight fill. Contrast in light / dark: 5.19:1 / 13.04:1 on `color.highlight.default`. Needs 4.5:1. |
+| `--fossil-color-text-on-veil` | Text and icons on the veil, in both modes. Contrast in light / dark: 5.74:1 / 5.74:1 on `color.background.veil`. Needs 4.5:1. |
 | `--fossil-color-border-default` | A quiet container edge, meant to sit against a fill. Too faint to stand alone as a line. |
 | `--fossil-color-border-strong` | A standalone rule or tick. Contrast in light / dark: 3.57:1 / 4.96:1 on `color.background.page`, 3.89:1 / 4.74:1 on `color.background.surface`. Needs 3:1. |
 | `--fossil-color-border-hover` | A control's edge on hover. Contrast in light / dark: 7.38:1 / 12.69:1 on `color.background.page`, 8.03:1 / 12.14:1 on `color.background.surface`. Needs 3:1. |
