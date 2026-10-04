@@ -49,7 +49,7 @@ const GROUP_KEYS = new Set([
   '$deprecated',
   '$extensions',
 ]);
-const EXTENSION_KEYS = new Set(['modes', 'replacedBy', 'since']);
+const EXTENSION_KEYS = new Set(['modes', 'replacedBy', 'since', 'contrast']);
 const COLOR_SPACES = new Set([
   'srgb',
   'srgb-linear',
@@ -563,6 +563,33 @@ export function validate(files: TokenFile[]): Result {
             `replacedBy points to {${replacement}}, which is deprecated too`,
           );
       }
+    }
+    if (ext?.contrast !== undefined) {
+      const { contrast } = ext;
+      const against =
+        isRecord(contrast) && Array.isArray(contrast.against)
+          ? contrast.against.map(referenceOf)
+          : [];
+      if (type !== 'color') report('contrast only belongs on a colour token');
+      if (
+        !isRecord(contrast) ||
+        typeof contrast.minimum !== 'number' ||
+        contrast.minimum < 1 ||
+        contrast.minimum > 21 ||
+        against.length === 0
+      )
+        report(
+          'contrast is { "against": ["{color.background.page}"], "minimum": 4.5 }',
+        );
+      for (const path of against)
+        if (path === undefined)
+          report(
+            'contrast.against lists references, such as "{color.background.page}"',
+          );
+        else if (!byPath.has(path))
+          report(`contrast is checked against {${path}}, which doesn't exist`);
+        else if (typeOf(path) !== 'color')
+          report(`contrast is checked against {${path}}, which isn't a colour`);
     }
     if (ext?.since !== undefined) {
       if (!isDeprecated) report('since only belongs on a deprecated token');

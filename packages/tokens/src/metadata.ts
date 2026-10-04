@@ -22,6 +22,8 @@ export interface TokenMetadata {
   replacedBy?: string;
   /** The version that deprecated it. */
   since?: string;
+  /** The colours it must stand out against, and the WCAG contrast ratio it must reach on each, in every mode. */
+  contrast?: { against: readonly string[]; minimum: number };
 }
 
 /** The contents of `tokens.json`. */

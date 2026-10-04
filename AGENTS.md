@@ -124,21 +124,21 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 | `--fossil-color-background-page` | The page ground. |
 | `--fossil-color-background-surface` | Cards, panels, popovers and other surfaces that sit on the page. |
 | `--fossil-color-background-sunken` | A fill set below the page, such as a tab track. |
-| `--fossil-color-background-raised` | A fill that comes back up from a sunken one, such as the selected tab. Never the only sign of selection: its separation is under 3:1. |
+| `--fossil-color-background-raised` | A fill that comes back up from a sunken one, such as the selected tab. Never the only sign of selection. |
 | `--fossil-color-background-hover` | The wash behind a hovered row, pill or link. |
 | `--fossil-color-background-wash` | A tint that marks a row without filling it, such as a table header. |
 | `--fossil-color-background-scrim` | Behind a modal. |
-| `--fossil-color-text-default` | Body text. 17.60:1 on the page in light, 18.17:1 in dark. |
-| `--fossil-color-text-muted` | Secondary text. 7.38:1 on the page in light, 12.70:1 in dark. |
-| `--fossil-color-text-on-accent` | Text and icons on an accent fill. 5.91:1 on accent.default in light, 7.70:1 in dark. |
-| `--fossil-color-text-on-highlight` | Text and icons on a highlight fill. 5.20:1 on highlight.default in light, 13.05:1 in dark. |
+| `--fossil-color-text-default` | Body text. Contrast in light / dark: 17.59:1 / 18.16:1 on `color.background.page`, 19.15:1 / 17.36:1 on `color.background.surface`. Needs 4.5:1. |
+| `--fossil-color-text-muted` | Secondary text. Contrast in light / dark: 7.38:1 / 12.69:1 on `color.background.page`, 8.03:1 / 12.14:1 on `color.background.surface`. Needs 4.5:1. |
+| `--fossil-color-text-on-accent` | Text and icons on an accent fill. Contrast in light / dark: 5.91:1 / 7.69:1 on `color.accent.default`. Needs 4.5:1. |
+| `--fossil-color-text-on-highlight` | Text and icons on a highlight fill. Contrast in light / dark: 5.19:1 / 13.04:1 on `color.highlight.default`. Needs 4.5:1. |
 | `--fossil-color-border-default` | A quiet container edge, meant to sit against a fill. Too faint to stand alone as a line. |
-| `--fossil-color-border-strong` | A standalone rule or tick. One value serves both modes: 3.58:1 on the page in light, 4.96:1 in dark. |
-| `--fossil-color-border-hover` | A control's edge on hover. 7.38:1 on the page in light, 12.70:1 in dark. |
-| `--fossil-color-border-selected` | The edge of the current or selected item. |
-| `--fossil-color-accent-default` | Links and primary actions. 5.43:1 on the page in light, 7.76:1 in dark. |
-| `--fossil-color-highlight-default` | Small marks that should stand out: the current page, the caret, the selected tab. 4.78:1 on the page in light, 13.15:1 in dark. |
-| `--fossil-color-focus-ring` | The focus indicator. |
+| `--fossil-color-border-strong` | A standalone rule or tick. Contrast in light / dark: 3.57:1 / 4.96:1 on `color.background.page`, 3.89:1 / 4.74:1 on `color.background.surface`. Needs 3:1. |
+| `--fossil-color-border-hover` | A control's edge on hover. Contrast in light / dark: 7.38:1 / 12.69:1 on `color.background.page`, 8.03:1 / 12.14:1 on `color.background.surface`. Needs 3:1. |
+| `--fossil-color-border-selected` | The edge of the current or selected item. Contrast in light / dark: 4.77:1 / 13.15:1 on `color.background.page`, 5.19:1 / 12.57:1 on `color.background.surface`. Needs 3:1. |
+| `--fossil-color-accent-default` | Links and primary actions. Contrast in light / dark: 5.42:1 / 7.76:1 on `color.background.page`, 5.91:1 / 7.42:1 on `color.background.surface`. Needs 4.5:1. |
+| `--fossil-color-highlight-default` | Small marks that should stand out: the current page, the caret, the selected tab. Contrast in light / dark: 4.77:1 / 13.15:1 on `color.background.page`, 5.19:1 / 12.57:1 on `color.background.surface`. Needs 4.5:1. |
+| `--fossil-color-focus-ring` | The focus indicator. Contrast in light / dark: 4.77:1 / 13.15:1 on `color.background.page`, 5.19:1 / 12.57:1 on `color.background.surface`. Needs 3:1. |
 | `--fossil-color-selection-background` | Selected text. The selected text itself takes highlight.default. |
 | `--fossil-color-shadow-default` | The colour of every shadow. |
 
