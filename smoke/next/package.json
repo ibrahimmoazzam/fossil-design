@@ -1,0 +1,24 @@
+{
+  "name": "fossil-smoke-next",
+  "private": true,
+  "description": "Builds a Next 16 app from Fossil's packed tarballs: a Server Component page, and Motion driving Modal through renderPanel.",
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "lint:css": "stylelint \"app/**/*.css\""
+  },
+  "dependencies": {
+    "motion": "14.0.0",
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "stylelint": "17.16.0",
+    "typescript": "6.0.3"
+  }
+}

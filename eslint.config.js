@@ -11,6 +11,8 @@ export default defineConfig(
     '**/.figma/',
     '**/storybook-static/',
     '**/*.module.css.d.ts',
+    // The smoke-test apps install Fossil from tarballs and have no node_modules in the repository.
+    'smoke/',
   ]),
   {
     linterOptions: {

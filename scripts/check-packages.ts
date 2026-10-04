@@ -1,9 +1,9 @@
 // Packs every published package as npm would receive it, then checks the tarball with
 // publint and attw, so "a consumer can resolve these types" is a check rather than a hope.
-import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { pnpm } from './run.ts';
 
 const root = new URL('../', import.meta.url);
 const packagesDir = new URL('packages/', root);
@@ -21,26 +21,11 @@ const published = readdirSync(packagesDir, { withFileTypes: true })
     return manifest.private !== true;
   });
 
-// The pnpm running this script, which may be a JavaScript entry point rather than a binary.
-const pnpm = process.env.npm_execpath ?? 'pnpm';
-const viaNode = /\.[cm]?js$/.test(pnpm);
-
-const run = (args: string[], cwd: URL) =>
-  execFileSync(
-    viaNode ? process.execPath : pnpm,
-    viaNode ? [pnpm, ...args] : args,
-    {
-      cwd,
-      stdio: ['ignore', 'pipe', 'inherit'],
-      encoding: 'utf8',
-    },
-  );
-
 let failed = false;
 try {
   for (const dir of published) {
     // pnpm pack rewrites workspace: ranges to real versions, as the release does.
-    const tarball = run(['pack', '--pack-destination', destination], dir)
+    const tarball = pnpm(['pack', '--pack-destination', destination], dir)
       .trim()
       .split('\n')
       .at(-1);
@@ -52,7 +37,7 @@ try {
       ['attw', [tarball, '--profile', 'esm-only', '--format', 'ascii']],
     ] as const) {
       try {
-        process.stdout.write(run(['exec', command, ...args], root));
+        process.stdout.write(pnpm(['exec', command, ...args], root));
       } catch (error) {
         failed = true;
         const { stdout } = error as { stdout?: string };
