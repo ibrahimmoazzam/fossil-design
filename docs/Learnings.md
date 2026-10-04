@@ -305,6 +305,14 @@ Checked again in October 2026, while building Phase 3 (ADR 0007):
 - **Motion variables:** `TIMING` (seconds) and `EASING` arrived in Plugin API Update 133 (August 2026). An easing value is `{ type, easingFunctionCubicBezier?: { x1, y1, x2, y2 } }`, with `CUSTOM_CUBIC_BEZIER` for a custom curve. Figma refuses scopes on both types, as a third-party project measured live (figwright, pull request 261).
 - **Setup in Claude Code:** `claude plugin install figma@claude-plugins-official` installs the server and Figma's skills together; `/mcp` signs in.
 
+Measured live on a scratch file in October 2026, during Phase 3's checks:
+- **The scripts' self-check works.** `Function.prototype.toString` in Figma's sandbox returns each function's source as sent, so a generated script's hash of itself passes. `use_figma` accepted a 23 KB script.
+- **Numbers are 32-bit floats.** Every number Figma stores comes back rounded to single precision: `1.2` as `1.2000000476837158`, `0.15` seconds as `0.15000000596046448`, and colour channels and curve points the same way. Comparing with `===` sees a change on every run.
+- **Descriptions come back HTML-escaped.** Figma stores `&`, `<`, `>`, `"` and `'` in a variable's description as `&amp;`, `&lt;`, `&gt;`, `&quot;` and `&#39;`. Nothing else changes, and an entity already in the text is escaped again.
+- **Timing and easing.** Both types accept aliases, and an easing variable holds a custom cubic Bézier. Setting scopes on either throws `Cannot set scopes on this variable type`, as figwright reported.
+- **Scopes.** With empty scopes, primitives stay out of every picker, while semantic aliases to them still resolve. The `GAP` scope offers a variable in both gap and padding fields.
+- **Order.** No Plugin API call reorders variables (styles have reorder methods, variables don't), so a collection lists its variables in the order they were created.
+
 The same split applies to generating the component library (PRD Phase 5b). A script derives each component's name, variants and variable bindings from code, and a second script reads the result back and checks it. The agent does the part that needs judgment, turning JSX and styles into Figma frames. `figma-generate-library` alone would leave names and bindings to the agent.
 
 ### Code Connect is Organization and Enterprise only

@@ -12,7 +12,7 @@ Fossil's tokens live in git, in `packages/tokens/src`. This skill puts them into
 
 - **Never write Plugin API code for variables yourself.** Every `use_figma` call in this skill sends a script that `pnpm figma:*` generated, exactly as the file holds it. Don't fix, shorten, reformat or wrap it. Each script hashes itself and refuses to run if anything changed.
 - **Always include `figma-use` in `skillNames`** when calling `use_figma`, as Figma requires.
-- **Ask before writing to a Figma file.** Before the first apply script in a session, confirm the file (its URL) with the user, and that they want its variables changed. Reads need no confirmation.
+- **Ask before writing to a Figma file.** Before the first apply script in a session, ask the user whether to change the variables in that file, naming it, and wait for a yes. A pasted URL isn't a yes, and permission systems such as Claude Code's auto mode look for that explicit answer. Reads need no confirmation.
 - **Save read results exactly as `use_figma` returns them.** Never edit a saved result: `figma:diff` checks its hash.
 - **Don't work around an error.** If a script says it was changed, generate it again and resend it exactly. An apply script that failed for another reason can be sent again, because each one only changes what differs. Otherwise stop and report the error.
 

@@ -44,7 +44,7 @@ Checked in October 2026 ([`Learnings.md`](../Learnings.md), section 5):
 - each collection's key (`collection`);
 - the commit of the last complete apply (`commit`).
 
-**Values.** Colours travel as hex and alpha, and compare to the 8-bit channel. Dimensions travel in px at a 16px root, and are written back in the token's own unit. Figma holds only a font stack's first name; the fallbacks stay in code. Durations travel in seconds and are written back in their own unit. Easing travels as a custom cubic Bézier; a designer who picks one of Figma's named easings is refused, because Figma doesn't document the curves behind them. Timing and easing variables have no scopes, since Figma refuses them, so primitive durations and curves stay visible in Figma's motion pickers. The sync handles sRGB colours only.
+**Values.** Colours travel as hex and alpha, and compare to the 8-bit channel. Dimensions travel in px at a 16px root, and are written back in the token's own unit. Figma holds only a font stack's first name; the fallbacks stay in code. Durations travel in seconds and are written back in their own unit. Figma keeps every number as a 32-bit float, so the apply compares numbers at that precision, and it decodes the HTML escapes Figma puts in descriptions before comparing them. Easing travels as a custom cubic Bézier; a designer who picks one of Figma's named easings is refused, because Figma doesn't document the curves behind them. Timing and easing variables have no scopes, since Figma refuses them, so primitive durations and curves stay visible in Figma's motion pickers. The sync handles sRGB colours only.
 
 **Apply** writes the parts in order: primitives first, then semantic variables, each after anything it aliases.
 
@@ -62,18 +62,22 @@ Checked in October 2026 ([`Learnings.md`](../Learnings.md), section 5):
 
 Additions, deletions, renames, detached aliases and mode changes made in Figma are refused, each with the code change it needs. Changes are formatted with Prettier and checked by the token validator before anything is written.
 
-**Tests** run the generated scripts against a fake Figma that is as strict as Figma: types, unique names, the four-mode limit.
+**Tests** run the generated scripts against a fake Figma that is as strict as Figma: types, unique names, the four-mode limit, refused scopes on motion types, 32-bit numbers and escaped descriptions.
 
 ## Consequences
 
-- The agent retypes each script and result. Apply parts are 11 to 22 KB, the finish step 8 KB and a read 5 KB, because each script carries only the runtime functions it calls.
+- The agent retypes each script and result. Apply parts are 13 to 23 KB, the finish step 8 KB and a read 6 KB, because each script carries only the runtime functions it calls.
 - `runtime.ts` is shipped as text, so it is written in a restricted style; `packages/figma-sync/AGENTS.md` lists the rules.
-- Five things only a live run can confirm:
-  - that `Function.prototype.toString` in Figma's sandbox returns the source the integrity check hashes;
-  - that empty scopes hide primitives while aliases to them still resolve;
-  - that the `GAP` scope covers padding;
-  - how large a script `use_figma` accepts;
-  - that timing and easing variables accept aliases and custom curves as documented.
+- A live run on a scratch file in October 2026 settled what only Figma could ([`Learnings.md`](../Learnings.md), section 5):
+  - `Function.prototype.toString` in Figma's sandbox returns the source the integrity check hashes;
+  - empty scopes hide primitives while aliases to them still resolve;
+  - the `GAP` scope covers padding as well as gap;
+  - `use_figma` accepts a 23 KB script;
+  - timing and easing variables accept aliases and custom curves, and refuse scopes.
+
+  It also found two behaviours the first fake lacked, 32-bit numbers and escaped descriptions, which made a second apply rewrite values that hadn't changed.
+
+- The Plugin API can't reorder variables, so a collection keeps the order its variables were created in. Changing the order of tokens in a file reorders a new Figma file, not an existing one.
 - Reporting the library components still bound to an orphaned variable waits for Phase 5b, which builds the library.
 - The scope table follows Fossil's token groups. A fork that renames groups edits it.
 - The diff needs the stamped commit in the local clone, so it asks for a `git fetch` when the commit is missing.
