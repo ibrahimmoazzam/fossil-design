@@ -507,6 +507,11 @@ Building the component package's foundation settled these, each checked against 
 - **Chrome** keeps its Tab starting point on an element after `blur()`, so the next real Tab moves past it and can leave the page. Real-input tests focus a sentinel at the start of the page first.
 - **Testing Library**'s accessible-name calculation doesn't name a `<figure>` from its `<figcaption>`, though Chrome does.
 - **`vitest/browser`** in Vitest 5 drives `tab`, `keyboard`, `click` and `hover` through Playwright, so `:hover` and `:focus-visible` behave as they do for a person. Storybook 10.6's composed stories render through `Story.run()`.
+- **CSS transitions appear in `element.getAnimations()`.** Their `finished` promises settle correctly when a transition is reversed or cut short, where `transitionend` doesn't: a reversed transition runs for less than its full duration, and the one it replaced fires `transitioncancel`.
+- **Floating UI 0.27** ignores presses on elements added to the page after a floating element opens, treating them as injected by a browser extension.
+- **Real input in Vitest's browser mode** goes to whichever frame has focus, so test files running in parallel frames take each other's keystrokes. Real-input projects set `fileParallelism: false`.
+- **The React Compiler's lint** treats an object holding a ref as a ref: reading its other fields during render is reported. Destructure such a hook's result.
+- **Chromium headless** records video from a canvas with `MediaRecorder`, so a story can load a real clip without a video file in the repository.
 - **`eslint-plugin-jsx-a11y` 6.10.2** declares ESLint 9 as its highest peer, so it doesn't run on ESLint 10. Storybook's axe checks cover the rendered output instead.
 
 ---
@@ -548,6 +553,9 @@ Building the component package's foundation settled these, each checked against 
 | Icon pipeline | Components generated at build time from `@material-symbols/svg-400`, named in `icons.json`, with the Apache-2.0 license copied into `dist` | Consumers need no SVGR, the icons stay version-matched, and the license travels with them (ADR 0010) |
 | `asChild` | React's `cloneElement`, with no slot library | One small merge of `className` and children; the child keeps its own element, props and ref |
 | `Figure` width | No `displayWidth`; apps size a figure through `className` | None of the portfolio's 8 figures or 5 clips sets one |
+| Motion in Fossil | CSS transitions with `@starting-style` and `data-state`; `usePresence` keeps an element mounted until `getAnimations()` settles | The durations stay in the motion tokens, reduced motion needs no special case, and no animation library reaches forks (ADR 0011) |
+| Extension points | `Modal`'s `renderPanel` and `onShowingChange`, `Tabs`' `renderIndicator`, `Carousel`'s data attributes, `Link`'s `asChild` | Only where a library must own an element's lifecycle, and each library-neutral |
+| Translucent backgrounds in the contrast check | Laid over white and over black, keeping the lower ratio | A veil over a photo has unknown footage beneath it; the worst case is the honest check |
 | Token access | Components and compositions use semantic tokens only. Typed props accept only semantic token keys, and the Stylelint config rejects primitives outside a consumer's site-tokens file | Keeps the two tiers meaningful: changing a primitive value restyles everything built on it, which is also what makes Fossil adaptable |
 | Terms | "Primitive" means the raw token tier only; product-specific components are "compositions" | Both words were overloaded, which confuses people and agents alike; one name per concept |
 | Library generation | A script writes each component's spec (names, variants, bindings) from code and checks the built result; the agent builds the frames | Names and bindings must be exact, so they come from code and get verified; only the frame layout needs judgment |

@@ -21,6 +21,8 @@ Build `@fossil-design/tokens` first; `pnpm build` from the root does it in order
 - `scripts/generate.ts` writes `src/generated/box.module.css`, one class per prop, value and breakpoint, and `src/generated/icons.ts`, one component per name in `icons.json`.
 - `icons.json` lists the Material Symbols (rounded, weight 400) that Fossil's components use. Add a name there to ship another icon; the build copies their Apache-2.0 license into `dist/licenses/`.
 - `src/responsive.ts` holds `Responsive<T>` and the helpers that turn responsive props into classes.
+- `src/hooks/` holds `usePresence`, which keeps an element mounted until its CSS transitions finish, and `usePrefersReducedMotion`.
+- `src/components/Floating/` is shared by `Popover` and `Tooltip`: the surface's look, the portal into a `<dialog>`, and reading a trigger's ref on React 18 and 19. It isn't a component.
 - `.storybook/` holds the Storybook config. `token-px.ts` converts a token to the pixels a play function compares against, and `focus-start.ts` puts focus at the start of the page before a real Tab.
 - `*.browser.test.tsx` files hold the real-input tests. They render a story with `composeStories(stories).Story.run()`, then drive it with `userEvent` and `page` from `vitest/browser`.
 
@@ -31,6 +33,8 @@ Build `@fossil-design/tokens` first; `pnpm build` from the root does it in order
 - **Native elements first,** ARIA only for real gaps. Everything interactive is keyboard-operable, has a visible focus indicator and an accessible name, and respects `prefers-reduced-motion`.
 - **Props describe behaviour, not the element underneath.** Take `open`, `onOpenChange` and `title`, never an `HTMLDialogElement` ref or a native-only prop, so a fork can swap a headless library into one component without changing its API.
 - **React 18.3 and 19.** Use `forwardRef` and set `displayName`. Put `'use client'` at the top of a component that uses state, effects or refs, and only there.
+- **Motion in CSS.** Enter with `@starting-style`, exit on `data-state="closed"` while `usePresence` keeps the element mounted, and turn transitions off under `prefers-reduced-motion`. Never add an animation library. Where an app needs one, add a library-neutral extension point, as ADR 0011 lists, and record it there.
+- **Behaviour props use headless-library names:** `open` and `onOpenChange`, `value`, `defaultValue` and `onValueChange`.
 - **Layout through `Box` and `Stack`,** in stories as in components.
 - **Element substitution through `asChild`.** A component that styles an element an app may need to swap, such as `Link` for a router's link, takes `asChild` and clones its single child, merging `className`. Use React's `cloneElement`, not a library.
 - **Icons as components.** Take an `IconComponent`, not a name, so an app's own SVGs work beside Fossil's.
@@ -54,3 +58,8 @@ Traps the dry run and the build found, so nobody has to find them again:
 - A story's play function runs first in `Story.run()`, and its simulated focus can leave `:focus-visible` set. Move focus away before a real click that checks it.
 - Testing Library's accessible-name calculation doesn't name a `<figure>` from its `<figcaption>`, though browsers do. Query the figure, then the caption inside it.
 - A `vi.fn()` doesn't fit a story's arg types; Storybook's `fn()` from `storybook/test` does, and Vitest's matchers accept it.
+- Real input goes to whichever frame has focus, so the real-input project runs its files one at a time (`fileParallelism: false`). Don't turn it back on.
+- `transitionend` misses a reversed or interrupted transition. Wait on `element.getAnimations()` instead, as `usePresence` does.
+- Floating UI ignores presses on elements added after a floating element opens. A test's outside target must exist before it opens.
+- The React Compiler's lint treats an object holding a ref as a ref. Destructure a hook that returns one, such as `usePresence`, before reading its other fields during render.
+- A test clicking around a `<dialog>` should aim at the space beside the panel, not at the frame's very edge, where the click may never reach the page.
