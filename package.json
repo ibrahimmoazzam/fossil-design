@@ -15,21 +15,26 @@
   },
   "scripts": {
     "build": "pnpm -r build",
-    "lint": "eslint . && prettier --check .",
+    "lint": "eslint . && stylelint \"**/*.css\" && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc && pnpm -r typecheck",
     "test": "vitest run",
+    "check:packages": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/check-packages.ts",
     "figma:apply": "pnpm --filter figma-sync apply",
     "figma:read": "pnpm --filter figma-sync read",
     "figma:diff": "pnpm --filter figma-sync diff",
     "changeset": "changeset"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
+    "@fossil-design/stylelint-config": "workspace:*",
     "@types/node": "^22.20.4",
     "eslint": "^10.11.0",
     "prettier": "^3.9.9",
+    "publint": "^0.3.25",
+    "stylelint": "^17.16.0",
     "typescript": "catalog:",
     "typescript-eslint": "^8.71.0",
     "vitest": "^5.0.3"

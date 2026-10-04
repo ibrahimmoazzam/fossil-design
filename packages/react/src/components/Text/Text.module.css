@@ -1,0 +1,118 @@
+/* Each text style sets all five parts. The `font` shorthand would drop letter-spacing. */
+
+.text {
+  margin: 0;
+}
+
+.body {
+  font-family: var(--fossil-text-body-font-family);
+  font-size: var(--fossil-text-body-font-size);
+  font-weight: var(--fossil-text-body-font-weight);
+  letter-spacing: var(--fossil-text-body-letter-spacing);
+  line-height: var(--fossil-text-body-line-height);
+}
+
+.prose {
+  font-family: var(--fossil-text-prose-font-family);
+  font-size: var(--fossil-text-prose-font-size);
+  font-weight: var(--fossil-text-prose-font-weight);
+  letter-spacing: var(--fossil-text-prose-letter-spacing);
+  line-height: var(--fossil-text-prose-line-height);
+}
+
+.small {
+  font-family: var(--fossil-text-small-font-family);
+  font-size: var(--fossil-text-small-font-size);
+  font-weight: var(--fossil-text-small-font-weight);
+  letter-spacing: var(--fossil-text-small-letter-spacing);
+  line-height: var(--fossil-text-small-line-height);
+}
+
+.caption {
+  font-family: var(--fossil-text-caption-font-family);
+  font-size: var(--fossil-text-caption-font-size);
+  font-weight: var(--fossil-text-caption-font-weight);
+  letter-spacing: var(--fossil-text-caption-letter-spacing);
+  line-height: var(--fossil-text-caption-line-height);
+}
+
+.fine {
+  font-family: var(--fossil-text-fine-font-family);
+  font-size: var(--fossil-text-fine-font-size);
+  font-weight: var(--fossil-text-fine-font-weight);
+  letter-spacing: var(--fossil-text-fine-letter-spacing);
+  line-height: var(--fossil-text-fine-line-height);
+}
+
+.label {
+  font-family: var(--fossil-text-label-font-family);
+  font-size: var(--fossil-text-label-font-size);
+  font-weight: var(--fossil-text-label-font-weight);
+  letter-spacing: var(--fossil-text-label-letter-spacing);
+  line-height: var(--fossil-text-label-line-height);
+  text-transform: uppercase;
+}
+
+.control {
+  font-family: var(--fossil-text-control-font-family);
+  font-size: var(--fossil-text-control-font-size);
+  font-weight: var(--fossil-text-control-font-weight);
+  letter-spacing: var(--fossil-text-control-letter-spacing);
+  line-height: var(--fossil-text-control-line-height);
+}
+
+.heading-xs {
+  font-family: var(--fossil-text-heading-xs-font-family);
+  font-size: var(--fossil-text-heading-xs-font-size);
+  font-weight: var(--fossil-text-heading-xs-font-weight);
+  letter-spacing: var(--fossil-text-heading-xs-letter-spacing);
+  line-height: var(--fossil-text-heading-xs-line-height);
+}
+
+.heading-s {
+  font-family: var(--fossil-text-heading-s-font-family);
+  font-size: var(--fossil-text-heading-s-font-size);
+  font-weight: var(--fossil-text-heading-s-font-weight);
+  letter-spacing: var(--fossil-text-heading-s-letter-spacing);
+  line-height: var(--fossil-text-heading-s-line-height);
+}
+
+.heading-m {
+  font-family: var(--fossil-text-heading-m-font-family);
+  font-size: var(--fossil-text-heading-m-font-size);
+  font-weight: var(--fossil-text-heading-m-font-weight);
+  letter-spacing: var(--fossil-text-heading-m-letter-spacing);
+  line-height: var(--fossil-text-heading-m-line-height);
+}
+
+.heading-l {
+  font-family: var(--fossil-text-heading-l-font-family);
+  font-size: var(--fossil-text-heading-l-font-size);
+  font-weight: var(--fossil-text-heading-l-font-weight);
+  letter-spacing: var(--fossil-text-heading-l-letter-spacing);
+  line-height: var(--fossil-text-heading-l-line-height);
+}
+
+.heading-xl {
+  font-family: var(--fossil-text-heading-xl-font-family);
+  font-size: var(--fossil-text-heading-xl-font-size);
+  font-weight: var(--fossil-text-heading-xl-font-weight);
+  letter-spacing: var(--fossil-text-heading-xl-letter-spacing);
+  line-height: var(--fossil-text-heading-xl-line-height);
+}
+
+.tone-default {
+  color: var(--fossil-color-text-default);
+}
+
+.tone-muted {
+  color: var(--fossil-color-text-muted);
+}
+
+.tone-accent {
+  color: var(--fossil-color-accent-default);
+}
+
+.tone-highlight {
+  color: var(--fossil-color-highlight-default);
+}

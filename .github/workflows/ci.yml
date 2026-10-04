@@ -42,4 +42,7 @@ jobs:
           }
       - run: pnpm lint
       - run: pnpm typecheck
+      # Storybook's tests and the real-input tests run in Chromium.
+      - run: pnpm --filter react exec playwright install --with-deps chromium
       - run: pnpm test
+      - run: pnpm check:packages
