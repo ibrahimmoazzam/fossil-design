@@ -1,5 +1,11 @@
 # @fossil-design/tokens
 
+## 0.1.1
+
+### Patch Changes
+
+- 7abd7e1: `tokens.css` and `tokens.json` list tokens in the order their files do. Numbered names such as `space.025` no longer move after `space.1000`.
+
 ## 0.1.0
 
 ### Minor Changes
