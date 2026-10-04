@@ -183,6 +183,24 @@ describe('the tokens Figma gets', () => {
     });
   });
 
+  it('keeps the order the token files list them in', () => {
+    const numbered = modelOf(source)
+      .model.map((t) => t.path)
+      .filter((p) => /^space\.\d+$/.test(p));
+    expect(numbered).toEqual([
+      'space.0',
+      'space.025',
+      'space.050',
+      'space.100',
+      'space.150',
+      'space.200',
+      'space.300',
+      'space.400',
+      'space.600',
+      'space.1000',
+    ]);
+  });
+
   it('leaves composites and stroke styles in code', () => {
     for (const path of [
       'text.body',
@@ -718,6 +736,23 @@ describe('writing Figma’s values to the token source', () => {
     expect(after).toHaveLength(before.length);
     expect(after.filter((line, i) => line !== before[i])).toEqual([
       '        "$value": "{color.gray.500}",',
+    ]);
+  });
+
+  it('keeps each group in its file’s order, numbered tokens included', async () => {
+    const changed = await applyEdits(
+      source,
+      tokens,
+      [{ path: 'duration.200', mode: 'Value', from: undefined, value: 0.25 }],
+      FORMAT_FROM,
+    );
+    const before = must(
+      source.find((f) => f.path === 'primitive/motion.tokens.json'),
+    ).content.split('\n');
+    const after = must(changed[0]).content.split('\n');
+    expect(after).toHaveLength(before.length);
+    expect(after.filter((line, i) => line !== before[i])).toEqual([
+      '        "value": 250,',
     ]);
   });
 

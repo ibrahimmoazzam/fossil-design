@@ -1,6 +1,8 @@
 import { format, resolveConfig } from 'prettier';
 import {
   isRecord,
+  keyOrder,
+  keysInOrder,
   referenceOf,
   validate,
   VENDOR,
@@ -47,6 +49,27 @@ export function toDtcg(
   if (typeof value === 'object' && 'bezier' in value) return [...value.bezier];
   return value;
 }
+
+/**
+ * JSON with each object's keys in the order its source listed them, and every object expanded, as
+ * the token files are. Prettier keeps an object expanded only if its input was.
+ */
+const ordered = (
+  value: unknown,
+  order: ReadonlyMap<string, number>,
+  path: readonly string[] = [],
+): string => {
+  if (Array.isArray(value))
+    return `[${value.map((v, i) => ordered(v, order, [...path, String(i)])).join(', ')}]`;
+  if (!isRecord(value)) return JSON.stringify(value);
+  const keys = keysInOrder(value, order, path);
+  if (keys.length === 0) return '{}';
+  return `{\n${keys
+    .map(
+      (k) => `${JSON.stringify(k)}: ${ordered(value[k], order, [...path, k])}`,
+    )
+    .join(',\n')}\n}`;
+};
 
 /** The group or token at a path inside a token file. */
 const nodeAt = (root: unknown, path: string): Record<string, unknown> => {
@@ -113,14 +136,15 @@ export async function applyEdits(
     else delete node.$extensions;
   }
 
-  // Prettier keeps an object expanded only if its input was, and the token files expand every one.
   const options = { ...(await resolveConfig(formatFrom)), parser: 'json' };
   const changed: TokenFile[] = [];
-  for (const [path, document] of documents)
+  for (const [path, document] of documents) {
+    const original = files.find((f) => f.path === path)?.content ?? '';
     changed.push({
       path,
-      content: await format(JSON.stringify(document, null, 2), options),
+      content: await format(ordered(document, keyOrder(original)), options),
     });
+  }
   const next = files.map((f) => changed.find((c) => c.path === f.path) ?? f);
   const { problems } = validate(next);
   if (problems.length > 0)
