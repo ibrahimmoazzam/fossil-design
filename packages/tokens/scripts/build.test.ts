@@ -18,6 +18,7 @@ import {
   TRANSFORMS,
   type BuildOptions,
 } from './build.ts';
+import { contrastRatio } from './contrast.ts';
 import { report } from './deprecations.ts';
 import { BLOCK_END, BLOCK_START } from './formats.ts';
 import {
@@ -199,6 +200,46 @@ describe('building the token source', () => {
     expect(lines(media)).toEqual(lines(forced));
   });
 
+  it('meets every contrast minimum the tokens declare, in light and dark', () => {
+    const checked = Object.entries(json.tokens).filter(
+      ([, t]) => t.contrast !== undefined,
+    );
+    expect(checked.length).toBeGreaterThan(0);
+    for (const [path, t] of checked)
+      for (const against of t.contrast?.against ?? []) {
+        const ground = json.tokens[against];
+        const modes = [
+          ['light', t.value, ground?.value],
+          [
+            'dark',
+            t.dark?.value ?? t.value,
+            ground?.dark?.value ?? ground?.value,
+          ],
+        ] as const;
+        for (const [mode, fore, back] of modes)
+          expect(
+            contrastRatio(fore, back) ?? 0,
+            `${path} on ${against} in ${mode}`,
+          ).toBeGreaterThanOrEqual(t.contrast?.minimum ?? 21);
+      }
+    expect(agents).toContain('Contrast in light / dark:');
+  });
+
+  it('gives a token that aliases a semantic token the dark value of its target', () => {
+    let checked = 0;
+    for (const [path, t] of Object.entries(json.tokens)) {
+      const target =
+        typeof t.aliasOf === 'string' ? json.tokens[t.aliasOf] : undefined;
+      if (t.tier !== 'semantic' || target?.tier !== 'semantic') continue;
+      if (t.dark !== undefined && t.dark.aliasOf !== t.aliasOf) continue;
+      expect(t.dark?.value ?? t.value, path).toEqual(
+        target.dark?.value ?? target.value,
+      );
+      checked += 1;
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
+
   it('writes durations in CSS units and nothing unconverted', () => {
     expect(declaration(css, '--fossil-duration-150')).toBe('150ms');
     expect(css).not.toMatch(/\[object Object\]|\bundefined\b|\bNaN\b/);
@@ -212,6 +253,8 @@ describe('building the token source', () => {
     const muted = byPath.get('color.text.muted');
     const light = referenceOf(muted?.value) ?? '';
     const dark = darkOf(muted);
+    const contrast = muted?.extension?.contrast as
+      { against: string[]; minimum: number } | undefined;
     expect(json.tokens['color.text.muted']).toEqual({
       tier: 'semantic',
       type: 'color',
@@ -222,6 +265,12 @@ describe('building the token source', () => {
         dark: { value: byPath.get(dark)?.value, aliasOf: dark },
       }),
       description: muted?.description,
+      ...(contrast !== undefined && {
+        contrast: {
+          against: contrast.against.map((a) => referenceOf(a) ?? a),
+          minimum: contrast.minimum,
+        },
+      }),
     });
   });
 

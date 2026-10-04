@@ -41,7 +41,7 @@
       },
       "raised": {
         "$value": "{color.white.500}",
-        "$description": "A fill that comes back up from a sunken one, such as the selected tab. Never the only sign of selection: its separation is under 3:1.",
+        "$description": "A fill that comes back up from a sunken one, such as the selected tab. Never the only sign of selection.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
@@ -87,44 +87,66 @@
     "text": {
       "default": {
         "$value": "{color.black.400}",
-        "$description": "Body text. 17.60:1 on the page in light, 18.17:1 in dark.",
+        "$description": "Body text.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
               "dark": "{color.gray.50}"
+            },
+            "contrast": {
+              "against": [
+                "{color.background.page}",
+                "{color.background.surface}"
+              ],
+              "minimum": 4.5
             }
           }
         }
       },
       "muted": {
         "$value": "{color.gray.600}",
-        "$description": "Secondary text. 7.38:1 on the page in light, 12.70:1 in dark.",
+        "$description": "Secondary text.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
               "dark": "{color.gray.300}"
+            },
+            "contrast": {
+              "against": [
+                "{color.background.page}",
+                "{color.background.surface}"
+              ],
+              "minimum": 4.5
             }
           }
         }
       },
       "on-accent": {
         "$value": "{color.white.500}",
-        "$description": "Text and icons on an accent fill. 5.91:1 on accent.default in light, 7.70:1 in dark.",
+        "$description": "Text and icons on an accent fill.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
               "dark": "{color.black.400}"
+            },
+            "contrast": {
+              "against": ["{color.accent.default}"],
+              "minimum": 4.5
             }
           }
         }
       },
       "on-highlight": {
         "$value": "{color.white.500}",
-        "$description": "Text and icons on a highlight fill. 5.20:1 on highlight.default in light, 13.05:1 in dark.",
+        "$description": "Text and icons on a highlight fill.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
               "dark": "{color.black.400}"
+            },
+            "contrast": {
+              "against": ["{color.highlight.default}"],
+              "minimum": 4.5
             }
           }
         }
@@ -144,32 +166,68 @@
       },
       "strong": {
         "$value": "{color.gray.500}",
-        "$description": "A standalone rule or tick. One value serves both modes: 3.58:1 on the page in light, 4.96:1 in dark."
+        "$description": "A standalone rule or tick.",
+        "$extensions": {
+          "com.ibrahimmoazzam.fossil": {
+            "contrast": {
+              "against": [
+                "{color.background.page}",
+                "{color.background.surface}"
+              ],
+              "minimum": 3
+            }
+          }
+        }
       },
       "hover": {
         "$value": "{color.gray.600}",
-        "$description": "A control's edge on hover. 7.38:1 on the page in light, 12.70:1 in dark.",
+        "$description": "A control's edge on hover.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
               "dark": "{color.gray.300}"
+            },
+            "contrast": {
+              "against": [
+                "{color.background.page}",
+                "{color.background.surface}"
+              ],
+              "minimum": 3
             }
           }
         }
       },
       "selected": {
         "$value": "{color.highlight.default}",
-        "$description": "The edge of the current or selected item."
+        "$description": "The edge of the current or selected item.",
+        "$extensions": {
+          "com.ibrahimmoazzam.fossil": {
+            "contrast": {
+              "against": [
+                "{color.background.page}",
+                "{color.background.surface}"
+              ],
+              "minimum": 3
+            }
+          }
+        }
       }
     },
     "accent": {
       "default": {
         "$value": "{color.blue.600}",
-        "$description": "Links and primary actions. 5.43:1 on the page in light, 7.76:1 in dark.",
+        "$description": "Links and primary actions.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
               "dark": "{color.blue.400}"
+            },
+            "contrast": {
+              "against": [
+                "{color.background.page}",
+                "{color.background.surface}"
+              ],
+              "minimum": 4.5
             }
           }
         }
@@ -178,11 +236,18 @@
     "highlight": {
       "default": {
         "$value": "{color.azure.600}",
-        "$description": "Small marks that should stand out: the current page, the caret, the selected tab. 4.78:1 on the page in light, 13.15:1 in dark.",
+        "$description": "Small marks that should stand out: the current page, the caret, the selected tab.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
               "dark": "{color.yellow.300}"
+            },
+            "contrast": {
+              "against": [
+                "{color.background.page}",
+                "{color.background.surface}"
+              ],
+              "minimum": 4.5
             }
           }
         }
@@ -191,7 +256,18 @@
     "focus": {
       "ring": {
         "$value": "{color.highlight.default}",
-        "$description": "The focus indicator."
+        "$description": "The focus indicator.",
+        "$extensions": {
+          "com.ibrahimmoazzam.fossil": {
+            "contrast": {
+              "against": [
+                "{color.background.page}",
+                "{color.background.surface}"
+              ],
+              "minimum": 3
+            }
+          }
+        }
       }
     },
     "selection": {

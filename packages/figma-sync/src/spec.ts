@@ -16,6 +16,8 @@ const SCOPES: readonly (readonly [string, readonly string[]])[] = [
   ['color', ['ALL_FILLS', 'STROKE_COLOR']],
   ['space', ['GAP']],
   ['radius', ['CORNER_RADIUS']],
+  ['border.width', ['STROKE_FLOAT']],
+  ['focus.ring.offset', ['EFFECT_FLOAT']],
   ['focus.ring', ['STROKE_FLOAT', 'EFFECT_FLOAT']],
   ['layout', ['WIDTH_HEIGHT']],
   ['icon.size', ['WIDTH_HEIGHT']],

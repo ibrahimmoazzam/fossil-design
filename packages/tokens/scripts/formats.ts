@@ -5,6 +5,7 @@ import type {
   TokenMetadata,
   TokensFile,
 } from '../src/metadata.ts';
+import { contrastRatio } from './contrast.ts';
 import { isRecord, referenceOf, referencesIn, type Token } from './validate.ts';
 
 /** A build that can't write valid output. Each problem names its token. */
@@ -230,13 +231,20 @@ function aliasOf(value: unknown): Alias | undefined {
 /** tokens.json: each token's custom property, resolved value, alias, dark value and lifecycle. */
 export function tokensFile(entries: readonly Entry[]): TokensFile {
   const source = new Map(entries.map(({ token }) => [token.path, token]));
-  const resolve = (value: unknown): unknown => {
+  // In dark mode every alias takes its target's dark value, as the custom properties do, so a
+  // token without a dark value of its own still changes when the token it aliases does.
+  const resolve = (value: unknown, dark = false): unknown => {
     const ref = referenceOf(value);
-    if (ref !== undefined) return resolve(source.get(ref)?.value);
-    if (Array.isArray(value)) return value.map(resolve);
+    if (ref !== undefined) {
+      const target = source.get(ref);
+      const next =
+        dark && target ? (darkOf(target) ?? target.value) : target?.value;
+      return resolve(next, dark);
+    }
+    if (Array.isArray(value)) return value.map((v) => resolve(v, dark));
     if (isRecord(value))
       return Object.fromEntries(
-        Object.entries(value).map(([key, part]) => [key, resolve(part)]),
+        Object.entries(value).map(([key, part]) => [key, resolve(part, dark)]),
       );
     return value;
   };
@@ -244,10 +252,17 @@ export function tokensFile(entries: readonly Entry[]): TokensFile {
   const tokens: Record<string, TokenMetadata> = {};
   for (const { token, type, properties } of entries) {
     const alias = aliasOf(token.value);
-    const dark = darkOf(token);
-    const darkAlias = aliasOf(dark);
+    const declared = darkOf(token);
+    const dark = declared ?? token.value;
+    const darkValue = resolve(dark, true);
+    const darkAlias =
+      declared !== undefined ||
+      JSON.stringify(darkValue) !== JSON.stringify(resolve(token.value))
+        ? aliasOf(dark)
+        : undefined;
     const replacedBy = referenceOf(token.extension?.replacedBy);
     const since = token.extension?.since;
+    const contrast = token.extension?.contrast;
     const [first] = properties;
     tokens[token.path] = {
       tier: token.tier,
@@ -261,7 +276,7 @@ export function tokensFile(entries: readonly Entry[]): TokensFile {
       value: resolve(token.value),
       ...(alias !== undefined && { aliasOf: alias }),
       ...(darkAlias !== undefined && {
-        dark: { value: resolve(dark), aliasOf: darkAlias },
+        dark: { value: darkValue, aliasOf: darkAlias },
       }),
       ...(typeof token.description === 'string' && {
         description: token.description,
@@ -271,6 +286,14 @@ export function tokensFile(entries: readonly Entry[]): TokensFile {
       }),
       ...(replacedBy !== undefined && { replacedBy }),
       ...(typeof since === 'string' && { since }),
+      ...(isRecord(contrast) &&
+        Array.isArray(contrast.against) &&
+        typeof contrast.minimum === 'number' && {
+          contrast: {
+            against: contrast.against.map((a) => referenceOf(a) ?? ''),
+            minimum: contrast.minimum,
+          },
+        }),
     };
   }
   return { tokens };
@@ -414,6 +437,22 @@ export function foundations({ tokens }: TokensFile, prefix: string): string {
     others.set(group, [...(others.get(group) ?? []), ...names(entry[1])]);
   }
   const code = (s: string) => `\`${s}\``;
+  // WCAG doesn't round: 4.499:1 fails 4.5:1, so the table shows ratios rounded down.
+  const ratio = (n: number | undefined) =>
+    n === undefined ? '?' : `${(Math.floor(n * 100) / 100).toFixed(2)}:1`;
+  const contrastNote = (t: TokenMetadata): string => {
+    if (t.contrast === undefined) return '';
+    const on = t.contrast.against.map((path) => {
+      const back = tokens[path];
+      const light = contrastRatio(t.value, back?.value);
+      const dark = contrastRatio(
+        t.dark?.value ?? t.value,
+        back?.dark?.value ?? back?.value,
+      );
+      return `${ratio(light)} / ${ratio(dark)} on ${code(path)}`;
+    });
+    return ` Contrast in light / dark: ${on.join(', ')}. Needs ${String(t.contrast.minimum)}:1.`;
+  };
 
   const typeRows = text.map(([path, t]) => {
     const v = isRecord(t.value) ? t.value : {};
@@ -459,7 +498,7 @@ export function foundations({ tokens }: TokensFile, prefix: string): string {
     '| --- | --- |',
     ...colours.map(
       ([, t]) =>
-        `| ${names(t).map(code).join(', ')} | ${cell(t.description ?? '')} |`,
+        `| ${names(t).map(code).join(', ')} | ${cell((t.description ?? '') + contrastNote(t))} |`,
     ),
     '',
     '### Other semantic tokens',

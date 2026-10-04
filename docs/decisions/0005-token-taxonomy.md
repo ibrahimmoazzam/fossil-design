@@ -44,13 +44,15 @@ Four constraints shaped the taxonomy:
 
 **Lifecycle metadata.** A deprecated token sets the standard `$deprecated`, as `true` or an explanation. It may also set `replacedBy` (a reference to a token of the same type that isn't deprecated) and `since` (the version that deprecated it, such as `"0.3.0"`) under the same vendor key. Neither belongs on a token that isn't deprecated.
 
+**Contrast.** A colour token may declare what it must stand out against, under the same vendor key: `contrast: { "against": ["{color.background.page}"], "minimum": 4.5 }`. The minimum is WCAG 2.2's: 4.5 for text (1.4.3), and 3 for borders, focus rings and other marks that aren't text (1.4.11). The build calculates each ratio in light and dark for the foundations block, and a test fails when one falls short, including after a value changes in Figma. Descriptions don't state ratios, since nothing would keep them true.
+
 **Values.**
 
 - Colours are DTCG colour objects; transparency goes in `alpha`.
 - The portfolio's `em` letter-spacing becomes `rem` at each text style's size, which is exact because a text style has a fixed size.
 - The reference brand uses Space Grotesk for headings, Space Mono for labels and Figtree for body text. All three are open fonts on Google Fonts, so Phase 5b can build Figma text styles with them. `font.family.heading` and `font.family.mono` are semantic, so an app can point them at its own faces; the portfolio keeps Roobert this way.
 
-**Validation runs first in the token build** (`packages/tokens/scripts/validate.ts`). It checks the tier rules, the DTCG value formats, references and their types, cycles, duplicate paths, modes and lifecycle fields. It reports every problem, and fails before anything is written. The script is TypeScript, run by Node's type stripping (`--experimental-strip-types`, which Node 22.14 needs and Node 24 accepts), so the build needs no extra dependency.
+**Validation runs first in the token build** (`packages/tokens/scripts/validate.ts`). It checks the tier rules, the DTCG value formats, references and their types, cycles, duplicate paths, modes, lifecycle fields and contrast checks. It reports every problem, and fails before anything is written. The script is TypeScript, run by Node's type stripping (`--experimental-strip-types`, which Node 22.14 needs and Node 24 accepts), so the build needs no extra dependency.
 
 ## Consequences
 

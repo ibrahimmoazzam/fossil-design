@@ -223,6 +223,12 @@ describe('the tokens Figma gets', () => {
     ]);
     expect(scopes('space.m')).toEqual(['GAP']);
     expect(scopes('radius.control')).toEqual(['CORNER_RADIUS']);
+    expect(scopes('border.width.default')).toEqual(['STROKE_FLOAT']);
+    expect(scopes('focus.ring.width')).toEqual([
+      'STROKE_FLOAT',
+      'EFFECT_FLOAT',
+    ]);
+    expect(scopes('focus.ring.offset')).toEqual(['EFFECT_FLOAT']);
     expect(scopes('color.gray.600')).toEqual([]);
     expect(scopes('layer.overlay')).toEqual([]);
     expect(scopes('motion.duration.fast')).toBeUndefined();

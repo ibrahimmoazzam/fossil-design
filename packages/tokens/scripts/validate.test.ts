@@ -334,6 +334,41 @@ describe('DTCG values', () => {
   });
 });
 
+describe('contrast checks', () => {
+  const checked = (contrast: unknown) => [
+    palette,
+    muted({ $extensions: { [VENDOR]: { contrast } } }),
+  ];
+
+  it('accepts the colours to check against and a minimum ratio', () => {
+    expect(
+      messages(checked({ against: ['{color.gray.300}'], minimum: 4.5 })),
+    ).toEqual([]);
+  });
+
+  it('rejects a check against a token that does not exist', () => {
+    expect(
+      messages(checked({ against: ['{color.gray.900}'], minimum: 4.5 })),
+    ).toContain(
+      "contrast is checked against {color.gray.900}, which doesn't exist",
+    );
+  });
+
+  it('rejects a check against a token that is not a colour', () => {
+    expect(
+      messages(checked({ against: ['{space.200}'], minimum: 4.5 })),
+    ).toContain(
+      "contrast is checked against {space.200}, which isn't a colour",
+    );
+  });
+
+  it('rejects a check without a minimum', () => {
+    expect(messages(checked({ against: ['{color.gray.300}'] }))).toContain(
+      'contrast is { "against": ["{color.background.page}"], "minimum": 4.5 }',
+    );
+  });
+});
+
 describe('lifecycle metadata', () => {
   const replaced = (
     extension: Record<string, unknown>,
