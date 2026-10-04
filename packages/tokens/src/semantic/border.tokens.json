@@ -1,10 +1,21 @@
 {
   "border": {
     "$type": "border",
+    "width": {
+      "$type": "dimension",
+      "default": {
+        "$value": "{border.width.1}",
+        "$description": "Edges and rules: cards, inputs, tags, table blocks and dividers."
+      },
+      "hairline": {
+        "$value": "{border.width.half}",
+        "$description": "The thin frame around images and video: one device pixel on a 2x screen."
+      }
+    },
     "default": {
       "$value": {
         "color": "{color.border.default}",
-        "width": "{border.width.1}",
+        "width": "{border.width.default}",
         "style": "{border.style.solid}"
       },
       "$description": "Container edges: cards, inputs, controls."
@@ -12,7 +23,7 @@
     "strong": {
       "$value": {
         "color": "{color.border.strong}",
-        "width": "{border.width.1}",
+        "width": "{border.width.default}",
         "style": "{border.style.solid}"
       },
       "$description": "A border that must read as a line: tags, table blocks, dividers."
@@ -20,7 +31,7 @@
     "hairline": {
       "$value": {
         "color": "{color.border.default}",
-        "width": "{border.width.half}",
+        "width": "{border.width.hairline}",
         "style": "{border.style.solid}"
       },
       "$description": "The thin frame around images and video."
@@ -28,7 +39,7 @@
     "focus": {
       "$value": {
         "color": "{color.focus.ring}",
-        "width": "{border.width.2}",
+        "width": "{focus.ring.width}",
         "style": "{border.style.solid}"
       },
       "$description": "Focus outlines. Pair with focus.ring.offset."
@@ -39,7 +50,7 @@
     "ring": {
       "width": {
         "$value": "{border.width.2}",
-        "$description": "The width of a focus ring drawn with box-shadow; border.focus covers outlines."
+        "$description": "The width of the focus indicator, whether a box-shadow ring or border.focus's outline."
       },
       "offset": {
         "$value": "{border.width.2}",

@@ -144,6 +144,7 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 
 ### Other semantic tokens
 
+- `border.width`: `--fossil-border-width-default`, `--fossil-border-width-hairline`
 - `border`: `--fossil-border-default`, `--fossil-border-strong`, `--fossil-border-hairline`, `--fossil-border-focus`
 - `focus.ring`: `--fossil-focus-ring-width`, `--fossil-focus-ring-offset`
 - `shadow`: `--fossil-shadow-raised`, `--fossil-shadow-floating`, `--fossil-shadow-overlay`
