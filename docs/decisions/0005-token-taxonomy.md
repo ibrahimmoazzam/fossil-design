@@ -44,7 +44,7 @@ Four constraints shaped the taxonomy:
 
 **Lifecycle metadata.** A deprecated token sets the standard `$deprecated`, as `true` or an explanation. It may also set `replacedBy` (a reference to a token of the same type that isn't deprecated) and `since` (the version that deprecated it, such as `"0.3.0"`) under the same vendor key. Neither belongs on a token that isn't deprecated.
 
-**Contrast.** A colour token may declare what it must stand out against, under the same vendor key: `contrast: { "against": ["{color.background.page}"], "minimum": 4.5 }`. The minimum is WCAG 2.2's: 4.5 for text (1.4.3), and 3 for borders, focus rings and other marks that aren't text (1.4.11). The build calculates each ratio in light and dark for the foundations block, and a test fails when one falls short, including after a value changes in Figma. Descriptions don't state ratios, since nothing would keep them true.
+**Contrast.** A colour token may declare what it must stand out against, under the same vendor key: `contrast: { "against": ["{color.background.page}"], "minimum": 4.5 }`. The minimum is WCAG 2.2's: 4.5 for text (1.4.3), and 3 for borders, focus rings and other marks that aren't text (1.4.11). The build calculates each ratio in light and dark for the foundations block, and a test fails when one falls short, including after a value changes in Figma. A translucent background, such as the veil over a photo, is checked at its worst: laid over white and over black, whichever gives less contrast. Descriptions don't state ratios, since nothing would keep them true.
 
 **Values.**
 

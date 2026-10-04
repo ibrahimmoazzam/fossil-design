@@ -1,0 +1,35 @@
+/* Over the clip's corner, at a 44px touch target (WCAG 2.5.5), on the veil so it reads over any frame. */
+.toggle {
+  position: absolute;
+  inset-block-end: var(--fossil-space-s);
+  inset-inline-end: var(--fossil-space-s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-width: 0;
+  border-radius: var(--fossil-radius-pill);
+  background-color: var(--fossil-color-background-veil);
+  color: var(--fossil-color-text-on-veil);
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity var(--fossil-motion-duration-fast)
+    var(--fossil-motion-easing-standard);
+}
+
+.toggle:hover,
+.toggle:focus-visible {
+  opacity: 1;
+}
+
+.toggle:focus-visible {
+  outline: var(--fossil-border-focus);
+  outline-offset: var(--fossil-focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle {
+    transition: none;
+  }
+}

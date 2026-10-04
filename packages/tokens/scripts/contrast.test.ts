@@ -33,4 +33,15 @@ describe('contrast ratio', () => {
       contrastRatio(colour('#000000', 0.5), colour('#ffffff')),
     ).toBeUndefined();
   });
+
+  it('checks a translucent background at its worst, over white and over black', () => {
+    // White on black at 60% over a white frame is #666666: 5.74:1. Over black it would be 21:1.
+    expect(
+      contrastRatio(colour('#ffffff'), colour('#000000', 0.6)),
+    ).toBeCloseTo(5.74, 2);
+    // Black text on the same veil fails over black, whatever it gives over white.
+    expect(
+      contrastRatio(colour('#000000'), colour('#000000', 0.6)),
+    ).toBeCloseTo(1, 5);
+  });
 });

@@ -1,4 +1,5 @@
 .frame {
+  position: relative;
   overflow: hidden;
   border: var(--fossil-border-hairline);
   border-radius: var(--fossil-radius-compact);

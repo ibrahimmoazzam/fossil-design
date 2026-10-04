@@ -32,6 +32,9 @@ export default mergeConfig(
           test: {
             name: 'browser',
             include: ['src/**/*.browser.test.tsx'],
+            // Real keyboard and pointer input goes to whichever frame has focus, so files in
+            // parallel frames would take each other's keystrokes.
+            fileParallelism: false,
             setupFiles: ['.storybook/vitest.setup.ts'],
             browser: {
               enabled: true,

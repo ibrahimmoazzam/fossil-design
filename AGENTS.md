@@ -16,6 +16,7 @@ pnpm format                      # rewrite files with Prettier
 pnpm typecheck                   # tsc for the root files, then every package
 pnpm test                        # every Vitest project, once
 pnpm check:packages              # pack each published package, then run publint and attw on it
+pnpm smoke                       # install the tarballs into a Next 16 app and a Vite app on React 18
 pnpm changeset                   # record a release note for a package change
 ```
 
@@ -23,6 +24,7 @@ pnpm changeset                   # record a release note for a package change
 - One test project: `pnpm test --project workspace`. Nested projects take their parent's name: `pnpm test --project 'react*'` runs `react (unit)`, `react (browser)` and `react (storybook)`. Watch mode: `pnpm exec vitest`.
 - The browser tests need Chromium once per machine: `pnpm --filter react exec playwright install chromium`.
 - Storybook: `pnpm --filter react storybook`, at `localhost:6006`.
+- `pnpm smoke [next|vite]` copies the apps in `smoke/` to a temporary folder, installs the packed tarballs with npm, then type-checks, lints the CSS, builds and checks what they render. It needs the network. Set `FOSSIL_KEEP_SMOKE=1` to keep the folder.
 - `pnpm --filter react generate` writes `Box`'s CSS and the `.module.css.d.ts` types. The react package's `build` and `typecheck` run it first. Neither output is committed.
 - Check the token source without building: `pnpm --filter tokens validate`. Token files live in `packages/tokens/src/primitive/` and `src/semantic/`; ADR 0005 holds their rules.
 - The token build writes `tokens.css`, `tokens.json` and `lint.json` to `packages/tokens/dist/`, the TypeScript in `src/generated/`, and the foundations block in this file. Commit the block with the token change; CI fails if the build changes it. ADR 0006 covers each output.
@@ -55,7 +57,8 @@ packages/eslint-config, packages/stylelint-config
 packages/figma-sync    Figma sync core and scripts (private)
 .claude/skills         the fossil-figma-sync skill
 tests/                 workspace-wide tests, such as package names against fossil.config.json
-scripts/               workspace-wide scripts, such as the packed-tarball check
+scripts/               workspace-wide scripts: the packed-tarball check and the smoke test
+smoke/                 consumer apps outside the workspace, built from the packed tarballs
 docs/PRD.md            the spec: phases, tasks, exit criteria
 docs/Learnings.md      the research behind each decision
 docs/decisions         ADRs
@@ -175,10 +178,12 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 | `--fossil-color-background-hover` | The wash behind a hovered row, pill or link. |
 | `--fossil-color-background-wash` | A tint that marks a row without filling it, such as a table header. |
 | `--fossil-color-background-scrim` | Behind a modal. |
+| `--fossil-color-background-veil` | A fill over images and video, such as a clip's play button. The same in both modes, because the footage is. |
 | `--fossil-color-text-default` | Body text. Contrast in light / dark: 17.59:1 / 18.16:1 on `color.background.page`, 19.15:1 / 17.36:1 on `color.background.surface`. Needs 4.5:1. |
 | `--fossil-color-text-muted` | Secondary text. Contrast in light / dark: 7.38:1 / 12.69:1 on `color.background.page`, 8.03:1 / 12.14:1 on `color.background.surface`. Needs 4.5:1. |
 | `--fossil-color-text-on-accent` | Text and icons on an accent fill. Contrast in light / dark: 5.91:1 / 7.69:1 on `color.accent.default`. Needs 4.5:1. |
 | `--fossil-color-text-on-highlight` | Text and icons on a highlight fill. Contrast in light / dark: 5.19:1 / 13.04:1 on `color.highlight.default`. Needs 4.5:1. |
+| `--fossil-color-text-on-veil` | Text and icons on the veil, in both modes. Contrast in light / dark: 5.74:1 / 5.74:1 on `color.background.veil`. Needs 4.5:1. |
 | `--fossil-color-border-default` | A quiet container edge, meant to sit against a fill. Too faint to stand alone as a line. |
 | `--fossil-color-border-strong` | A standalone rule or tick. Contrast in light / dark: 3.57:1 / 4.96:1 on `color.background.page`, 3.89:1 / 4.74:1 on `color.background.surface`. Needs 3:1. |
 | `--fossil-color-border-hover` | A control's edge on hover. Contrast in light / dark: 7.38:1 / 12.69:1 on `color.background.page`, 8.03:1 / 12.14:1 on `color.background.surface`. Needs 3:1. |
@@ -236,14 +241,15 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 
 A change is done when all of these pass. Run them in this order: `pnpm build && pnpm lint && pnpm typecheck && pnpm test && pnpm check:packages`.
 
-| Check                                                                                                                                             | Command                                            | Covers today                                                                                                                                |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| The token build, with its validation                                                                                                              | `pnpm --filter tokens build`, part of `pnpm build` | Validation of the DTCG source, then every Style Dictionary output                                                                           |
-| ESLint and Stylelint, with Fossil's shared configs                                                                                                | `pnpm lint`                                        | ESLint and Prettier; Stylelint with Fossil's own config on every stylesheet. Fossil's ESLint config arrives in Phase 5                      |
-| Type-checking, after generating CSS Module types                                                                                                  | `pnpm typecheck`                                   | All packages, with CSS Module types generated first                                                                                         |
-| Tests: Storybook interaction tests, axe checks with zero violations, real-input browser tests for native behaviour such as Escape on a `<dialog>` | `pnpm test`                                        | Workspace, token, Stylelint config and React unit tests; every story with axe; real-input tests for keyboard focus, hover and the skip link |
-| Packed tarballs pass publint and attw                                                                                                             | `pnpm check:packages`                              | Every published package                                                                                                                     |
-| A changeset, if a package's public surface changed                                                                                                | `pnpm changeset`                                   | Yes                                                                                                                                         |
+| Check                                                                                                                                             | Command                                            | Covers today                                                                                                                                                                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The token build, with its validation                                                                                                              | `pnpm --filter tokens build`, part of `pnpm build` | Validation of the DTCG source, then every Style Dictionary output                                                                                                                                                 |
+| ESLint and Stylelint, with Fossil's shared configs                                                                                                | `pnpm lint`                                        | ESLint and Prettier; Stylelint with Fossil's own config on every stylesheet. Fossil's ESLint config arrives in Phase 5                                                                                            |
+| Type-checking, after generating CSS Module types                                                                                                  | `pnpm typecheck`                                   | All packages, with CSS Module types generated first                                                                                                                                                               |
+| Tests: Storybook interaction tests, axe checks with zero violations, real-input browser tests for native behaviour such as Escape on a `<dialog>` | `pnpm test`                                        | Workspace, token, Stylelint config and React unit tests; every story with axe; real-input tests for focus, hover and the native behaviour of every interactive component                                          |
+| Packed tarballs pass publint and attw                                                                                                             | `pnpm check:packages`                              | Every published package                                                                                                                                                                                           |
+| The packed packages install, type-check, build and render in a consumer app                                                                       | `pnpm smoke`                                       | A Next 16 app with a Server Component page and Motion on `Modal`, and a Vite app on React 18. CI runs it on every pull request; run it locally when a change touches the build, the exports or a client component |
+| A changeset, if a package's public surface changed                                                                                                | `pnpm changeset`                                   | Yes                                                                                                                                                                                                               |
 
 ## Conventions
 

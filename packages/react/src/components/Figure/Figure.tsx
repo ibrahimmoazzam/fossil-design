@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { cx } from '../../responsive.js';
 import { Box } from '../Box/Box.js';
 import { Text } from '../Text/Text.js';
+import hidden from '../VisuallyHidden/VisuallyHidden.module.css';
 import styles from './Figure.module.css';
 
 export interface FigureProps {
@@ -12,6 +13,11 @@ export interface FigureProps {
    * a `<figure>` exists to pair media with a caption.
    */
   caption?: ReactNode;
+  /**
+   * Keeps the caption for assistive technology but off the screen, for media the surrounding
+   * text already describes in full.
+   */
+  captionHidden?: boolean;
   /** Size the figure from the app's stylesheet, such as a width at a breakpoint. */
   className?: string;
 }
@@ -21,7 +27,12 @@ export interface FigureProps {
  * with its own `alt`: describe what it shows, or use `alt=""` when the caption or the
  * surrounding text already does.
  */
-export function Figure({ children, caption, className }: FigureProps) {
+export function Figure({
+  children,
+  caption,
+  captionHidden = false,
+  className,
+}: FigureProps) {
   const frame = (
     <Box className={cx(styles.frame, caption === undefined && className)}>
       {children}
@@ -41,7 +52,7 @@ export function Figure({ children, caption, className }: FigureProps) {
         as="figcaption"
         variant="caption"
         tone="muted"
-        className={styles.caption}
+        className={captionHidden ? hidden.visuallyHidden : styles.caption}
       >
         {caption}
       </Text>

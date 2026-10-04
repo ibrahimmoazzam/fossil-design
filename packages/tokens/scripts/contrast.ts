@@ -1,16 +1,21 @@
 import { isRecord } from './validate.ts';
 
-/** A DTCG colour's sRGB channels, 0 to 1, read from its 8-bit hex as WCAG defines them. */
-const channels = (colour: unknown): number[] | undefined => {
+/** A DTCG colour's sRGB channels, 0 to 1, read from its 8-bit hex as WCAG defines them, and its alpha. */
+const read = (
+  colour: unknown,
+): { rgb: number[]; alpha: number } | undefined => {
   if (!isRecord(colour) || colour.colorSpace !== 'srgb') return undefined;
-  if (typeof colour.alpha === 'number' && colour.alpha < 1) return undefined;
+  const alpha = typeof colour.alpha === 'number' ? colour.alpha : 1;
   if (typeof colour.hex === 'string' && /^#[0-9a-f]{6}$/i.test(colour.hex))
-    return [1, 3, 5].map(
-      (i) => parseInt(String(colour.hex).slice(i, i + 2), 16) / 255,
-    );
+    return {
+      rgb: [1, 3, 5].map(
+        (i) => parseInt(String(colour.hex).slice(i, i + 2), 16) / 255,
+      ),
+      alpha,
+    };
   return Array.isArray(colour.components) &&
     colour.components.every((c) => typeof c === 'number')
-    ? colour.components
+    ? { rgb: colour.components, alpha }
     : undefined;
 };
 
@@ -21,16 +26,29 @@ const luminance = ([r = 0, g = 0, b = 0]: number[]): number => {
   return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
 };
 
-/**
- * WCAG 2.2's contrast ratio between two DTCG colours, from 1 to 21. Undefined when either isn't
- * an opaque sRGB colour, because a translucent one depends on what lies beneath it.
- */
-export function contrastRatio(a: unknown, b: unknown): number | undefined {
-  const x = channels(a);
-  const y = channels(b);
-  if (x === undefined || y === undefined) return undefined;
+const ratio = (x: number[], y: number[]): number => {
   const [lighter, darker] = [luminance(x), luminance(y)].sort(
     (p, q) => q - p,
   ) as [number, number];
   return (lighter + 0.05) / (darker + 0.05);
+};
+
+/**
+ * WCAG 2.2's contrast ratio of a foreground on a background, from 1 to 21. A translucent
+ * background, such as a veil over a photo, is checked at its worst: laid over white and over
+ * black, whichever gives less contrast. Undefined for a translucent foreground, or a colour that
+ * isn't sRGB.
+ */
+export function contrastRatio(
+  foreground: unknown,
+  background: unknown,
+): number | undefined {
+  const fore = read(foreground);
+  const back = read(background);
+  if (fore === undefined || back === undefined || fore.alpha < 1)
+    return undefined;
+  if (back.alpha >= 1) return ratio(fore.rgb, back.rgb);
+  const over = (beneath: number) =>
+    back.rgb.map((c) => c * back.alpha + beneath * (1 - back.alpha));
+  return Math.min(ratio(fore.rgb, over(1)), ratio(fore.rgb, over(0)));
 }

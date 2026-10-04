@@ -1,0 +1,127 @@
+/* Panel above, list below: the markup's order, so focus order matches the screen. */
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fossil-space-m);
+  min-inline-size: 0;
+}
+
+.panel {
+  min-inline-size: 0;
+}
+
+.panelContent {
+  transition-duration: var(--fossil-motion-duration-base);
+  transition-property: opacity, translate;
+  transition-timing-function: var(--fossil-motion-easing-standard);
+}
+
+@starting-style {
+  .panelContent {
+    opacity: 0;
+    translate: 0 0.25rem;
+  }
+}
+
+/*
+ * Places the pill without letting its width travel upward. minmax(0, max-content) lets the pill
+ * hug its tabs while they fit, and reports 0 as its minimum, so a container sized to it scrolls
+ * the pill instead of stretching.
+ */
+.listRow {
+  display: grid;
+  grid-template-columns: minmax(0, max-content);
+}
+
+.align-center {
+  justify-content: center;
+}
+
+.align-start {
+  justify-content: start;
+}
+
+/*
+ * Scrolls sideways rather than wrapping: a segmented control on two lines stops reading as one.
+ * The padding is the chip's inset and the room a focus ring needs before overflow clips it.
+ */
+.list {
+  display: flex;
+  overflow-x: auto;
+  align-items: center;
+  padding: var(--fossil-space-2xs);
+  border-radius: var(--fossil-radius-pill);
+  background-color: var(--fossil-color-background-sunken);
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.tab {
+  position: relative;
+  flex: none;
+  padding-block: var(--fossil-space-s);
+  padding-inline: var(--fossil-space-l);
+  border-width: 0;
+  border-radius: var(--fossil-radius-pill);
+  background-color: transparent;
+  color: var(--fossil-color-text-muted);
+  font-family: var(--fossil-text-control-font-family);
+  font-size: var(--fossil-text-control-font-size);
+  font-weight: var(--fossil-text-control-font-weight);
+  letter-spacing: var(--fossil-text-control-letter-spacing);
+  line-height: var(--fossil-text-control-line-height);
+  cursor: pointer;
+  transition: color var(--fossil-motion-duration-fast)
+    var(--fossil-motion-easing-standard);
+}
+
+.tab:hover {
+  color: var(--fossil-color-text-default);
+}
+
+.tab:focus-visible {
+  outline: var(--fossil-border-focus);
+  outline-offset: var(--fossil-focus-ring-offset);
+}
+
+/*
+ * Selection is marked three ways, so none carries it alone: the chip, which sits below 3:1
+ * against the track, the highlight colour and the weight.
+ */
+.tab[aria-selected='true'] {
+  color: var(--fossil-color-highlight-default);
+  font-weight: var(--fossil-font-weight-strong);
+}
+
+.chip {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--fossil-radius-pill);
+  background-color: var(--fossil-color-background-raised);
+}
+
+.label {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+/*
+ * A bold copy of the label with no height and no paint, so a tab is always as wide as its
+ * selected state and the row never shifts when the weight changes.
+ */
+.ghost {
+  display: block;
+  overflow: hidden;
+  block-size: 0;
+  font-weight: var(--fossil-font-weight-strong);
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panelContent,
+  .tab {
+    transition: none;
+  }
+}
