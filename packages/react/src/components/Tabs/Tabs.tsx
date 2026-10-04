@@ -2,12 +2,12 @@
 
 import {
   useId,
-  useLayoutEffect,
   useRef,
   useState,
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect.js';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js';
 import { cx } from '../../responsive.js';
 import { Box } from '../Box/Box.js';
@@ -87,7 +87,7 @@ export function Tabs({
 
   // A panel with nothing focusable in it needs a tab stop of its own to be reachable; one that
   // has its own controls doesn't, and the pattern says to leave it out.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const panel = panelRef.current;
     if (panel) panel.tabIndex = panel.querySelector(FOCUSABLE) ? -1 : 0;
   }, [selected?.id]);

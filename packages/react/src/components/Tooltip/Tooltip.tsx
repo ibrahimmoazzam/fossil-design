@@ -20,12 +20,12 @@ import {
 } from '@floating-ui/react';
 import {
   cloneElement,
-  useLayoutEffect,
   useRef,
   useState,
   type ReactElement,
   type ReactNode,
 } from 'react';
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect.js';
 import { usePresence } from '../../hooks/usePresence.js';
 import {
   ORIGIN,
@@ -147,7 +147,7 @@ export function Tooltip({
     state,
   } = usePresence<HTMLDivElement>(open);
   const surfaceRef = useRef<HTMLDivElement | null>(null);
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (open && surfaceRef.current) fitToLines(surfaceRef.current);
   }, [open, content]);
 

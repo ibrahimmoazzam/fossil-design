@@ -4,7 +4,6 @@ import {
   Children,
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -12,6 +11,7 @@ import {
 } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '../../generated/icons.js';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js';
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect.js';
 import { usePresence } from '../../hooks/usePresence.js';
 import { cx } from '../../responsive.js';
 import { Box, type SpaceToken } from '../Box/Box.js';
@@ -98,7 +98,7 @@ export function Carousel({
     state: controlsState,
   } = usePresence<HTMLDivElement>(reach.scrollable);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (trackRef.current) syncTabStop(trackRef.current);
   }, [count]);
 

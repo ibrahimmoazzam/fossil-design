@@ -1,4 +1,9 @@
-import { createElement, type HTMLAttributes, type ReactNode } from 'react';
+import {
+  createElement,
+  type HTMLAttributes,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import { cx } from '../../responsive.js';
 import styles from './VisuallyHidden.module.css';
 
@@ -30,7 +35,9 @@ export function VisuallyHidden({
   as = 'span',
   className,
   ...rest
-}: VisuallyHiddenProps) {
+}: VisuallyHiddenProps): ReactElement {
+  // Annotated: an inferred createElement type would copy this @types/react version's props into
+  // the declaration, which consumers on another version can't read.
   return createElement(as, {
     ...rest,
     className: cx(styles.visuallyHidden, className),
