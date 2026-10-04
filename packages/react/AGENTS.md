@@ -63,3 +63,6 @@ Traps the dry run and the build found, so nobody has to find them again:
 - Floating UI ignores presses on elements added after a floating element opens. A test's outside target must exist before it opens.
 - The React Compiler's lint treats an object holding a ref as a ref. Destructure a hook that returns one, such as `usePresence`, before reading its other fields during render.
 - A test clicking around a `<dialog>` should aim at the space beside the panel, not at the frame's very edge, where the click may never reach the page.
+- Give a component that returns `createElement(...)` an explicit return type. An inferred one copies this `@types/react` version's props into the declaration, which a consumer on another version can't read. The smoke test's type-check catches it.
+- Use `useIsomorphicLayoutEffect`, never `useLayoutEffect`: React 18 warns when a layout effect renders on the server. The smoke test fails on any warning from React 18's server render.
+- A Vite app without `@vitejs/plugin-react` sees a `MODULE_LEVEL_DIRECTIVE` notice for each `'use client'` module. The plugin silences them, and Vite's React template includes it.

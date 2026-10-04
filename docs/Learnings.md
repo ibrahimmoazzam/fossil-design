@@ -512,6 +512,10 @@ Building the component package's foundation settled these, each checked against 
 - **Real input in Vitest's browser mode** goes to whichever frame has focus, so test files running in parallel frames take each other's keystrokes. Real-input projects set `fileParallelism: false`.
 - **The React Compiler's lint** treats an object holding a ref as a ref: reading its other fields during render is reported. Destructure such a hook's result.
 - **Chromium headless** records video from a canvas with `MediaRecorder`, so a story can load a real clip without a video file in the repository.
+- **A declaration inferred from `createElement`** copies the full props of the `@types/react` it was built with, including types other versions lack, such as 19.3's `SubmitEventHandler`. A consumer's type-check then fails inside Fossil. Explicit return types avoid it.
+- **React 18's server renderer warns about `useLayoutEffect`;** React 19's doesn't. Libraries that support both use a layout effect in the browser and a plain effect on the server.
+- **Vite 8's bundler** prints a `MODULE_LEVEL_DIRECTIVE` notice for each `'use client'` module it bundles. `@vitejs/plugin-react` 6.1 silences it for `use client` and `use server`.
+- **Next 16.3 with Turbopack** builds and prerenders a Server Component page from Fossil's tarballs. In its production build, Motion 14's `AnimatePresence` ran `Modal`'s panel through `renderPanel` with no console errors.
 - **`eslint-plugin-jsx-a11y` 6.10.2** declares ESLint 9 as its highest peer, so it doesn't run on ESLint 10. Storybook's axe checks cover the rendered output instead.
 
 ---
