@@ -488,6 +488,24 @@ npm is restricting tokens that bypass 2FA. Re-checked September 2026:
 
 Trusted publishing from GitHub Actions is the correct setup, and is cheap to configure at project start.
 
+### The Phase 4 build (October 2026)
+
+Building the component package's foundation settled these, each checked against the installed version:
+
+- **pnpm 12.8** blocks dependency build scripts by default, and fails the install until each is approved or denied. esbuild's only checks its platform binary, so it is denied (`allowBuilds: { esbuild: false }`); esbuild runs from its optional platform package without it.
+- **Vite 8.3:**
+  - `build.rolldownOptions` replaces `rollupOptions`, which remains as a deprecated alias.
+  - `build.cssMinify` follows `build.minify`, so turning minification off also skips Lightning CSS.
+- **`vite-css-modules` 1.16** has a CLI that reads `patchCssModules()` from the Vite config. In default-export mode its `.module.css.d.ts` keeps dashed class names as exact keys, so indexing a missing class fails type-checking.
+- **Storybook 10.6:**
+  - `addon-vitest` injects the project-annotations setup file itself; its Vitest 4+ template has no `setupFiles`.
+  - `addon-a11y` runs axe 4.13. With `test: 'error'`, a contrast failure fails the story's test.
+  - `@storybook/react-vite` already bundles `@joshwooding/vite-plugin-react-docgen-typescript`, which Phase 6 needs.
+- **Vitest 5** lets a project config declare its own projects. From the root, a nested project's name is prefixed with its parent's, as in `react (unit)`.
+- **`stylelint-declaration-strict-value` 1.12** checks shorthands longhand by longhand with `expandShorthand`, and accepts any function unless `ignoreFunctions` is off. **`stylelint-value-no-unknown-custom-properties` 6.1** accepts a `var()` with a fallback (ADR 0008).
+- **TypeScript 6** checks side-effect imports everywhere, including a Storybook preview's `import './preview.css'`.
+- **`eslint-plugin-jsx-a11y` 6.10.2** declares ESLint 9 as its highest peer, so it doesn't run on ESLint 10. Storybook's axe checks cover the rendered output instead.
+
 ---
 
 ## 6. Decisions and rationale
@@ -518,6 +536,12 @@ Trusted publishing from GitHub Actions is the correct setup, and is cheap to con
 | Component mapping | Exact naming parity between Figma and code | Replaces Code Connect, which needs Organization or Enterprise; `get_design_context` returns names and variant props without it |
 | Figma component library | Required, generated from code | Narrows design-side output the way the closed `Box` API narrows code: instances reach Claude Code as named components with variant props, while frames drawn from raw shapes arrive as generic boxes |
 | `Box` and `Stack` in Figma | Left out of the library | Auto layout already does their job; frames bound to Fossil variables reach Claude Code as `var(--fossil-*)` values that map onto their props |
+| Stylelint config timing | Built first in Phase 4, not Phase 5 | Phase 4's exit criterion lints every component stylesheet with it, and a stylesheet linted from its first line needs no clean-up (ADR 0008) |
+| Raw colours | Rejected in every value, not only in colour properties | The strict-value rule only sees the properties it is given, so a raw colour in a local custom property or a shadow would otherwise pass |
+| Icon set | Only the Material Symbols Fossil's own components use, listed in one file; `Icon` also takes any SVG component | A curated set keeps icons inside the closed surface. The rounded set alone is 3,927 icons, and every one would reach the agent docs. Adding an icon is a one-line change |
+| Popover focus | Floating UI's focus manager; no `focus-trap-react` | The portfolio's `Popover` already uses it. `focus-trap-react` belongs to the portfolio's `NavBar`, which stays there |
+| `Box` responsive props | One generated class per prop, value and breakpoint; `padding` resolved to block and inline longhands in JavaScript | Media queries need classes. With longhands only, the wider breakpoint wins, and at one breakpoint the longhand wins (ADR 0009) |
+| `Box` surfaces | Only fill and text pairs the token build checks for contrast | The generator fails on any other pair, so `surface` can't produce an unchecked combination |
 | Token access | Components and compositions use semantic tokens only. Typed props accept only semantic token keys, and the Stylelint config rejects primitives outside a consumer's site-tokens file | Keeps the two tiers meaningful: changing a primitive value restyles everything built on it, which is also what makes Fossil adaptable |
 | Terms | "Primitive" means the raw token tier only; product-specific components are "compositions" | Both words were overloaded, which confuses people and agents alike; one name per concept |
 | Library generation | A script writes each component's spec (names, variants, bindings) from code and checks the built result; the agent builds the frames | Names and bindings must be exact, so they come from code and get verified; only the frame layout needs judgment |

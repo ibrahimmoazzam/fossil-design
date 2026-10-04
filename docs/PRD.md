@@ -1,6 +1,6 @@
 # Fossil Design: Product Requirements Document
 
-**Status:** Draft for implementation, revised after the Phase 2 and Phase 4 dry run (1 October 2026)
+**Status:** Draft for implementation, revised after the Phase 2 and Phase 4 dry run (1 October 2026) and at the start of Phase 4 (4 October 2026)
 **Audience:** Claude Code, and any human contributor
 **Companion document:** `Learnings.md` contains the competitive research and the rationale behind every decision here. Read it if a decision seems arbitrary; it probably is not.
 
@@ -303,7 +303,7 @@ Phases are ordered by dependency. Each has an explicit exit criterion. Do not st
 5. **Output 3: `tokens.ts`.** Key unions per semantic group, such as `'space.gap': ['s', 'm', 'l']`, with deprecated keys left out, so component props accept only token keys.
 6. **Output 4: `breakpoints.ts`.** Literal values and media query strings, because custom properties can't be used in media conditions.
 7. **Typography.** Typography tokens are composites, which become Figma text styles in Phase 5b. In CSS, each part becomes its own aliased custom property: family, size, weight, line height, letter spacing. Never use the `font` shorthand, which drops letter-spacing and turns aliases into copied values.
-8. **Output 5: lint lists.** Primitive token names, and deprecated names with their replacements, for the Stylelint config (Phase 5).
+8. **Output 5: lint lists.** Primitive token names, and deprecated names with their replacements, for the Stylelint config (Phases 4 and 5).
 9. Deprecation report: a script that reads `tokens.json` and prints currently deprecated tokens.
 10. **Foundation rules in `AGENTS.md`,** generated from the tokens:
     - the spacing scale;
@@ -396,7 +396,8 @@ This is the most technically interesting phase. It has no dependency on Phase 4,
 Build against the Phase 1 inventory of the finished portfolio, not a guessed page list. Every component here should replace something the portfolio already has.
 
 **Tasks**
-1. **Styling: CSS Modules.** Components reference semantic custom properties and nothing else; the Phase 5 Stylelint config enforces this inside Fossil too.
+1. **Styling: CSS Modules.** Components reference semantic custom properties and nothing else; the shared Stylelint config enforces this inside Fossil too.
+   - **Build the Stylelint config first.** It is Phase 5's first task, moved here because this phase's exit criterion needs it, and because a stylesheet linted from its first line needs no clean-up later (ADR 0008). The rest of Phase 5 stays there.
    - `vite-css-modules` generates strict class-name types in default-export mode. A class typo, or a variant with no matching CSS class, is then a type error.
    - Generate those types with its CLI before type-checking, and keep them out of git.
    - The source `tsconfig` uses `moduleResolution: "bundler"`, because `NodeNext` doesn't find `.module.css.d.ts` files. Relative imports carry explicit `.js` extensions, so the emitted declarations still resolve under Node16.
@@ -413,7 +414,7 @@ Build against the Phase 1 inventory of the finished portfolio, not a guessed pag
    - **Layout and content:** `Text`, `Stack`, `Button`, `Card`.
    - **From `src/components/ui/`:**
      - `Link` renders an `<a>`, with `asChild` so `next/link` or another router's link can supply navigation.
-     - `Icon` ships the Material Symbols it uses as prebuilt React components, so consumers need no SVGR.
+     - `Icon` ships the Material Symbols that Fossil's own components use as prebuilt React components, so consumers need no SVGR for them. The names live in one list file, and adding one is a one-line change. `Icon` also takes any SVG component an app supplies.
      - `VisuallyHidden` uses the `clip-path` pattern, with no negative margin.
      - `SkipLink`.
      - `Figure`, as a container: Fossil owns the `<figure>`, the caption and the hairline frame, and the app passes in its own image, such as `next/image` or a plain `<img>`.
@@ -421,7 +422,7 @@ Build against the Phase 1 inventory of the finished portfolio, not a guessed pag
      - `Modal`, on native `<dialog>`;
      - `Tabs`;
      - `Carousel`, on native scrolling with scroll-snap;
-     - `Popover` and `Tooltip`, which bring Floating UI and `focus-trap-react` as dependencies. They share one internal stylesheet for the floating surface, harvested from the portfolio's `Floating`.
+     - `Popover` and `Tooltip`, which bring Floating UI as a dependency. `Popover` keeps focus with Floating UI's own focus manager, as the portfolio's does; the portfolio's `focus-trap-react` belongs to its `NavBar`, which stays there. They share one internal stylesheet for the floating surface, harvested from the portfolio's `Floating`.
      - `Clip`, as a container: Fossil owns the play and pause control, the reduced-motion behaviour (through `matchMedia`, not Motion) and the caption, and the app passes in its own video source.
    - **Stays in the portfolio:** `Reveal`, which is purely animation; `ComparisonSlider`, which is built on `next/image`; and the app-specific rest of `src/components/ui/`, as recorded in the inventory.
 5. **Motion-free, with extension points.**
@@ -480,10 +481,10 @@ Build against the Phase 1 inventory of the finished portfolio, not a guessed pag
 Both configs combine core and widely used rules with lists generated from the tokens. Fossil writes no lint rules of its own. Fossil lints its own source with them too, so the consumer path is dogfooded on every commit.
 
 **Tasks**
-1. **`@fossil-design/stylelint-config`.**
+1. **`@fossil-design/stylelint-config`.** Built at the start of Phase 4, which needs it for its exit criterion (ADR 0008).
    - **`stylelint-declaration-strict-value`:** colour, background, fill, stroke, padding, gap, radius, font and duration properties must use a custom property. Plain keywords such as `inherit`, `transparent` and `0` are allowed.
    - **`stylelint-value-no-unknown-custom-properties`:** every `var()` must name a custom property that exists. It imports Fossil's `tokens.css` plus the consumer's site tokens.
-   - **Core `declaration-property-value-disallowed-list`:** rejects primitive and deprecated names, using the generated lists.
+   - **Core `declaration-property-value-disallowed-list`:** rejects primitive and deprecated names, using the generated lists, and raw colour syntax (hex and colour functions) in any value. The strict-value rule only sees colour properties, so without this a raw colour could sit in a local custom property or a shadow.
    - **Core `declaration-property-value-allowed-list`:** margins may only be `0`.
    - **Disables:** `reportDescriptionlessDisables` and `reportNeedlessDisables` are on.
    - **The `siteTokens` option** names the consumer's own tokens file. Those files may alias Fossil primitives and hold raw values; everywhere else is semantic-only. This is the sanctioned way to add site-specific tokens, such as the portfolio's coffee and heart colours.
@@ -668,6 +669,8 @@ This is the most publishable artifact in the project and the strongest case-stud
 Phases 0 through 2 are strictly sequential and are the spine of the project. Nothing else works without them.
 
 Phase 3 (Figma) is independent of Phases 4 and 5 and can be reordered freely, but it must land before Phase 5b, which binds components to its variables. It is the most interesting and the most likely to stall, so tackle it when momentum is high rather than when the order says to.
+
+Phase 5's Stylelint config is built at the start of Phase 4, because Phase 4's exit criterion lints every component stylesheet with it. The rest of Phase 5 follows Phase 4.
 
 Phase 5b needs Phases 3 and 4. Build it straight after Phase 4, before any real design work starts in Figma.
 
