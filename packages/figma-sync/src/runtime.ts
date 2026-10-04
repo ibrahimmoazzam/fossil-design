@@ -432,6 +432,9 @@ export async function apply(spec: ApplySpec, figma: Figma): Promise<unknown> {
 
   const same = (a: FigmaValue | undefined, b: FigmaValue): boolean => {
     if (a === undefined) return false;
+    // Figma keeps numbers as 32-bit floats: 1.2 comes back as 1.2000000476837158.
+    if (typeof a === 'number' && typeof b === 'number')
+      return Math.fround(a) === Math.fround(b);
     if (typeof a !== 'object' || typeof b !== 'object') return a === b;
     if ('type' in a || 'type' in b) {
       if (!('type' in a) || !('type' in b)) return false;
@@ -489,7 +492,14 @@ export async function apply(spec: ApplySpec, figma: Figma): Promise<unknown> {
       variable.setVariableCodeSyntax('WEB', v.code);
       changes.push('code syntax');
     }
-    if (variable.description !== v.description) {
+    // Figma keeps a description HTML-escaped: & < > " and ' come back as entities.
+    const description = variable.description
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&');
+    if (description !== v.description) {
       variable.description = v.description;
       changes.push('description');
     }

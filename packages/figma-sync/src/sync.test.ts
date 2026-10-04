@@ -11,7 +11,7 @@ import {
   type TokenFile,
 } from '../../tokens/scripts/validate.ts';
 import { diff, type Report } from './diff.ts';
-import { FakeFigma } from './fake-figma.ts';
+import { FakeFigma, float32 } from './fake-figma.ts';
 import { figmaTokens, type FigmaToken } from './model.ts';
 import { sha256, type ReadPage, type Spec } from './runtime.ts';
 import { CHANGED, script } from './scripts.ts';
@@ -243,6 +243,9 @@ describe('applying to a fresh file', () => {
     expect(muted.description).toBe(
       'Secondary text. 7.38:1 on the page in light, 12.70:1 in dark.',
     );
+    expect(figma.variable('color.border.hover').description).toBe(
+      'A control&#39;s edge on hover. 7.38:1 on the page in light, 12.70:1 in dark.',
+    );
   });
 
   it('takes code syntax from tokens.json', () => {
@@ -279,7 +282,7 @@ describe('applying to a fresh file', () => {
   it('holds primitive values in Figma units, with empty scopes', () => {
     const gray = figma.variable('color.gray.600');
     expect(gray.valuesByMode[figma.mode(gray, 'Value')]).toEqual(
-      rgba('#4a5159'),
+      float32(rgba('#4a5159')),
     );
     expect(gray.scopes).toEqual([]);
     const space = figma.variable('space.100');
@@ -290,12 +293,19 @@ describe('applying to a fresh file', () => {
   it('holds durations in seconds and easing as a custom curve, and leaves their scopes alone', () => {
     const duration = figma.variable('duration.150');
     expect(duration.resolvedType).toBe('TIMING');
-    expect(duration.valuesByMode[figma.mode(duration, 'Value')]).toBe(0.15);
+    expect(duration.valuesByMode[figma.mode(duration, 'Value')]).toBe(
+      Math.fround(0.15),
+    );
     const easing = figma.variable('easing.ease');
     expect(easing.resolvedType).toBe('EASING');
     expect(easing.valuesByMode[figma.mode(easing, 'Value')]).toEqual({
       type: 'CUSTOM_CUBIC_BEZIER',
-      easingFunctionCubicBezier: { x1: 0.25, y1: 0.1, x2: 0.25, y2: 1 },
+      easingFunctionCubicBezier: {
+        x1: 0.25,
+        y1: Math.fround(0.1),
+        x2: 0.25,
+        y2: 1,
+      },
     });
     const standard = figma.variable('motion.easing.standard');
     expect(standard.valuesByMode[figma.mode(standard, 'Light')]).toEqual({
@@ -393,6 +403,20 @@ describe('applying safely', () => {
     await expect(applyAll(figma)).rejects.toThrow(
       'More than one variable is stamped with space.m',
     );
+  });
+
+  it('leaves a description alone on the next run, though Figma escapes it', async () => {
+    const figma = new FakeFigma();
+    const marked = editFile(source, 'semantic/color.tokens.json', (json) => {
+      must(must(semanticColor(json).text).muted).$description =
+        'Tom & Jerry\'s <b>"muted"</b> text, not &#39;.';
+    });
+    await applyAll(figma, marked);
+    expect(figma.variable('color.text.muted').description).toBe(
+      'Tom &amp; Jerry&#39;s &lt;b&gt;&quot;muted&quot;&lt;/b&gt; text, not &amp;#39;.',
+    );
+    for (const part of (await applyAll(figma, marked)).slice(0, -1))
+      expect(part).toMatchObject({ updated: [] });
   });
 });
 

@@ -46,3 +46,6 @@ Each one is verified in `docs/Learnings.md`:
 - Professional and Education files allow four modes per collection.
 - An empty `scopes` list hides a variable from Figma's pickers, which is how primitives stay out of designers' way.
 - Figma refuses scopes on timing and easing variables, so the sync never sets them, and primitive durations and curves stay visible.
+- Figma keeps every number as a 32-bit float, colour channels and curve points included, so the apply compares numbers at that precision.
+- Figma HTML-escapes `&`, `<`, `>`, `"` and `'` in a variable's description, so the apply decodes them before comparing.
+- The Plugin API can't reorder variables. Figma lists them in the order they were created, which follows the token files.

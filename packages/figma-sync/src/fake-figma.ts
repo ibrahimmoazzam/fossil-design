@@ -2,6 +2,31 @@ import type { Figma, FigmaCollection, FigmaVariable } from './runtime.ts';
 
 type Value = FigmaVariable['valuesByMode'][string];
 
+/** A value as Figma keeps it: every number as a 32-bit float, so 1.2 comes back as 1.2000000476837158. */
+export const float32 = (value: Value): Value => {
+  if (typeof value === 'number') return Math.fround(value);
+  if (typeof value !== 'object') return value;
+  if ('r' in value)
+    return {
+      r: Math.fround(value.r),
+      g: Math.fround(value.g),
+      b: Math.fround(value.b),
+      a: Math.fround(value.a),
+    };
+  if (value.type === 'VARIABLE_ALIAS' || !value.easingFunctionCubicBezier)
+    return value;
+  const { x1, y1, x2, y2 } = value.easingFunctionCubicBezier;
+  return {
+    type: value.type,
+    easingFunctionCubicBezier: {
+      x1: Math.fround(x1),
+      y1: Math.fround(y1),
+      x2: Math.fround(x2),
+      y2: Math.fround(y2),
+    },
+  };
+};
+
 class Data {
   readonly #data = new Map<string, string>();
 
@@ -53,7 +78,7 @@ class Variable extends Data implements FigmaVariable {
   readonly valuesByMode: Record<string, Value> = {};
   readonly codeSyntax: Record<string, string> = {};
   #scopes = ['ALL_SCOPES'];
-  description = '';
+  #description = '';
   #name: string;
   readonly #figma: FakeFigma;
 
@@ -81,6 +106,20 @@ class Variable extends Data implements FigmaVariable {
     if (this.resolvedType === 'TIMING' || this.resolvedType === 'EASING')
       throw new Error('Cannot set scopes on this variable type');
     this.#scopes = scopes;
+  }
+
+  get description(): string {
+    return this.#description;
+  }
+
+  /** Figma keeps a description HTML-escaped: & < > " and ' come back as entities, and nothing else changes. */
+  set description(text: string) {
+    this.#description = text
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
   }
 
   get name(): string {
@@ -132,7 +171,7 @@ class Variable extends Data implements FigmaVariable {
           `A ${this.resolvedType} variable can't hold ${JSON.stringify(value)}`,
         );
     }
-    this.valuesByMode[modeId] = value;
+    this.valuesByMode[modeId] = float32(value);
   }
 
   setVariableCodeSyntax(platform: 'WEB', value: string): void {
