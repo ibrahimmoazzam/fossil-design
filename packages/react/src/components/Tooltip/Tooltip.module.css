@@ -1,0 +1,19 @@
+/* Set in the mono face, as the portfolio's floating surfaces are, at the fine text size. */
+.tooltip {
+  composes: surface from '../Floating/floating.module.css';
+  display: flex;
+  align-items: center;
+  gap: var(--fossil-space-2xs);
+  padding-block: var(--fossil-space-xs);
+  padding-inline: var(--fossil-space-s);
+  border-radius: var(--fossil-radius-compact);
+  font-family: var(--fossil-font-family-mono);
+  font-size: var(--fossil-text-fine-font-size);
+  font-weight: var(--fossil-text-fine-font-weight);
+  letter-spacing: var(--fossil-text-fine-letter-spacing);
+  line-height: var(--fossil-text-fine-line-height);
+}
+
+.arrow {
+  composes: arrow from '../Floating/floating.module.css';
+}

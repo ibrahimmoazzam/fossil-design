@@ -5,7 +5,14 @@ import { patchCssModules } from 'vite-css-modules';
 import fossilConfig from '../../fossil.config.json' with { type: 'json' };
 import pkg from './package.json' with { type: 'json' };
 
-const peers = Object.keys(pkg.peerDependencies);
+// The tokens are bundled into style.css, never imported at runtime; a bare CSS import left in JS
+// breaks Node, Vitest and Jest consumers.
+const external = [
+  ...Object.keys(pkg.peerDependencies),
+  ...Object.keys(pkg.dependencies).filter(
+    (name) => name !== '@fossil-design/tokens',
+  ),
+];
 
 /** A consumer's `import '@fossil-design/react/style.css'` needs a declaration under TypeScript 6. */
 function styleDeclaration(): Plugin {
@@ -63,7 +70,7 @@ export default defineConfig({
     minify: false,
     rolldownOptions: {
       external: (id) =>
-        peers.some((peer) => id === peer || id.startsWith(`${peer}/`)),
+        external.some((name) => id === name || id.startsWith(`${name}/`)),
       output: {
         // One file per module keeps 'use client' on the components that need it.
         preserveModules: true,

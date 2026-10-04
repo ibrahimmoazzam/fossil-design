@@ -1,0 +1,34 @@
+/* The look Popover and Tooltip share. Each composes it, keeping its own size and spacing. */
+.surface {
+  z-index: var(--fossil-layer-overlay);
+  inline-size: max-content;
+  max-inline-size: min(20rem, calc(100vw - var(--fossil-space-l)));
+  background-color: var(--fossil-color-background-surface);
+  box-shadow: var(--fossil-shadow-floating);
+  color: var(--fossil-color-text-default);
+  transition-duration: var(--fossil-motion-duration-fast);
+  transition-property: opacity, scale;
+  transition-timing-function: var(--fossil-motion-easing-standard);
+}
+
+.surface[data-state='closed'] {
+  opacity: 0;
+  scale: 0.96;
+}
+
+@starting-style {
+  .surface {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+.arrow {
+  fill: var(--fossil-color-background-surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface {
+    transition: none;
+  }
+}

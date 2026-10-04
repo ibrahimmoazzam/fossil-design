@@ -1,0 +1,115 @@
+/*
+ * The dialog fills the viewport, so the panel can be centred and the scrim animated; ::backdrop
+ * can't be transitioned out. display stays off the base rule so the browser's
+ * dialog:not([open]) { display: none } still hides it when closed.
+ */
+.dialog {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: none;
+  max-block-size: none;
+  padding: var(--fossil-space-l);
+  border-width: 0;
+  background-color: transparent;
+}
+
+.dialog[open] {
+  display: grid;
+  place-items: center;
+}
+
+/* One shared cell, so a tooltip portalled into the dialog doesn't push the panel off centre. */
+.dialog[open] > * {
+  grid-area: 1 / 1;
+}
+
+.dialog::backdrop {
+  background-color: transparent;
+}
+
+/* Clicks fall through the scrim to the dialog element, which is what turns a click outside into a dismissal. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background-color: var(--fossil-color-background-scrim);
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  transition: opacity var(--fossil-motion-duration-base)
+    var(--fossil-motion-easing-standard);
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  overflow: hidden auto;
+  flex-direction: column;
+  gap: var(--fossil-space-l);
+  inline-size: min(100%, 32rem);
+  max-block-size: 100%;
+  padding: var(--fossil-space-xl);
+  border-radius: var(--fossil-radius-surface);
+  background-color: var(--fossil-color-background-surface);
+  box-shadow: var(--fossil-shadow-overlay);
+  color: var(--fossil-color-text-default);
+}
+
+/* Fossil's own fade and scale. A panel rendered through renderPanel animates itself instead. */
+.animated {
+  transition-duration: var(--fossil-motion-duration-base);
+  transition-property: opacity, scale;
+  transition-timing-function: var(--fossil-motion-easing-standard);
+}
+
+.dialog[data-state='closed'] .scrim,
+.dialog[data-state='closed'] .animated {
+  opacity: 0;
+}
+
+.dialog[data-state='closed'] .animated {
+  scale: 0.92;
+}
+
+@starting-style {
+  .dialog[open] .scrim,
+  .dialog[open] .animated {
+    opacity: 0;
+  }
+
+  .dialog[open] .animated {
+    scale: 0.92;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fossil-space-m);
+}
+
+.header:has(.headerContent) {
+  gap: var(--fossil-space-xs);
+}
+
+/* Focused when the dialog opens, so a screen reader announces it; it's not a control. */
+.title:focus-visible {
+  outline: none;
+}
+
+.headerContent {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fossil-space-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim,
+  .animated {
+    transition: none;
+  }
+}

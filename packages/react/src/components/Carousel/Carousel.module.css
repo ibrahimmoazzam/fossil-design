@@ -1,0 +1,180 @@
+/*
+ * Knobs an app can set from its own stylesheet, on this element or any ancestor:
+ *   --carousel-gutter      inset at both ends; the page gutter makes a full-bleed carousel line
+ *                          its first card up with the text above it
+ *   --carousel-item-width  a fixed card width; unset, each card sizes itself
+ *   --carousel-bleed       room on every side for what a card paints outside its box, such as a
+ *                          focus ring or a shadow. overflow-x: auto clips both axes.
+ * The gap between cards is the gap prop.
+ */
+.carousel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fossil-space-m);
+  min-inline-size: 0;
+}
+
+.carousel:has(> .dots) {
+  gap: var(--fossil-space-2xs);
+}
+
+/* The track is the offsetParent, so a card's offsetLeft shares scrollLeft's origin. */
+.track {
+  position: relative;
+  display: flex;
+  overflow-x: auto;
+  flex-direction: row;
+  margin: 0;
+  padding-block: var(--carousel-bleed, var(--fossil-space-2xs));
+  padding-inline: var(--carousel-inset);
+  list-style: none;
+  overscroll-behavior-inline: contain;
+  scroll-padding-inline: var(--carousel-inset);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* The gutter places the cards and the bleed is the margin around them; both step and snap read it. */
+  --carousel-inset: calc(
+    var(--carousel-gutter, 0px) + var(--carousel-bleed, var(--fossil-space-2xs))
+  );
+}
+
+.track:focus-visible {
+  outline: var(--fossil-border-focus);
+  outline-offset: calc(-1 * var(--fossil-focus-ring-width));
+}
+
+.item {
+  display: flex;
+  flex: 0 0 var(--carousel-item-width, auto);
+  scroll-snap-align: start;
+}
+
+.item > * {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--fossil-space-xs);
+  padding-inline: var(--carousel-gutter, 0);
+}
+
+.controls,
+.dots {
+  transition-duration: var(--fossil-motion-duration-base);
+  transition-property: opacity, translate;
+  transition-timing-function: var(--fossil-motion-easing-standard);
+}
+
+.controls[data-state='closed'],
+.dots[data-state='closed'] {
+  opacity: 0;
+  translate: 0 0.375rem;
+}
+
+@starting-style {
+  .controls,
+  .dots {
+    opacity: 0;
+    translate: 0 0.375rem;
+  }
+}
+
+/* aria-disabled rather than disabled, so the button under the pointer keeps focus at the end. */
+.control[aria-disabled='true'] {
+  cursor: default;
+  opacity: 0.4;
+}
+
+/*
+ * Each dot is a 24px button, WCAG 2.5.8's minimum, edge to edge. Each mark is drawn pulled
+ * toward the row's middle, but never outside its own button, so a dot always hits its target.
+ */
+.dots {
+  position: relative;
+  display: flex;
+  align-self: center;
+  /* Set per carousel from its children; the default only keeps the declaration valid. */
+  --count: 2;
+  --dot-size: 6px;
+  --dot-target: 24px;
+  --dot-spacing: max(
+    12px,
+    calc(
+      var(--dot-target) - (var(--dot-target) - var(--dot-size)) /
+        (var(--count) - 1)
+    )
+  );
+}
+
+/* The pill hugs the dots, not their buttons, with even ends. */
+.dots::before {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 50%;
+  inline-size: calc(
+    (var(--count) - 1) * var(--dot-spacing) + var(--dot-target)
+  );
+  border-radius: var(--fossil-radius-pill);
+  background-color: var(--fossil-color-background-page);
+  content: '';
+  translate: -50% 0;
+}
+
+.dot {
+  /* Set per dot: its place in the row. */
+  --i: 0;
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: var(--dot-target);
+  block-size: var(--dot-target);
+  padding: 0;
+  border-width: 0;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+/* border.strong clears 3:1 on the page and on a card; the current dot is text.default. */
+.dot::before {
+  inline-size: var(--dot-size);
+  block-size: var(--dot-size);
+  border-radius: var(--fossil-radius-pill);
+  background-color: var(--fossil-color-border-strong);
+  content: '';
+  transition: background-color var(--fossil-motion-duration-base)
+    var(--fossil-motion-easing-standard);
+  translate: calc(
+      (var(--i) - (var(--count) - 1) / 2) *
+        (var(--dot-spacing) - var(--dot-target))
+    )
+    0;
+}
+
+.dot:hover::before {
+  background-color: var(--fossil-color-border-hover);
+}
+
+.dot[aria-current='true']::before {
+  background-color: var(--fossil-color-text-default);
+}
+
+/* The ring goes on the mark, since the button no longer centres on it. */
+.dot:focus-visible {
+  outline: none;
+}
+
+.dot:focus-visible::before {
+  outline: var(--fossil-border-focus);
+  outline-offset: var(--fossil-focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .controls,
+  .dots,
+  .dot::before {
+    transition: none;
+  }
+}

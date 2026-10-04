@@ -24,6 +24,12 @@ export {
   type ButtonTone,
 } from './components/Button/Button.js';
 export {
+  Carousel,
+  carouselVariants,
+  type CarouselIndicator,
+  type CarouselProps,
+} from './components/Carousel/Carousel.js';
+export {
   Card,
   cardElements,
   cardHeadingElements,
@@ -31,6 +37,8 @@ export {
   type CardHeadingElement,
   type CardProps,
 } from './components/Card/Card.js';
+export { Clip, type ClipProps } from './components/Clip/Clip.js';
+export { useClipPlayback } from './components/Clip/useClipPlayback.js';
 export { Figure, type FigureProps } from './components/Figure/Figure.js';
 export type { IconComponent } from './components/Icon/createIcon.js';
 export {
@@ -46,6 +54,13 @@ export {
   type LinkTone,
 } from './components/Link/Link.js';
 export {
+  Modal,
+  type ModalPanelProps,
+  type ModalProps,
+  type ModalRenderPanel,
+} from './components/Modal/Modal.js';
+export { Popover, type PopoverProps } from './components/Popover/Popover.js';
+export {
   SkipLink,
   type SkipLinkProps,
 } from './components/SkipLink/SkipLink.js';
@@ -56,6 +71,13 @@ export {
   type StackProps,
 } from './components/Stack/Stack.js';
 export {
+  Tabs,
+  tabsVariants,
+  type TabItem,
+  type TabsAlign,
+  type TabsProps,
+} from './components/Tabs/Tabs.js';
+export {
   Text,
   textElements,
   textVariants,
@@ -65,6 +87,7 @@ export {
   type TextTone,
   type TextVariant,
 } from './components/Text/Text.js';
+export { Tooltip, type TooltipProps } from './components/Tooltip/Tooltip.js';
 export {
   VisuallyHidden,
   visuallyHiddenElements,
