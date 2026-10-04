@@ -125,6 +125,46 @@ export const isRecord = (v: unknown): v is Record<string, unknown> =>
 export const referenceOf = (v: unknown): string | undefined =>
   typeof v === 'string' ? REFERENCE.exec(v)?.[1] : undefined;
 
+/**
+ * Where each key appears in a JSON text, by dotted path. `JSON.parse` moves integer-like keys
+ * such as `100` ahead of every other key, so `space.025` would follow `space.1000`.
+ */
+export function keyOrder(text: string): Map<string, number> {
+  const order = new Map<string, number>();
+  const path: string[] = [];
+  const open: { array: boolean; index: number }[] = [];
+  let key = '';
+  const tokens = [...text.matchAll(/"(?:[^"\\]|\\.)*"|[{}[\],:]/g)].map(
+    (m) => m[0],
+  );
+  tokens.forEach((token, i) => {
+    const top = open.at(-1);
+    if (token.startsWith('"')) {
+      if (tokens[i + 1] !== ':') return;
+      key = JSON.parse(token) as string;
+      order.set([...path, key].join('.'), order.size);
+    } else if (token === '{' || token === '[') {
+      if (top) path.push(top.array ? String(top.index) : key);
+      open.push({ array: token === '[', index: 0 });
+    } else if (token === '}' || token === ']') {
+      open.pop();
+      if (open.length > 0) path.pop();
+    } else if (token === ',' && top?.array) top.index += 1;
+  });
+  return order;
+}
+
+/** An object's keys in the order its source text lists them; keys the text lacks go last. */
+export const keysInOrder = (
+  node: Record<string, unknown>,
+  order: ReadonlyMap<string, number>,
+  path: readonly string[],
+): string[] => {
+  const rank = (k: string) =>
+    order.get([...path, k].join('.')) ?? Number.MAX_SAFE_INTEGER;
+  return Object.keys(node).sort((a, b) => rank(a) - rank(b));
+};
+
 const isNumber = (v: unknown): v is number =>
   typeof v === 'number' && Number.isFinite(v);
 
@@ -264,6 +304,7 @@ function collect(file: TokenFile, problems: Problem[]): RawToken[] {
     });
     return [];
   }
+  const order = keyOrder(file.content);
   const found: RawToken[] = [];
   const walk = (
     node: unknown,
@@ -305,7 +346,8 @@ function collect(file: TokenFile, problems: Problem[]): RawToken[] {
       });
       return;
     }
-    for (const [name, child] of Object.entries(node)) {
+    for (const name of keysInOrder(node, order, path)) {
+      const child = node[name];
       if (name.startsWith('$')) continue;
       if (/[{}.]/.test(name)) {
         problems.push({
