@@ -1,5 +1,12 @@
 # @fossil-design/tokens
 
+## 0.2.0
+
+### Minor Changes
+
+- 32d3c6c: Colour tokens declare what they must stand out against and the WCAG ratio they need, under `contrast` in `tokens.json`. The AGENTS.md foundations table shows each ratio in light and dark, and descriptions no longer state ratios that a value change would make wrong. `tokens.json` now gives a token that aliases another semantic token its target's dark value: `color.border.selected` and `color.focus.ring` were listed with their light colour in dark mode.
+- dddd654: Adds `border.width.default` and `border.width.hairline`, semantic stroke widths. The border composites now reference them, and Figma offers them for stroke weight. `border.focus` takes its width from `focus.ring.width`, so a focus ring and a focus outline stay the same thickness.
+
 ## 0.1.1
 
 ### Patch Changes
