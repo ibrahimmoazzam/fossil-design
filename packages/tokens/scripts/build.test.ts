@@ -20,7 +20,13 @@ import {
 } from './build.ts';
 import { report } from './deprecations.ts';
 import { BLOCK_END, BLOCK_START } from './formats.ts';
-import { VENDOR } from './validate.ts';
+import {
+  readTokenFiles,
+  referenceOf,
+  validate,
+  VENDOR,
+  type Token,
+} from './validate.ts';
 
 const source = fileURLToPath(new URL('../src', import.meta.url));
 
@@ -97,6 +103,12 @@ const primitives = {
   },
 };
 
+/** The token a semantic token aliases in dark mode, if it has a dark value. */
+const darkOf = (token: Token | undefined): string | undefined =>
+  referenceOf(
+    (token?.extension?.modes as Record<string, unknown> | undefined)?.dark,
+  );
+
 const declaration = (css: string, name: string) =>
   new RegExp(`^\\s*${name}: (.*);$`, 'm').exec(css)?.[1];
 
@@ -105,6 +117,12 @@ describe('building the token source', () => {
   let css: string;
   let json: TokensFile;
   let agents: string;
+
+  /** A token's custom property, read from tokens.json. */
+  const name = (path: string) => {
+    const cssVar = json.tokens[path]?.cssVar;
+    return typeof cssVar === 'string' ? cssVar : path;
+  };
 
   beforeAll(async () => {
     const agentsFile = join(tempDir(), 'AGENTS.md');
@@ -126,11 +144,20 @@ describe('building the token source', () => {
   });
 
   it('writes semantic tokens as var() of the token they alias', () => {
-    expect(declaration(css, '--fossil-color-text-muted')).toBe(
-      'var(--fossil-color-gray-600)',
-    );
+    const tokens = validate(readTokenFiles(source)).tokens;
+    for (const token of tokens.filter((t) => t.tier === 'semantic')) {
+      const alias = referenceOf(token.value);
+      if (alias !== undefined)
+        expect(declaration(css, name(token.path)), token.path).toBe(
+          `var(${name(alias)})`,
+        );
+    }
+    const border = tokens.find((t) => t.path === 'border.default')?.value as
+      Record<string, unknown> | undefined;
     expect(declaration(css, '--fossil-border-default')).toBe(
-      'var(--fossil-border-width-1) var(--fossil-border-style-solid) var(--fossil-color-border-default)',
+      ['width', 'style', 'color']
+        .map((part) => `var(${name(referenceOf(border?.[part]) ?? part)})`)
+        .join(' '),
     );
   });
 
@@ -157,9 +184,13 @@ describe('building the token source', () => {
     )?.[1];
     const forced = /^:root\[data-theme="dark"\] \{\n([^}]*)\}/m.exec(css)?.[1];
     expect(media).toContain('color-scheme: dark;');
-    expect(media).toContain(
-      '--fossil-color-text-muted: var(--fossil-color-gray-300);',
-    );
+    for (const token of validate(readTokenFiles(source)).tokens) {
+      const dark = darkOf(token);
+      if (dark !== undefined)
+        expect(media, token.path).toContain(
+          `${name(token.path)}: var(${name(dark)});`,
+        );
+    }
     const lines = (block = '') =>
       block
         .split('\n')
@@ -174,26 +205,23 @@ describe('building the token source', () => {
   });
 
   it('records each token in tokens.json', () => {
+    // Read from the source, so a value changed in Figma or by a fork doesn't break the test.
+    const byPath = new Map(
+      validate(readTokenFiles(source)).tokens.map((t) => [t.path, t]),
+    );
+    const muted = byPath.get('color.text.muted');
+    const light = referenceOf(muted?.value) ?? '';
+    const dark = darkOf(muted);
     expect(json.tokens['color.text.muted']).toEqual({
       tier: 'semantic',
       type: 'color',
       cssVar: '--fossil-color-text-muted',
-      value: {
-        colorSpace: 'srgb',
-        components: [0.2902, 0.3176, 0.349],
-        hex: '#4a5159',
-      },
-      aliasOf: 'color.gray.600',
-      dark: {
-        value: {
-          colorSpace: 'srgb',
-          components: [0.8039, 0.8235, 0.8471],
-          hex: '#cdd2d8',
-        },
-        aliasOf: 'color.gray.300',
-      },
-      description:
-        'Secondary text. 7.38:1 on the page in light, 12.70:1 in dark.',
+      value: byPath.get(light)?.value,
+      aliasOf: light,
+      ...(dark !== undefined && {
+        dark: { value: byPath.get(dark)?.value, aliasOf: dark },
+      }),
+      description: muted?.description,
     });
   });
 

@@ -1,0 +1,26 @@
+{
+  "motion": {
+    "duration": {
+      "$type": "duration",
+      "fast": {
+        "$value": "{duration.150}",
+        "$description": "Colour and border changes."
+      },
+      "base": {
+        "$value": "{duration.200}",
+        "$description": "Most transitions."
+      },
+      "slow": {
+        "$value": "{duration.400}",
+        "$description": "Changes in size and layout."
+      }
+    },
+    "easing": {
+      "$type": "cubicBezier",
+      "standard": {
+        "$value": "{easing.ease}",
+        "$description": "The curve for every transition."
+      }
+    }
+  }
+}

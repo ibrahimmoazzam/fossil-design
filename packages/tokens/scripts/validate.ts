@@ -66,26 +66,27 @@ const COLOR_SPACES = new Set([
   'xyz-d65',
   'xyz-d50',
 ]);
-const FONT_WEIGHTS = new Set([
-  'thin',
-  'hairline',
-  'extra-light',
-  'ultra-light',
-  'light',
-  'normal',
-  'regular',
-  'book',
-  'medium',
-  'semi-bold',
-  'demi-bold',
-  'bold',
-  'extra-bold',
-  'ultra-bold',
-  'black',
-  'heavy',
-  'extra-black',
-  'ultra-black',
-]);
+/** DTCG's font weight names, and the number each one means. */
+export const FONT_WEIGHTS: Readonly<Record<string, number>> = {
+  thin: 100,
+  hairline: 100,
+  'extra-light': 200,
+  'ultra-light': 200,
+  light: 300,
+  normal: 400,
+  regular: 400,
+  book: 400,
+  medium: 500,
+  'semi-bold': 600,
+  'demi-bold': 600,
+  bold: 700,
+  'extra-bold': 800,
+  'ultra-bold': 800,
+  black: 900,
+  heavy: 900,
+  'extra-black': 950,
+  'ultra-black': 950,
+};
 const STROKE_STYLES = new Set([
   'solid',
   'dashed',
@@ -123,6 +124,46 @@ export const isRecord = (v: unknown): v is Record<string, unknown> =>
 /** The path a value references, such as `color.gray.600` for `"{color.gray.600}"`. */
 export const referenceOf = (v: unknown): string | undefined =>
   typeof v === 'string' ? REFERENCE.exec(v)?.[1] : undefined;
+
+/**
+ * Where each key appears in a JSON text, by dotted path. `JSON.parse` moves integer-like keys
+ * such as `100` ahead of every other key, so `space.025` would follow `space.1000`.
+ */
+export function keyOrder(text: string): Map<string, number> {
+  const order = new Map<string, number>();
+  const path: string[] = [];
+  const open: { array: boolean; index: number }[] = [];
+  let key = '';
+  const tokens = [...text.matchAll(/"(?:[^"\\]|\\.)*"|[{}[\],:]/g)].map(
+    (m) => m[0],
+  );
+  tokens.forEach((token, i) => {
+    const top = open.at(-1);
+    if (token.startsWith('"')) {
+      if (tokens[i + 1] !== ':') return;
+      key = JSON.parse(token) as string;
+      order.set([...path, key].join('.'), order.size);
+    } else if (token === '{' || token === '[') {
+      if (top) path.push(top.array ? String(top.index) : key);
+      open.push({ array: token === '[', index: 0 });
+    } else if (token === '}' || token === ']') {
+      open.pop();
+      if (open.length > 0) path.pop();
+    } else if (token === ',' && top?.array) top.index += 1;
+  });
+  return order;
+}
+
+/** An object's keys in the order its source text lists them; keys the text lacks go last. */
+export const keysInOrder = (
+  node: Record<string, unknown>,
+  order: ReadonlyMap<string, number>,
+  path: readonly string[],
+): string[] => {
+  const rank = (k: string) =>
+    order.get([...path, k].join('.')) ?? Number.MAX_SAFE_INTEGER;
+  return Object.keys(node).sort((a, b) => rank(a) - rank(b));
+};
 
 const isNumber = (v: unknown): v is number =>
   typeof v === 'number' && Number.isFinite(v);
@@ -184,7 +225,7 @@ function checkLiteral(type: string, v: unknown): string | undefined {
         : 'A font family is a name or an array of names';
     case 'fontWeight':
       return (isNumber(v) && v >= 1 && v <= 1000) ||
-        (typeof v === 'string' && FONT_WEIGHTS.has(v))
+        (typeof v === 'string' && Object.hasOwn(FONT_WEIGHTS, v))
         ? undefined
         : 'A font weight is a number from 1 to 1000 or a DTCG weight name';
     case 'number':
@@ -263,6 +304,7 @@ function collect(file: TokenFile, problems: Problem[]): RawToken[] {
     });
     return [];
   }
+  const order = keyOrder(file.content);
   const found: RawToken[] = [];
   const walk = (
     node: unknown,
@@ -304,7 +346,8 @@ function collect(file: TokenFile, problems: Problem[]): RawToken[] {
       });
       return;
     }
-    for (const [name, child] of Object.entries(node)) {
+    for (const name of keysInOrder(node, order, path)) {
+      const child = node[name];
       if (name.startsWith('$')) continue;
       if (/[{}.]/.test(name)) {
         problems.push({

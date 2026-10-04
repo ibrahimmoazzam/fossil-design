@@ -1,0 +1,30 @@
+{
+  "duration": {
+    "$type": "duration",
+    "150": {
+      "$value": {
+        "value": 150,
+        "unit": "ms"
+      }
+    },
+    "200": {
+      "$value": {
+        "value": 200,
+        "unit": "ms"
+      }
+    },
+    "400": {
+      "$value": {
+        "value": 400,
+        "unit": "ms"
+      }
+    }
+  },
+  "easing": {
+    "$type": "cubicBezier",
+    "ease": {
+      "$value": [0.25, 0.1, 0.25, 1],
+      "$description": "The CSS ease curve."
+    }
+  }
+}

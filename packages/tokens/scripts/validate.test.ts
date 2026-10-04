@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  keyOrder,
   readTokenFiles,
   validate,
   VENDOR,
@@ -77,6 +78,29 @@ describe('the token source', () => {
       expect(t.description, t.path).toBeTypeOf('string');
       expect(t.type, t.path).toBeDefined();
     }
+  });
+});
+
+describe('order', () => {
+  it('keeps tokens in the order their file lists them, numbered names included', () => {
+    const content =
+      '{"space":{"$type":"dimension","0":{"$value":{"value":0,"unit":"px"}},"025":{"$value":{"value":2,"unit":"px"}},"100":{"$value":{"value":8,"unit":"px"}}}}';
+    const { tokens, problems } = validate([
+      { path: 'primitive/space.tokens.json', content },
+    ]);
+    expect(problems).toEqual([]);
+    expect(tokens.map((t) => t.path)).toEqual([
+      'space.0',
+      'space.025',
+      'space.100',
+    ]);
+  });
+
+  it('reads key order through arrays and escaped quotes', () => {
+    const order = keyOrder(
+      '{"a":[{"x":1},{"y":"say \\"hi\\": ok"}],"9":2,"b":3}',
+    );
+    expect([...order.keys()]).toEqual(['a', 'a.0.x', 'a.1.y', '9', 'b']);
   });
 });
 
