@@ -1,5 +1,18 @@
 # @fossil-design/react
 
+## 0.2.0
+
+### Minor Changes
+
+- 87d67ba: Content components: `Button`, `Card`, `Figure`, `Icon`, `Link`, `SkipLink` and `VisuallyHidden`, with the six Material Symbols Fossil's components use as React components (`CloseIcon` and the rest). `Link` takes `asChild` to style a router's link or a button, and `Icon` takes any SVG component of your own. Each ships with stories and axe checks; real-input tests cover keyboard focus, hover and the skip link.
+- 4769ac2: Interactive components: `Modal`, `Tabs`, `Carousel`, `Popover`, `Tooltip` and `Clip`, with `useClipPlayback`. They animate with CSS transitions and honour reduced motion, with no animation library. Extension points let an app add one: `Modal`'s `renderPanel` and `onShowingChange`, `Tabs`' `renderIndicator`, and data attributes on `Carousel`. `Figure` gains `captionHidden`. `Popover` and `Tooltip` bring `@floating-ui/react` as a dependency.
+
+### Patch Changes
+
+- d5b407d: `VisuallyHidden`'s type declaration no longer copies React's props, which failed type-checking in apps on another `@types/react` version. `Tooltip`, `Tabs` and `Carousel` no longer make React 18 warn about `useLayoutEffect` during server rendering.
+- Updated dependencies [7d974b6]
+  - @fossil-design/tokens@0.3.0
+
 ## 0.1.0
 
 ### Minor Changes
