@@ -8,6 +8,8 @@ export default defineConfig(
     '**/coverage/',
     '**/src/generated/',
     '**/.figma/',
+    '**/storybook-static/',
+    '**/*.module.css.d.ts',
   ]),
   {
     linterOptions: {
@@ -15,7 +17,7 @@ export default defineConfig(
     },
   },
   {
-    files: ['**/*.{js,ts}'],
+    files: ['**/*.{js,ts,tsx}'],
     extends: [
       js.configs.recommended,
       tseslint.configs.strictTypeChecked,

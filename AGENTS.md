@@ -2,7 +2,7 @@
 
 Fossil Design, or Fossil for short, is an open-source design system for agentic coding: tokens in git flow into CSS, typed React components, Figma variables and a generated Figma component library, with lint configs and agent docs that keep generated UI on-system. Teams adopt it by forking it as a template. The published `@fossil-design/*` packages are the reference brand, harvested from the author's portfolio site.
 
-The repo foundation and the token build are in place; the other packages are placeholders until their phases land. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
+The repo foundation, the token build, the Figma sync and the Stylelint config are in place. `@fossil-design/react` is being built in Phase 4, and the ESLint config is a placeholder until Phase 5. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
 
 ## Commands
 
@@ -11,20 +11,24 @@ Run from the repo root, with Node 22.14 or later and pnpm 12.8.1 (pinned in `pac
 ```sh
 pnpm install --frozen-lockfile   # install exactly what pnpm-lock.yaml records
 pnpm build                       # build every package, in dependency order
-pnpm lint                        # ESLint, then Prettier in check mode
+pnpm lint                        # ESLint, Stylelint, then Prettier in check mode
 pnpm format                      # rewrite files with Prettier
 pnpm typecheck                   # tsc for the root files, then every package
 pnpm test                        # every Vitest project, once
+pnpm check:packages              # pack each published package, then run publint and attw on it
 pnpm changeset                   # record a release note for a package change
 ```
 
 - One package: `pnpm --filter <folder> <script>`, for example `pnpm --filter tokens build`.
-- One test project: `pnpm test --project workspace`. Watch mode: `pnpm exec vitest`.
+- One test project: `pnpm test --project workspace`. Nested projects take their parent's name: `pnpm test --project 'react*'` runs `react (unit)` and `react (storybook)`. Watch mode: `pnpm exec vitest`.
+- The browser tests need Chromium once per machine: `pnpm --filter react exec playwright install chromium`.
+- Storybook: `pnpm --filter react storybook`, at `localhost:6006`.
+- `pnpm --filter react generate` writes `Box`'s CSS and the `.module.css.d.ts` types. The react package's `build` and `typecheck` run it first. Neither output is committed.
 - Check the token source without building: `pnpm --filter tokens validate`. Token files live in `packages/tokens/src/primitive/` and `src/semantic/`; ADR 0005 holds their rules.
 - The token build writes `tokens.css`, `tokens.json` and `lint.json` to `packages/tokens/dist/`, the TypeScript in `src/generated/`, and the foundations block in this file. Commit the block with the token change; CI fails if the build changes it. ADR 0006 covers each output.
 - List deprecated tokens and their replacements: `pnpm --filter tokens deprecations`, after a build.
 - Sync tokens with Figma: `pnpm figma:apply`, `pnpm figma:read` and `pnpm figma:diff` write scripts and compare their results. Run a sync through the `fossil-figma-sync` skill in `.claude/skills/`, which needs the Figma MCP server. `packages/figma-sync/AGENTS.md` covers working on the sync itself.
-- Build before type-checking. A package's types resolve through the built declarations of the packages it depends on.
+- Build before linting and type-checking. A package's types resolve through the built declarations of the packages it depends on, and the Stylelint config reads the built token lists.
 - Add a dependency to one package with `pnpm --filter <folder> add <name>`, and to the root with `pnpm add -D -w <name>`. TypeScript comes from the `catalog:` in `pnpm-workspace.yaml`.
 
 ## Stack
@@ -51,6 +55,7 @@ packages/eslint-config, packages/stylelint-config
 packages/figma-sync    Figma sync core and scripts (private)
 .claude/skills         the fossil-figma-sync skill
 tests/                 workspace-wide tests, such as package names against fossil.config.json
+scripts/               workspace-wide scripts, such as the packed-tarball check
 docs/PRD.md            the spec: phases, tasks, exit criteria
 docs/Learnings.md      the research behind each decision
 docs/decisions         ADRs
@@ -187,15 +192,16 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 
 ## Definition of done
 
-A change is done when all of these pass. Run them in this order: `pnpm build && pnpm lint && pnpm typecheck && pnpm test`.
+A change is done when all of these pass. Run them in this order: `pnpm build && pnpm lint && pnpm typecheck && pnpm test && pnpm check:packages`.
 
-| Check                                                                                                                                             | Command                                            | Covers today                                                                                     |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| The token build, with its validation                                                                                                              | `pnpm --filter tokens build`, part of `pnpm build` | Validation of the DTCG source, then every Style Dictionary output                                |
-| ESLint and Stylelint, with Fossil's shared configs                                                                                                | `pnpm lint`                                        | ESLint and Prettier; Fossil's configs and Stylelint arrive in Phase 5                            |
-| Type-checking, after generating CSS Module types                                                                                                  | `pnpm typecheck`                                   | All packages; CSS Module type generation joins it in Phase 4                                     |
-| Tests: Storybook interaction tests, axe checks with zero violations, real-input browser tests for native behaviour such as Escape on a `<dialog>` | `pnpm test`                                        | Workspace, token validation and token build tests; Storybook and browser tests arrive in Phase 4 |
-| A changeset, if a package's public surface changed                                                                                                | `pnpm changeset`                                   | Yes                                                                                              |
+| Check                                                                                                                                             | Command                                            | Covers today                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The token build, with its validation                                                                                                              | `pnpm --filter tokens build`, part of `pnpm build` | Validation of the DTCG source, then every Style Dictionary output                                                                                                   |
+| ESLint and Stylelint, with Fossil's shared configs                                                                                                | `pnpm lint`                                        | ESLint and Prettier; Stylelint with Fossil's own config on every stylesheet. Fossil's ESLint config arrives in Phase 5                                              |
+| Type-checking, after generating CSS Module types                                                                                                  | `pnpm typecheck`                                   | All packages, with CSS Module types generated first                                                                                                                 |
+| Tests: Storybook interaction tests, axe checks with zero violations, real-input browser tests for native behaviour such as Escape on a `<dialog>` | `pnpm test`                                        | Workspace, token, Stylelint config and React unit tests, and every story with axe. Real-input tests arrive with the first component that relies on native behaviour |
+| Packed tarballs pass publint and attw                                                                                                             | `pnpm check:packages`                              | Every published package                                                                                                                                             |
+| A changeset, if a package's public surface changed                                                                                                | `pnpm changeset`                                   | Yes                                                                                                                                                                 |
 
 ## Conventions
 
