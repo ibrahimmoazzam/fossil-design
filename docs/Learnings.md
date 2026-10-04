@@ -504,6 +504,9 @@ Building the component package's foundation settled these, each checked against 
 - **Vitest 5** lets a project config declare its own projects. From the root, a nested project's name is prefixed with its parent's, as in `react (unit)`.
 - **`stylelint-declaration-strict-value` 1.12** checks shorthands longhand by longhand with `expandShorthand`, and accepts any function unless `ignoreFunctions` is off. **`stylelint-value-no-unknown-custom-properties` 6.1** accepts a `var()` with a fallback (ADR 0008).
 - **TypeScript 6** checks side-effect imports everywhere, including a Storybook preview's `import './preview.css'`.
+- **Chrome** keeps its Tab starting point on an element after `blur()`, so the next real Tab moves past it and can leave the page. Real-input tests focus a sentinel at the start of the page first.
+- **Testing Library**'s accessible-name calculation doesn't name a `<figure>` from its `<figcaption>`, though Chrome does.
+- **`vitest/browser`** in Vitest 5 drives `tab`, `keyboard`, `click` and `hover` through Playwright, so `:hover` and `:focus-visible` behave as they do for a person. Storybook 10.6's composed stories render through `Story.run()`.
 - **`eslint-plugin-jsx-a11y` 6.10.2** declares ESLint 9 as its highest peer, so it doesn't run on ESLint 10. Storybook's axe checks cover the rendered output instead.
 
 ---
@@ -542,6 +545,9 @@ Building the component package's foundation settled these, each checked against 
 | Popover focus | Floating UI's focus manager; no `focus-trap-react` | The portfolio's `Popover` already uses it. `focus-trap-react` belongs to the portfolio's `NavBar`, which stays there |
 | `Box` responsive props | One generated class per prop, value and breakpoint; `padding` resolved to block and inline longhands in JavaScript | Media queries need classes. With longhands only, the wider breakpoint wins, and at one breakpoint the longhand wins (ADR 0009) |
 | `Box` surfaces | Only fill and text pairs the token build checks for contrast | The generator fails on any other pair, so `surface` can't produce an unchecked combination |
+| Icon pipeline | Components generated at build time from `@material-symbols/svg-400`, named in `icons.json`, with the Apache-2.0 license copied into `dist` | Consumers need no SVGR, the icons stay version-matched, and the license travels with them (ADR 0010) |
+| `asChild` | React's `cloneElement`, with no slot library | One small merge of `className` and children; the child keeps its own element, props and ref |
+| `Figure` width | No `displayWidth`; apps size a figure through `className` | None of the portfolio's 8 figures or 5 clips sets one |
 | Token access | Components and compositions use semantic tokens only. Typed props accept only semantic token keys, and the Stylelint config rejects primitives outside a consumer's site-tokens file | Keeps the two tiers meaningful: changing a primitive value restyles everything built on it, which is also what makes Fossil adaptable |
 | Terms | "Primitive" means the raw token tier only; product-specific components are "compositions" | Both words were overloaded, which confuses people and agents alike; one name per concept |
 | Library generation | A script writes each component's spec (names, variants, bindings) from code and checks the built result; the agent builds the frames | Names and bindings must be exact, so they come from code and get verified; only the frame layout needs judgment |

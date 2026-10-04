@@ -1,0 +1,86 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fossil-space-xs);
+  border: var(--fossil-border-default);
+  border-radius: var(--fossil-radius-control);
+  font-family: var(--fossil-text-control-font-family);
+  font-size: var(--fossil-text-control-font-size);
+  font-weight: var(--fossil-text-control-font-weight);
+  letter-spacing: var(--fossil-text-control-letter-spacing);
+  line-height: var(--fossil-text-control-line-height);
+  cursor: pointer;
+  transition-duration: var(--fossil-motion-duration-fast);
+  transition-property: color, background-color, border-color;
+  transition-timing-function: var(--fossil-motion-easing-standard);
+}
+
+.button:focus-visible {
+  outline: var(--fossil-border-focus);
+  outline-offset: var(--fossil-focus-ring-offset);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.tone-primary {
+  border-color: transparent;
+  background-color: var(--fossil-color-accent-default);
+  color: var(--fossil-color-text-on-accent);
+}
+
+/* The hover wash laid over the fill, so the accent darkens in light mode and lightens in dark. */
+.tone-primary:hover:enabled {
+  background-image: linear-gradient(
+    var(--fossil-color-background-hover),
+    var(--fossil-color-background-hover)
+  );
+}
+
+.tone-secondary {
+  background-color: var(--fossil-color-background-surface);
+  color: var(--fossil-color-text-muted);
+}
+
+.tone-secondary:hover:enabled {
+  border-color: var(--fossil-color-border-hover);
+  color: var(--fossil-color-text-default);
+}
+
+/* Touch targets: at least 44px for size m (WCAG 2.5.5), and 32px for size s, where 2.5.8 asks for 24px. */
+.size-s {
+  min-block-size: 2rem;
+  padding-block: var(--fossil-space-xs);
+  padding-inline: var(--fossil-space-m);
+}
+
+.size-m {
+  min-block-size: 2.75rem;
+  padding-block: var(--fossil-space-s);
+  padding-inline: var(--fossil-space-l);
+}
+
+/* Icon-only buttons are round. */
+.iconOnly {
+  padding: 0;
+  border-radius: var(--fossil-radius-pill);
+}
+
+.iconOnly.size-s {
+  inline-size: 2rem;
+  block-size: 2rem;
+}
+
+.iconOnly.size-m {
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

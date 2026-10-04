@@ -3,6 +3,7 @@ dist/
 **/src/generated/
 *.module.css.d.ts
 storybook-static/
+.vitest/
 .figma/
 coverage/
 *.tsbuildinfo

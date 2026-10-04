@@ -190,6 +190,9 @@ importers:
       eslint:
         specifier: ^10.11.0
         version: 10.11.0(supports-color@10.2.2)
+      eslint-plugin-react-hooks:
+        specifier: ^7.1.1
+        version: 7.1.1(eslint@10.11.0(supports-color@10.2.2))(supports-color@10.2.2)
       prettier:
         specifier: ^3.9.9
         version: 3.9.9
@@ -233,6 +236,9 @@ importers:
       '@fossil-design/stylelint-config':
         specifier: workspace:*
         version: link:../stylelint-config
+      '@material-symbols/svg-400':
+        specifier: ^0.47.6
+        version: 0.47.6
       '@storybook/addon-a11y':
         specifier: ^10.6.1
         version: 10.6.1(storybook@10.6.1(@types/react@19.3.0)(prettier@3.9.9)(react@19.3.0))
@@ -928,6 +934,9 @@ packages:
   '@manypkg/tools@2.1.2':
     resolution: {integrity: sha512-6QEf6yqFbETdwGITKq57aYoPfX/3K8XFNwsAlx0C1M7o8cb79sv1M3w+tWuWvIcSbNqrLF7OD7YpZMVVz335hQ==}
     engines: {node: '>=20.0.0'}
+
+  '@material-symbols/svg-400@0.47.6':
+    resolution: {integrity: sha512-lXYsZWNXXu6gTVTAS/aRtOuKrjYhbyl1Y/t1JELXku3GZe0DLPfQ8O8UcbHGs1H22s32kGJVilkTKO2OkGzPXA==}
 
   '@napi-rs/wasm-runtime@1.2.4':
     resolution: {integrity: sha512-AJxoUD2/15ESHbvpcyjU274nsAPLuOtPHCk0vKJM5pj//Fg/B1FXNWjPnXTT9PymCYYiHo4zPj0ZomXBKhoy7g==}
@@ -1965,6 +1974,12 @@ packages:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
 
+  eslint-plugin-react-hooks@7.1.1:
+    resolution: {integrity: sha512-f2I7Gw6JbvCexzIInuSbZpfdQ44D7iqdWX01FKLvrPgqxoE7oMj8clOfto8U6vYiz4yd5oKu39rRSVOe1zRu0g==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0 || ^10.0.0
+
   eslint-scope@9.1.2:
     resolution: {integrity: sha512-xS90H51cKw0jltxmvmHy2Iai1LIqrfbw57b79w/J7MfvDfkIkFZ+kj6zC3BjtUwh150HsSSdxXZcsuv72miDFQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
@@ -2215,6 +2230,12 @@ packages:
   hasown@2.0.4:
     resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
     engines: {node: '>= 0.4'}
+
+  hermes-estree@0.25.1:
+    resolution: {integrity: sha512-0wUoCcLp+5Ev5pDW2OriHC2MJCbwLwuRx+gAqMTOkGKJJiBCLjtrvy4PWUGn6MIVefecRpzoOZ/UV6iGdOr+Cw==}
+
+  hermes-parser@0.25.1:
+    resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
 
   highlight.js@10.7.3:
     resolution: {integrity: sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==}
@@ -3516,6 +3537,15 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod-validation-error@4.0.2:
+    resolution: {integrity: sha512-Q6/nZLe6jxuU80qb/4uJ4t5v2VEZ44lzQjPDhYJNztRQ4wyWc6VF3D3Kb/fAuPetZQnhS3hnajCf9CsWesghLQ==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      zod: ^3.25.0 || ^4.0.0
+
+  zod@4.6.5:
+    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
+
 snapshots:
 
   '@adobe/css-tools@4.5.0': {}
@@ -4173,6 +4203,8 @@ snapshots:
       jju: 1.4.0
       tinyglobby: 0.2.17
       yaml: 2.9.1
+
+  '@material-symbols/svg-400@0.47.6': {}
 
   '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)':
     dependencies:
@@ -5187,6 +5219,17 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
+  eslint-plugin-react-hooks@7.1.1(eslint@10.11.0(supports-color@10.2.2))(supports-color@10.2.2):
+    dependencies:
+      '@babel/core': 7.29.7(supports-color@10.2.2)
+      '@babel/parser': 7.29.9
+      eslint: 10.11.0(supports-color@10.2.2)
+      hermes-parser: 0.25.1
+      zod: 4.6.5
+      zod-validation-error: 4.0.2(zod@4.6.5)
+    transitivePeerDependencies:
+      - supports-color
+
   eslint-scope@9.1.2:
     dependencies:
       '@types/esrecurse': 4.3.1
@@ -5459,6 +5502,12 @@ snapshots:
   hasown@2.0.4:
     dependencies:
       function-bind: 1.1.2
+
+  hermes-estree@0.25.1: {}
+
+  hermes-parser@0.25.1:
+    dependencies:
+      hermes-estree: 0.25.1
 
   highlight.js@10.7.3: {}
 
@@ -6801,3 +6850,9 @@ snapshots:
       yargs-parser: 20.2.9
 
   yocto-queue@0.1.0: {}
+
+  zod-validation-error@4.0.2(zod@4.6.5):
+    dependencies:
+      zod: 4.6.5
+
+  zod@4.6.5: {}

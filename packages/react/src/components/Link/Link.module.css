@@ -1,0 +1,92 @@
+/*
+ * A dotted underline that fills in, left to right, on hover and focus. Two rows of the same
+ * dots in currentColor: a dim track, and a fill that grows in width. The dots tile from the
+ * left and never stretch, so the fill reads as dots lighting up rather than a bar growing.
+ */
+.link {
+  padding: 0;
+  border-width: 0;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tone-inherit {
+  color: inherit;
+}
+
+.tone-accent {
+  color: var(--fossil-color-accent-default);
+}
+
+.link:focus-visible {
+  border-radius: var(--fossil-radius-compact);
+  outline: var(--fossil-border-focus);
+  outline-offset: var(--fossil-focus-ring-offset);
+}
+
+/* Inline, not inline-block, so a long link still wraps across lines. */
+.text {
+  position: relative;
+}
+
+.text::before,
+.text::after {
+  position: absolute;
+  inset-block-end: -0.2em;
+  inset-inline-start: 0;
+  block-size: 0.2em;
+  background-image: radial-gradient(
+    circle,
+    currentColor 0.08em,
+    transparent 0.08em
+  );
+  background-position: left center;
+  background-repeat: repeat-x;
+  background-size: 0.4em 100%;
+  content: '';
+}
+
+.text::after {
+  inline-size: 100%;
+  opacity: 0.35;
+}
+
+.text::before {
+  inline-size: 0%;
+  transition: inline-size var(--fossil-motion-duration-slow)
+    var(--fossil-motion-easing-standard);
+}
+
+.link:hover .text::before,
+.link:focus-visible .text::before {
+  inline-size: 100%;
+}
+
+/* The trailing icon dims and lights up with the dots, so the two read as one state. */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  /* stylelint-disable-next-line scale-unlimited/declaration-strict-value -- em, so the gap scales with the link's text; a space token would not */
+  padding-inline-start: 0.1em;
+  opacity: 0.35;
+  transition: opacity var(--fossil-motion-duration-slow)
+    var(--fossil-motion-easing-standard);
+}
+
+.link:hover .icon,
+.link:focus-visible .icon {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text::before,
+  .icon {
+    transition: none;
+  }
+}

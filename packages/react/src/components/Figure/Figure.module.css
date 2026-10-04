@@ -1,0 +1,18 @@
+.frame {
+  overflow: hidden;
+  border: var(--fossil-border-hairline);
+  border-radius: var(--fossil-radius-compact);
+}
+
+/* The app's image or video fills the frame and keeps its ratio. */
+.frame > :is(img, picture, video, svg, canvas) {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+/* Balanced: under a centred caption, two even lines look intended where a long and a short one don't. */
+.caption {
+  text-align: center;
+  text-wrap: balance;
+}

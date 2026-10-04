@@ -55,6 +55,7 @@
   },
   "devDependencies": {
     "@fossil-design/stylelint-config": "workspace:*",
+    "@material-symbols/svg-400": "^0.47.6",
     "@storybook/addon-a11y": "^10.6.1",
     "@storybook/addon-vitest": "^10.6.1",
     "@storybook/react-vite": "^10.6.1",

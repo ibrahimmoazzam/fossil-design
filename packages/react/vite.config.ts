@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { defineConfig, type Plugin } from 'vite';
 import { patchCssModules } from 'vite-css-modules';
 import fossilConfig from '../../fossil.config.json' with { type: 'json' };
@@ -20,10 +22,30 @@ function styleDeclaration(): Plugin {
   };
 }
 
+/** Apache-2.0 asks for its license to travel with the icons Fossil generates from Material Symbols. */
+function iconLicense(): Plugin {
+  const require = createRequire(import.meta.url);
+  return {
+    name: 'fossil:icon-license',
+    apply: 'build',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'licenses/material-symbols.txt',
+        source: readFileSync(
+          require.resolve('@material-symbols/svg-400/LICENSE'),
+          'utf8',
+        ),
+      });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     patchCssModules({ exportMode: 'default', generateSourceTypes: true }),
     styleDeclaration(),
+    iconLicense(),
   ],
   css: {
     modules: {

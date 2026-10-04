@@ -1,0 +1,11 @@
+/* Out of sight, still in the accessibility tree. display: none or visibility: hidden would hide it from both. */
+.visuallyHidden {
+  position: absolute;
+  overflow: hidden;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  border-width: 0;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
