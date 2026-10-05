@@ -165,11 +165,11 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 | `text.fine` | body | 13px | 400 | 1.4 | 0 | Tags, tooltips and video captions. |
 | `text.label` | mono | 12px | 400 | 1.2 | 0.48px | Eyebrows and metadata. Components add text-transform: uppercase. |
 | `text.control` | body | 16px | 500 | 1 | 0 | Buttons and tabs: one line, so the line box equals the text. |
-| `text.heading.xs` | heading | 18px | 600 | 1.4 | 0 | Content-card titles. |
-| `text.heading.s` | heading | 22px | 600 | 1.4 | 0 | Card and modal titles. |
-| `text.heading.m` | heading | 24px | 600 | 1.4 | 0 | Section headings in long-form content. |
-| `text.heading.l` | heading | 32px | 600 | 1.4 | 0 | Major section headings and pull quotes. |
-| `text.heading.xl` | heading | 40px | 600 | 1.2 | 0 | Page titles at a fixed size. |
+| `text.heading.xs` | heading | 18px | 700 | 1.4 | 0 | Content-card titles. |
+| `text.heading.s` | heading | 22px | 700 | 1.4 | 0 | Card and modal titles. |
+| `text.heading.m` | heading | 24px | 700 | 1.4 | 0 | Section headings in long-form content. |
+| `text.heading.l` | heading | 32px | 700 | 1.4 | 0 | Major section headings and pull quotes. |
+| `text.heading.xl` | heading | 40px | 700 | 1.2 | 0 | Page titles at a fixed size. |
 
 ### Colour
 
