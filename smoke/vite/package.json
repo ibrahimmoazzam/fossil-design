@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist-server",
     "typecheck": "tsc --noEmit",
-    "lint:css": "stylelint \"src/**/*.css\""
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "lint:js": "eslint ."
   },
   "dependencies": {
     "react": "18.3.1",
@@ -16,8 +17,10 @@
     "@types/react": "18.3.31",
     "@types/react-dom": "18.3.7",
     "@vitejs/plugin-react": "6.1.1",
+    "eslint": "10.12.0",
     "stylelint": "17.16.0",
     "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0",
     "vite": "8.3.2"
   }
 }

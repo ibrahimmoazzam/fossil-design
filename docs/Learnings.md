@@ -521,6 +521,19 @@ Building the component package's foundation settled these, each checked against 
 - **A Figma Make kit built from `@fossil-design/react` 0.2.0** renders `Box`, `Stack`, `Text`, `Button` and `Card` with Fossil's tokens, responsive and in both themes, with no CSS setup beyond the guidelines.
 - **Make's properties panel doesn't respect Fossil's tokens.** Its dropdowns list every `--fossil-*` custom property, primitives included, with no filtering by type: space tokens appear under font size. Figma doesn't document where the list comes from; Fossil's Figma variables are scoped and hide primitives, so it is most likely read from `tokens.css`, whose custom properties have no type. An edit made in the panel is applied by Make's agent, which writes the raw value, and a rule in `Guidelines.md` telling it to write semantic tokens didn't change that. Make stays one-way: Claude Code rebuilds a prototype with Fossil's components and lint, so raw values in a Make file don't reach code.
 
+### The Phase 5 build (October 2026)
+
+Building the ESLint config, the escape count and the off-system check settled these, each checked against the installed version:
+
+- **`@eslint-community/eslint-plugin-eslint-comments` 4.8.1** accepts ESLint `^10`. Its `require-description` rule takes an `ignore` list of directive kinds; Fossil ignores `eslint-enable`, `eslint-env`, `exported`, `global` and `globals`, which disable nothing.
+- **typescript-eslint 8.71** enables `@typescript-eslint/no-deprecated` in `strictTypeChecked` only, so a consumer on `recommendedTypeChecked` needs Fossil's `deprecations` option to get it.
+- **ESLint 10's flat config** replaces a rule's options when a later config sets the same rule, so a consumer's own `no-restricted-syntax` would silently drop Fossil's. The package exports its entries for merging.
+- **ESLint and typescript-eslint lint text with no file on disk.** With `projectService.allowDefaultProject`, a type-aware rule such as `no-deprecated` runs on `lintText` input.
+- **A JSX comment can't sit before an element** directly inside `cond && ( … )`; a `//` comment there works, and ESLint reads it as a directive.
+- **Stylelint 17's CLI writes its report to stderr**, the JSON formatter included. `--output-file` writes it to a file, as ESLint's does.
+- **pnpm 12.8's `minimumReleaseAge`** refuses a version published within the cutoff. `pnpm add` of such a version writes `minimumReleaseAgeExclude` entries into `pnpm-workspace.yaml` by itself; Fossil drops them and waits for the version to age instead.
+- **`git grep -z` on a tree** prints `rev:path`, the line number and the text separated by NUL bytes, so the escape count reads a base commit without checking it out.
+
 ---
 
 ## 6. Decisions and rationale
@@ -570,6 +583,9 @@ Building the component package's foundation settled these, each checked against 
 | Make guidelines | Shipped in `@fossil-design/react`, with the kit optional | One copy that versions with the components, and it works on any paid plan: publishing a kit needs Figma's npm registry, which the Education team lacks |
 | Make kit tokens | From the npm package, not the Figma library | Make flattens library variables into raw CSS values that would compete with `--fossil-*` |
 | Margins | No margin prop on `Box`; a margin in CSS fails lint unless it's `0` or carries a disable comment with a reason | Harvested from the portfolio's rule: spacing comes from padding and `gap`, and a margin needs permission and a reason. A lint error that only a written reason can pass keeps the original "ask first" exception, and every use shows up in the escape count |
+| JSX lint | `@fossil-design/eslint-config` bans exactly the elements `Box` renders, and requires a reason on every disable | Every banned element has a replacement; a workspace test keeps the list equal to `boxElements` (ADR 0014) |
+| Escape count | Disables of Fossil's rules outside tests, reported in a CI job summary with the ones a pull request adds; it never fails | Routine TypeScript disables would bury the signal; a job summary needs no write permission, which pull requests from forks lack |
+| Gap log | Issues from a `gap` form, closed with a decision label and a written reason | A consumer's agent can open an issue but can't write to a ledger in Fossil's repository (`docs/gaps.md`) |
 | Figma mapping key | Shared plugin data under a `fossil` namespace | Agents writing through `use_figma` run as a different plugin and cannot read private plugin data |
 | Lifecycle metadata | DTCG `$deprecated`, plus `$extensions` for `replacedBy` and `since` | `$deprecated` is standard in 2025.10; the extra fields stay in the sanctioned escape |
 | Vendor key | `com.ibrahimmoazzam.fossil`, kept by forks | DTCG recommends reverse domain names; built on a domain the author owns; it names Fossil's extension format, not a brand (ADR 0005) |

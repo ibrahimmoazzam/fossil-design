@@ -183,14 +183,14 @@ export function Tabs({
                   (renderIndicator ? (
                     renderIndicator({ className: styles.chip })
                   ) : (
-                    <span aria-hidden="true" className={styles.chip} />
+                    <Box as="span" aria-hidden="true" className={styles.chip} />
                   ))}
-                <span className={styles.label}>
+                <Box as="span" className={styles.label}>
                   {tab.label}
-                  <span aria-hidden="true" className={styles.ghost}>
+                  <Box as="span" aria-hidden="true" className={styles.ghost}>
                     {tab.label}
-                  </span>
-                </span>
+                  </Box>
+                </Box>
               </button>
             );
           })}

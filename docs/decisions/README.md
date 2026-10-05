@@ -17,3 +17,4 @@ Each record states the context, the options considered, the decision and its con
 | [0011](./0011-interactive-components.md) | Interactive components: motion and extension points       | Accepted                            |
 | [0012](./0012-smoke-test.md)             | The consumption smoke test                                | Accepted                            |
 | [0013](./0013-base-primitives.md)        | Primitive tokens live under `base`                        | Accepted                            |
+| [0014](./0014-enforcement.md)            | The ESLint config, the escape count and the gap log       | Accepted                            |

@@ -1,0 +1,48 @@
+name: Gap
+description: Something an app couldn't build from Fossil, rebuilt itself, or needed an escape for.
+title: 'Gap: '
+labels: [gap]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A gap records where Fossil fell short. Gaps are reviewed at each release, and each is closed with a decision: a new **component**, a documented **pattern**, or **keep local**. Three gaps for the same need trigger a review; they don't promote anything by themselves.
+  - type: input
+    id: where
+    attributes:
+      label: Where it came up
+      description: The repository, file or pull request, and who or what was building it.
+      placeholder: portfolio, src/components/NavBar.tsx, an agent building the mobile menu
+    validations:
+      required: true
+  - type: textarea
+    id: need
+    attributes:
+      label: What the task needed
+      description: The UI or behaviour, in plain terms. Not the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: offered
+    attributes:
+      label: What Fossil offered
+      description: The closest component, prop, token or pattern, and why it didn't fit.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Links to the code, the disable comments with their reasons, screenshots, or the agent's transcript.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: How it showed up
+      options:
+        - Couldn't build it from Fossil
+        - Rebuilt something Fossil might need
+        - Added a lint escape
+    validations:
+      required: true
