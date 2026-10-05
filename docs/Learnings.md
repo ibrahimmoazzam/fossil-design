@@ -517,6 +517,8 @@ Building the component package's foundation settled these, each checked against 
 - **Vite 8's bundler** prints a `MODULE_LEVEL_DIRECTIVE` notice for each `'use client'` module it bundles. `@vitejs/plugin-react` 6.1 silences it for `use client` and `use server`.
 - **Next 16.3 with Turbopack** builds and prerenders a Server Component page from Fossil's tarballs. In its production build, Motion 14's `AnimatePresence` ran `Modal`'s panel through `renderPanel` with no console errors.
 - **`eslint-plugin-jsx-a11y` 6.10.2** declares ESLint 9 as its highest peer, so it doesn't run on ESLint 10. Storybook's axe checks cover the rendered output instead.
+- **A Figma Make kit built from `@fossil-design/react` 0.2.0** renders `Box`, `Stack`, `Text`, `Button` and `Card` with Fossil's tokens, responsive and in both themes, with no CSS setup beyond the guidelines.
+- **Make's properties panel doesn't respect Fossil's tokens.** Its dropdowns list every `--fossil-*` custom property, primitives included, with no filtering by type: space tokens appear under font size. Figma doesn't document where the list comes from; Fossil's Figma variables are scoped and hide primitives, so it is most likely read from `tokens.css`, whose custom properties have no type. An edit made in the panel is applied by Make's agent, which writes the raw value, and a rule in `Guidelines.md` telling it to write semantic tokens didn't change that. Make stays one-way: Claude Code rebuilds a prototype with Fossil's components and lint, so raw values in a Make file don't reach code.
 
 ---
 
