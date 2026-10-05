@@ -203,7 +203,7 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 - `layer`: `--fossil-layer-overlay`
 - `layout`: `--fossil-layout-measure`, `--fossil-layout-max-width`
 - `icon.size`: `--fossil-icon-size-s`, `--fossil-icon-size-m`, `--fossil-icon-size-l`
-- `motion.duration`: `--fossil-motion-duration-fast`, `--fossil-motion-duration-base`, `--fossil-motion-duration-slow`
+- `motion.duration`: `--fossil-motion-duration-fast`, `--fossil-motion-duration-default`, `--fossil-motion-duration-slow`
 - `motion.easing`: `--fossil-motion-easing-standard`
 - `radius`: `--fossil-radius-compact`, `--fossil-radius-control`, `--fossil-radius-surface`, `--fossil-radius-pill`
 - `font.family`: `--fossil-font-family-heading`, `--fossil-font-family-body`, `--fossil-font-family-mono`

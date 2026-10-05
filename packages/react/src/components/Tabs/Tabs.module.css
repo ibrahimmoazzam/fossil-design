@@ -11,7 +11,7 @@
 }
 
 .panelContent {
-  transition-duration: var(--fossil-motion-duration-base);
+  transition-duration: var(--fossil-motion-duration-default);
   transition-property: opacity, translate;
   transition-timing-function: var(--fossil-motion-easing-standard);
 }

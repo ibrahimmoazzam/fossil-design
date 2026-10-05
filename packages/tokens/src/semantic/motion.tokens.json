@@ -6,13 +6,24 @@
         "$value": "{base.duration.150}",
         "$description": "Colour and border changes."
       },
-      "base": {
+      "default": {
         "$value": "{base.duration.200}",
         "$description": "Most transitions."
       },
       "slow": {
         "$value": "{base.duration.400}",
         "$description": "Changes in size and layout."
+      },
+      "base": {
+        "$value": "{base.duration.200}",
+        "$description": "Most transitions.",
+        "$deprecated": "Renamed to motion.duration.default, because base names primitive tokens.",
+        "$extensions": {
+          "com.ibrahimmoazzam.fossil": {
+            "replacedBy": "{motion.duration.default}",
+            "since": "0.4.0"
+          }
+        }
       }
     },
     "easing": {
