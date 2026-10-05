@@ -38,10 +38,10 @@ Everything runs on a Figma Professional or Education plan and free tiers elsewhe
 | Package                                                          | What it is                                                                  | Status      |
 | ---------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------- |
 | [`@fossil-design/tokens`](./packages/tokens)                     | DTCG token source and the build that turns it into CSS, JSON and TypeScript | Early (0.x) |
-| [`@fossil-design/react`](./packages/react)                       | React components, precompiled to JavaScript and one stylesheet              | Placeholder |
-| [`@fossil-design/eslint-config`](./packages/eslint-config)       | Keeps JSX on-system                                                         | Placeholder |
-| [`@fossil-design/stylelint-config`](./packages/stylelint-config) | Keeps CSS on-system                                                         | Placeholder |
-| [`@fossil-design/figma-sync`](./packages/figma-sync)             | Syncs tokens with Figma; runs from the repo, not published                  | Placeholder |
+| [`@fossil-design/react`](./packages/react)                       | React components, precompiled to JavaScript and one stylesheet              | Early (0.x) |
+| [`@fossil-design/eslint-config`](./packages/eslint-config)       | Keeps JSX on-system                                                         | Early (0.x) |
+| [`@fossil-design/stylelint-config`](./packages/stylelint-config) | Keeps CSS on-system                                                         | Early (0.x) |
+| [`@fossil-design/figma-sync`](./packages/figma-sync)             | Syncs tokens with Figma; runs from the repo, not published                  | Private     |
 
 ## Make it your own
 
