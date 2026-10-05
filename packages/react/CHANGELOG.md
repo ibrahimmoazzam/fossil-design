@@ -1,5 +1,11 @@
 # @fossil-design/react
 
+## 0.3.1
+
+### Patch Changes
+
+- cf77a43: `Link` and `Tabs` render their inner spans through `Box`, so Fossil's components pass its own ESLint config. The markup gains Box's base class; nothing else changes.
+
 ## 0.3.0
 
 ### Minor Changes
