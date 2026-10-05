@@ -22,14 +22,15 @@ Option 3. A repository ruleset, "Protect main", targets the default branch, with
 
 - restricts deletions and blocks force pushes;
 - requires a pull request, with 0 approvals, so a sole maintainer can merge their own;
-- requires the status checks `Check on Node 22.14.0` and `Check on Node 24`.
+- requires the status checks `Check on Node 22.14.0` and `Check on Node 24`;
+- since Phase 4, also requires `Smoke-test the packed packages` ([0012](./0012-smoke-test.md)).
 
-To release, open the "chore: version packages" pull request, choose "Approve workflows to run" on its latest run, wait for both checks to pass, then merge. The pull request updates each time a changeset lands, and runs on its earlier commits can be ignored.
+To release, open the "chore: version packages" pull request, choose "Approve workflows to run" on its latest run, wait for every required check to pass, then merge. The pull request updates each time a changeset lands, and runs on its earlier commits can be ignored.
 
 ## Consequences
 
 - The repository still holds no long-lived credential that can publish.
-- Every release needs a maintainer with write access to approve one run. Merge stays blocked until both checks pass, so the step can't be skipped.
-- Required checks match by name. Changing the Node versions in the matrix in `ci.yml` renames the checks, so update the ruleset in the same change, or pull requests wait for checks that never report.
+- Every release needs a maintainer with write access to approve one run. Merge stays blocked until the required checks pass, so the step can't be skipped.
+- Required checks match by name. Changing the Node versions in the matrix in `ci.yml`, or a job's `name`, renames the checks, so update the ruleset in the same change, or pull requests wait for checks that never report.
 - Rulesets live in the repository's settings, not in git, so a fork recreates "Protect main" by hand. The Phase 8 adoption guide should include it.
 - If approving becomes a burden, revisit option 2.
