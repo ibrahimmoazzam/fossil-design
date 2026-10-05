@@ -94,7 +94,7 @@ Style Dictionary v5: one run, validated before anything is written
                 |
                 +---> npm  --->  portfolio site, and any fork's apps
                 +---> bundled agent docs + AGENTS.md block
-                +---> Make kit  --->  Figma Make prototypes (one way)
+                +---> Make guidelines in the package  --->  Figma Make prototypes (one way)
                 +---> Figma component library (generated from code, bound to Figma Variables)
 ```
 
@@ -167,7 +167,7 @@ Publish through trusted publishing via OIDC from GitHub Actions, never a long-li
 
 | Layer | Mechanism in Fossil |
 |---|---|
-| Context | A generated `AGENTS.md` block with always-on foundation rules and a component index; Markdown docs bundled in the installed package; the Make kit guidelines; Storybook MCP for Fossil's own development. In Figma: the component library, and variables with code syntax, read through the Figma MCP server |
+| Context | A generated `AGENTS.md` block with always-on foundation rules and a component index; Markdown docs bundled in the installed package; Make guidelines bundled the same way; Storybook MCP for Fossil's own development. In Figma: the component library, and variables with code syntax, read through the Figma MCP server |
 | Constraint | `Box` and component props typed to token keys and variant maps; the shared ESLint config (no raw layout elements) and Stylelint config (tokens only, semantic only, no margins). In Figma: variable scopes, and designing only from the component library |
 | Verification | Token build validation; Storybook interaction and a11y tests; real-input browser tests; the consumer smoke test with attw and publint; the Figma library check; gap review; the drift eval harness |
 
@@ -190,7 +190,7 @@ Publish through trusted publishing via OIDC from GitHub Actions, never a long-li
 
 Design tools consume the git source; they never replace it.
 
-**Figma Make: one way only.** A Make kit installs the published `@fossil-design/react` from npm, plus generated guidelines, so prototypes use the real components. Leave Figma library variables out of the kit: Make flattens them into raw CSS values that would compete with the `--fossil-*` properties. Claude Code implements a prototype by reading the Make file through the Figma MCP server. A change a prototype surfaces goes through a normal code PR.
+**Figma Make: one way only.** A Make file installs the published `@fossil-design/react` from npm and reads the guidelines that ship inside it, so prototypes use the real components. A Make kit can bundle the two where the plan lets you publish one, but it is optional: publishing a kit needs Figma's npm registry, which not every paid team has. Leave Figma library variables out of any kit: Make flattens them into raw CSS values that would compete with the `--fossil-*` properties. Claude Code implements a prototype by reading the Make file through the Figma MCP server. A change a prototype surfaces goes through a normal code PR.
 
 **Figma components: code-first.** The Fossil component library in Figma is generated from code (Phase 5b). Designers use and override instances freely. A change to a component itself goes through a code PR, and the next regeneration overwrites hand edits to main components.
 
@@ -499,7 +499,7 @@ Both configs combine core and widely used rules with lists generated from the to
 4. CI **reports** the escape count on each PR. It does not fail on it. A system that makes deviation impossible is one you will eventually fight and lose to; a system that makes deviation visible is one you stay in voluntarily.
 5. **Gap log and promotion.** Log a gap whenever an agent in the portfolio can't build something from Fossil, rebuilds something Fossil might need, or adds a Level 2 escape. A gap is an issue on the Fossil repo, from a `gap` issue template, recording four things: where it came up, what the task needed, what Fossil offered, and the evidence.
    - Review open gaps at each release, and close each one with a recorded decision:
-     - **Component:** add it to Fossil with variants, a story, tests, and "when to use" and "when not to use" docs. The Figma library and Make kit pick it up on release.
+     - **Component:** add it to Fossil with variants, a story, tests, and "when to use" and "when not to use" docs. The Figma library and the Make guidelines pick it up on release.
      - **Pattern:** document how to compose it from existing components in Fossil's generated docs, without new code.
      - **Keep local:** it stays a composition in the portfolio, and the reason is recorded.
    - Three gaps for the same need trigger a review. They don't promote anything automatically.
@@ -573,10 +573,12 @@ Always-on context beat retrieval, which is the same finding behind Fossil's alwa
 4. **Storybook MCP for Fossil's own development.**
    - Install `@storybook/addon-mcp`, which requires `@storybook/addon-vitest`, and set `componentsManifest: true` in `.storybook/main.ts`. Manifests are off by default.
    - Agents working on Fossil use it to write stories and run tests. Do not build a custom component MCP server.
-5. **Make kit guidelines.** Generate the kit's `guidelines/` folder from the same docs: `Guidelines.md`, `setup.md` (stylesheet import and theme), `tokens.md`, and one file per component.
+5. **Make guidelines, shipped in the package.** Generate `@fossil-design/react/guidelines/` at build time from the same docs: `Guidelines.md`, `setup.md` (stylesheet import and theme), `tokens.md`, and one file per component. They version with the package, so a prototype gets the guidelines that match the components it installed.
    - Only `Guidelines.md` is required. Make always reads it first and reads the other files only when `Guidelines.md` points to them, so it must route to each one explicitly.
    - Figma recommends several short files over a few long ones.
-   - Republish the kit when a release changes the package.
+   - **Without a kit:** a Make file installs the package from npm, and its own `Guidelines.md` is one line pointing at `node_modules/@fossil-design/react/guidelines/Guidelines.md`. Publishing a kit needs Figma's npm registry, which the Education team doesn't have (Learnings, section 5).
+   - **Check first** that Make's agent reads files under `node_modules`. If it doesn't, the package also serves the folder as plain files a designer can copy in, and the one-line pointer becomes a documented copy step.
+   - **With a kit,** where publishing works, the kit's guidelines are the same pointer, and a release reaches every Make file by updating the package version in the kit.
 6. **Format split,** following the Indeed benchmark: JSON for anything machine-consumed (component APIs, props, variants, token values), and Markdown for instructions and rules.
 7. **Finalise Fossil's own `AGENTS.md`:**
    - foundation rules always-on;
@@ -585,7 +587,8 @@ Always-on context beat retrieval, which is the same finding behind Fossil's alwa
 8. **Completeness check in CI.** The docs generator fails if a component lacks its JSDoc contract.
 
 **Exit criterion:**
-- Docs and Make kit guidelines regenerate from source, and CI fails on an undocumented component.
+- Docs and Make guidelines regenerate from source, and CI fails on an undocumented component.
+- A new Make file with only the package installed and a one-line `Guidelines.md` renders `Box`, `Button` and `Card` on-system, with no kit.
 - In a scratch consumer repo, the bin adds the `AGENTS.md` block, and an agent can list Fossil's components and token rules from installed files alone, offline.
 
 ---
