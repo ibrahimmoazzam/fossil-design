@@ -27,7 +27,7 @@ import '@fossil-design/tokens/tokens.css';
 }
 ```
 
-- **Semantic tokens only.** Primitive tokens such as `--fossil-color-gray-600` hold the raw values that semantic tokens alias. Style with the semantic ones, so a change to a primitive restyles everything built on it.
+- **Semantic tokens only.** Primitive tokens such as `--fossil-base-color-gray-600` hold the raw values that semantic tokens alias. Style with the semantic ones, so a change to a primitive restyles everything built on it.
 - **Dark mode is built in.** It follows the system's setting. Set `data-theme="light"` or `data-theme="dark"` on `<html>` to choose one.
 - **A text style is five properties.** Set all five; the `font` shorthand drops letter-spacing.
 

@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-04
+- **Partly superseded by:** [0013](./0013-base-primitives.md), which renames the responsive key `base` to `default`
 
 ## Context
 

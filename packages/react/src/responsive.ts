@@ -1,11 +1,11 @@
 import type { Breakpoint } from '@fossil-design/tokens';
 
-/** Where a responsive value applies: `base` is mobile, and each breakpoint overrides it from its min-width up. */
-export type ResponsiveKey = 'base' | Breakpoint;
+/** Where a responsive value applies: `default` covers every width, and each breakpoint overrides it from its min-width up. */
+export type ResponsiveKey = 'default' | Breakpoint;
 
 /**
  * One value for every width, or values per breakpoint, mobile first:
- * `{ base: 'm', tablet: 'l' }` is `m` on mobile and `l` from the tablet breakpoint up.
+ * `{ default: 'm', tablet: 'l' }` is `m` on mobile and `l` from the tablet breakpoint up.
  */
 export type Responsive<T> = T | Readonly<Partial<Record<ResponsiveKey, T>>>;
 
@@ -27,7 +27,7 @@ export function responsiveClasses<P extends string, V extends string>(
     ([key, v]) => {
       if (v === undefined) return [];
       return [
-        key === 'base'
+        key === 'default'
           ? styles[`${prop}-${v}` as const]
           : styles[`${key}-${prop}-${v}` as const],
       ];
@@ -46,8 +46,8 @@ export function preferLonghand<V extends string>(
   if (longhand === undefined) return shorthand;
   if (shorthand === undefined) return longhand;
   const merged: Partial<Record<ResponsiveKey, V>> =
-    typeof shorthand === 'string' ? { base: shorthand } : { ...shorthand };
-  const long = typeof longhand === 'string' ? { base: longhand } : longhand;
+    typeof shorthand === 'string' ? { default: shorthand } : { ...shorthand };
+  const long = typeof longhand === 'string' ? { default: longhand } : longhand;
   for (const [key, value] of Object.entries(long) as [
     ResponsiveKey,
     V | undefined,

@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-02
+- **Partly superseded by:** [0013](./0013-base-primitives.md), which puts every primitive under a `base` group
 
 ## Context
 

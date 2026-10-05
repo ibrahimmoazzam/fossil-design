@@ -1,140 +1,142 @@
 {
-  "font": {
-    "family": {
-      "$type": "fontFamily",
-      "figtree": {
-        "$value": ["Figtree", "system-ui", "sans-serif"]
+  "base": {
+    "font": {
+      "family": {
+        "$type": "fontFamily",
+        "figtree": {
+          "$value": ["Figtree", "system-ui", "sans-serif"]
+        },
+        "space-grotesk": {
+          "$value": ["Space Grotesk", "system-ui", "sans-serif"],
+          "$description": "The reference brand's heading face, an open replacement for Roobert."
+        },
+        "space-mono": {
+          "$value": ["Space Mono", "ui-monospace", "monospace"],
+          "$description": "The reference brand's label face, an open replacement for Roobert Mono."
+        }
       },
-      "space-grotesk": {
-        "$value": ["Space Grotesk", "system-ui", "sans-serif"],
-        "$description": "The reference brand's heading face, an open replacement for Roobert."
+      "size": {
+        "$type": "dimension",
+        "$description": "Numbered by step, smallest first.",
+        "1": {
+          "$value": {
+            "value": 0.75,
+            "unit": "rem"
+          }
+        },
+        "2": {
+          "$value": {
+            "value": 0.8125,
+            "unit": "rem"
+          }
+        },
+        "3": {
+          "$value": {
+            "value": 0.875,
+            "unit": "rem"
+          }
+        },
+        "4": {
+          "$value": {
+            "value": 0.9375,
+            "unit": "rem"
+          }
+        },
+        "5": {
+          "$value": {
+            "value": 1,
+            "unit": "rem"
+          }
+        },
+        "6": {
+          "$value": {
+            "value": 1.125,
+            "unit": "rem"
+          }
+        },
+        "7": {
+          "$value": {
+            "value": 1.25,
+            "unit": "rem"
+          }
+        },
+        "8": {
+          "$value": {
+            "value": 1.375,
+            "unit": "rem"
+          }
+        },
+        "9": {
+          "$value": {
+            "value": 1.5,
+            "unit": "rem"
+          }
+        },
+        "10": {
+          "$value": {
+            "value": 2,
+            "unit": "rem"
+          }
+        },
+        "11": {
+          "$value": {
+            "value": 2.5,
+            "unit": "rem"
+          }
+        }
       },
-      "space-mono": {
-        "$value": ["Space Mono", "ui-monospace", "monospace"],
-        "$description": "The reference brand's label face, an open replacement for Roobert Mono."
+      "weight": {
+        "$type": "fontWeight",
+        "300": {
+          "$value": 300
+        },
+        "400": {
+          "$value": 400
+        },
+        "500": {
+          "$value": 500
+        },
+        "600": {
+          "$value": 600
+        },
+        "700": {
+          "$value": 700
+        }
       }
     },
-    "size": {
+    "line-height": {
+      "$type": "number",
+      "none": {
+        "$value": 1
+      },
+      "tight": {
+        "$value": 1.2
+      },
+      "snug": {
+        "$value": 1.4
+      },
+      "base": {
+        "$value": 1.6
+      },
+      "relaxed": {
+        "$value": 1.75
+      }
+    },
+    "letter-spacing": {
       "$type": "dimension",
-      "$description": "Numbered by step, smallest first.",
-      "1": {
+      "none": {
         "$value": {
-          "value": 0.75,
-          "unit": "rem"
+          "value": 0,
+          "unit": "px"
         }
       },
-      "2": {
+      "wide": {
         "$value": {
-          "value": 0.8125,
+          "value": 0.03,
           "unit": "rem"
-        }
-      },
-      "3": {
-        "$value": {
-          "value": 0.875,
-          "unit": "rem"
-        }
-      },
-      "4": {
-        "$value": {
-          "value": 0.9375,
-          "unit": "rem"
-        }
-      },
-      "5": {
-        "$value": {
-          "value": 1,
-          "unit": "rem"
-        }
-      },
-      "6": {
-        "$value": {
-          "value": 1.125,
-          "unit": "rem"
-        }
-      },
-      "7": {
-        "$value": {
-          "value": 1.25,
-          "unit": "rem"
-        }
-      },
-      "8": {
-        "$value": {
-          "value": 1.375,
-          "unit": "rem"
-        }
-      },
-      "9": {
-        "$value": {
-          "value": 1.5,
-          "unit": "rem"
-        }
-      },
-      "10": {
-        "$value": {
-          "value": 2,
-          "unit": "rem"
-        }
-      },
-      "11": {
-        "$value": {
-          "value": 2.5,
-          "unit": "rem"
-        }
+        },
+        "$description": "0.04em at the 12px label size. DTCG dimensions take only px and rem, and a text style's size is fixed, so the conversion is exact."
       }
-    },
-    "weight": {
-      "$type": "fontWeight",
-      "300": {
-        "$value": 300
-      },
-      "400": {
-        "$value": 400
-      },
-      "500": {
-        "$value": 500
-      },
-      "600": {
-        "$value": 600
-      },
-      "700": {
-        "$value": 700
-      }
-    }
-  },
-  "line-height": {
-    "$type": "number",
-    "none": {
-      "$value": 1
-    },
-    "tight": {
-      "$value": 1.2
-    },
-    "snug": {
-      "$value": 1.4
-    },
-    "base": {
-      "$value": 1.6
-    },
-    "relaxed": {
-      "$value": 1.75
-    }
-  },
-  "letter-spacing": {
-    "$type": "dimension",
-    "none": {
-      "$value": {
-        "value": 0,
-        "unit": "px"
-      }
-    },
-    "wide": {
-      "$value": {
-        "value": 0.03,
-        "unit": "rem"
-      },
-      "$description": "0.04em at the 12px label size. DTCG dimensions take only px and rem, and a text style's size is fixed, so the conversion is exact."
     }
   }
 }

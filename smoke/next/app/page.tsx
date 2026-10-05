@@ -21,7 +21,7 @@ export default function Page() {
         as="main"
         id="main"
         tabIndex={-1}
-        padding={{ base: 'm', tablet: 'xl' }}
+        padding={{ default: 'm', tablet: 'xl' }}
       >
         <Stack gap="l">
           <Text as="h1" variant="heading-xl">

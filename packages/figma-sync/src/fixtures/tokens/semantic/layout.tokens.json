@@ -2,11 +2,11 @@
   "layout": {
     "$type": "dimension",
     "measure": {
-      "$value": "{size.48rem}",
+      "$value": "{base.size.48rem}",
       "$description": "The widest a column of prose may get."
     },
     "max-width": {
-      "$value": "{breakpoint.max}",
+      "$value": "{base.breakpoint.max}",
       "$description": "The widest the page's content may get."
     }
   },
@@ -14,15 +14,15 @@
     "$type": "dimension",
     "size": {
       "s": {
-        "$value": "{font.size.6}",
+        "$value": "{base.font.size.6}",
         "$description": "Icons in small buttons and inline marks."
       },
       "m": {
-        "$value": "{font.size.7}",
+        "$value": "{base.font.size.7}",
         "$description": "Icons in carousel and scroll controls."
       },
       "l": {
-        "$value": "{font.size.9}",
+        "$value": "{base.font.size.9}",
         "$description": "Standalone icons and chips."
       }
     }

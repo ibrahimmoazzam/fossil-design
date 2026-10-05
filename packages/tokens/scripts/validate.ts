@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 /** Fossil's key under `$extensions`. Forks keep it: it names Fossil's extension format, not a brand. */
 export const VENDOR = 'com.ibrahimmoazzam.fossil';
 export const MODES = ['dark'] as const;
+/** The group every primitive sits under, so its name says it isn't for direct use. */
+export const PRIMITIVE_GROUP = 'base';
 
 export type Tier = 'primitive' | 'semantic';
 
@@ -499,6 +501,11 @@ export function validate(files: TokenFile[]): Result {
 
     // The tier rules.
     const modes = t.extension?.modes;
+    const underBase = t.path.startsWith(`${PRIMITIVE_GROUP}.`);
+    if (t.tier === 'primitive' && !underBase)
+      report(`A primitive's path starts with ${PRIMITIVE_GROUP}.`);
+    if (t.tier === 'semantic' && underBase)
+      report(`Only primitives sit under ${PRIMITIVE_GROUP}`);
     if (t.tier === 'primitive') {
       if (referencesIn(t.value).length > 0)
         report('A primitive holds a raw value, not a reference');

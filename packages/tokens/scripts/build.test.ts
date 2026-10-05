@@ -90,17 +90,19 @@ const dimension = (value: number, unit = 'rem') => ({
 });
 
 const primitives = {
-  color: {
-    $type: 'color',
-    gray: { 300: srgb([0.8, 0.82, 0.85]), 600: srgb([0.29, 0.32, 0.35]) },
-    ink: srgb([0, 0, 0], { alpha: 0.2 }),
-  },
-  space: {
-    $type: 'dimension',
-    0: dimension(0, 'px'),
-    '050': dimension(0.25),
-    100: dimension(0.5),
-    1000: dimension(5),
+  base: {
+    color: {
+      $type: 'color',
+      gray: { 300: srgb([0.8, 0.82, 0.85]), 600: srgb([0.29, 0.32, 0.35]) },
+      ink: srgb([0, 0, 0], { alpha: 0.2 }),
+    },
+    space: {
+      $type: 'dimension',
+      0: dimension(0, 'px'),
+      '050': dimension(0.25),
+      100: dimension(0.5),
+      1000: dimension(5),
+    },
   },
 };
 
@@ -167,7 +169,7 @@ describe('building the token source', () => {
       'var(--fossil-font-family-heading)',
     );
     expect(declaration(css, '--fossil-text-label-letter-spacing')).toBe(
-      'var(--fossil-letter-spacing-wide)',
+      'var(--fossil-base-letter-spacing-wide)',
     );
     expect(json.tokens['text.body']?.cssVar).toEqual({
       fontFamily: '--fossil-text-body-font-family',
@@ -241,7 +243,7 @@ describe('building the token source', () => {
   });
 
   it('writes durations in CSS units and nothing unconverted', () => {
-    expect(declaration(css, '--fossil-duration-150')).toBe('150ms');
+    expect(declaration(css, '--fossil-base-duration-150')).toBe('150ms');
     expect(css).not.toMatch(/\[object Object\]|\bundefined\b|\bNaN\b/);
   });
 
@@ -276,7 +278,7 @@ describe('building the token source', () => {
 
   it('lists every primitive custom property for the lint config', () => {
     const lint = JSON.parse(read('dist/lint.json')) as LintLists;
-    expect(lint.primitive).toContain('--fossil-color-gray-600');
+    expect(lint.primitive).toContain('--fossil-base-color-gray-600');
     expect(lint.primitive).not.toContain('--fossil-color-text-muted');
     expect(lint.primitive).toHaveLength(
       Object.values(json.tokens).filter((t) => t.tier === 'primitive').length,
@@ -342,10 +344,13 @@ describe('a broken token fails the build with a clear message, before anything i
           color: {
             $type: 'color',
             text: {
-              muted: { $value: '{color.gray.600}', $description: 'Muted.' },
+              muted: {
+                $value: '{base.color.gray.600}',
+                $description: 'Muted.',
+              },
             },
             'text-muted': {
-              $value: '{color.gray.600}',
+              $value: '{base.color.gray.600}',
               $description: 'Muted again.',
             },
           },
@@ -362,16 +367,18 @@ describe('a broken token fails the build with a clear message, before anything i
     const { problems, wrote } = await failure(
       fixture({
         'primitive/motion.tokens.json': {
-          duration: {
-            $type: 'duration',
-            150: { $value: { value: 150, unit: 'ms' } },
+          base: {
+            duration: {
+              $type: 'duration',
+              150: { $value: { value: 150, unit: 'ms' } },
+            },
           },
         },
       }),
       { transforms: TRANSFORMS.filter((t) => t !== DURATION) },
     );
     expect(problems).toEqual([
-      'duration.150: --fossil-duration-150 would be "[object Object]". No transform turns this duration value into CSS.',
+      'base.duration.150: --fossil-base-duration-150 would be "[object Object]". No transform turns this duration value into CSS.',
     ]);
     expect(wrote).toBe(false);
   });
@@ -381,15 +388,17 @@ describe('a broken token fails the build with a clear message, before anything i
       fixture({
         'primitive/base.tokens.json': primitives,
         'semantic/space.tokens.json': {
-          space: {
-            $type: 'dimension',
-            100: { $value: '{space.050}', $description: 'Twin.' },
+          base: {
+            space: {
+              $type: 'dimension',
+              100: { $value: '{base.space.050}', $description: 'Twin.' },
+            },
           },
         },
       }),
     );
     expect(problems).toContain(
-      'semantic/space.tokens.json › space.100: Also defined in primitive/base.tokens.json; a path exists once, in one tier',
+      'semantic/space.tokens.json › base.space.100: Also defined in primitive/base.tokens.json; a path exists once, in one tier',
     );
     expect(wrote).toBe(false);
   });
@@ -407,18 +416,18 @@ describe('references', () => {
             deep: {
               $value: [
                 {
-                  blur: '{space.1000}',
-                  offsetY: '{space.050}',
-                  offsetX: '{space.0}',
-                  spread: '{space.0}',
-                  color: '{color.ink}',
+                  blur: '{base.space.1000}',
+                  offsetY: '{base.space.050}',
+                  offsetX: '{base.space.0}',
+                  spread: '{base.space.0}',
+                  color: '{base.color.ink}',
                 },
                 {
-                  color: '{color.ink}',
-                  offsetX: '{space.0}',
-                  offsetY: '{space.0}',
-                  blur: '{space.100}',
-                  spread: '{space.0}',
+                  color: '{base.color.ink}',
+                  offsetX: '{base.space.0}',
+                  offsetY: '{base.space.0}',
+                  blur: '{base.space.100}',
+                  spread: '{base.space.0}',
                   inset: true,
                 },
               ],
@@ -429,8 +438,8 @@ describe('references', () => {
       }),
     );
     expect(declaration(read('dist/tokens.css'), '--fossil-shadow-deep')).toBe(
-      'var(--fossil-space-0) var(--fossil-space-050) var(--fossil-space-1000) var(--fossil-space-0) var(--fossil-color-ink), ' +
-        'inset var(--fossil-space-0) var(--fossil-space-0) var(--fossil-space-100) var(--fossil-space-0) var(--fossil-color-ink)',
+      'var(--fossil-base-space-0) var(--fossil-base-space-050) var(--fossil-base-space-1000) var(--fossil-base-space-0) var(--fossil-base-color-ink), ' +
+        'inset var(--fossil-base-space-0) var(--fossil-base-space-0) var(--fossil-base-space-100) var(--fossil-base-space-0) var(--fossil-base-color-ink)',
     );
   });
 
@@ -438,24 +447,26 @@ describe('references', () => {
     const read = await buildInto(
       fixture({
         'primitive/type.tokens.json': {
-          font: {
-            family: { $type: 'fontFamily', sans: { $value: ['Figtree'] } },
-            size: { $type: 'dimension', 5: dimension(1) },
-            weight: { $type: 'fontWeight', 400: { $value: 400 } },
+          base: {
+            font: {
+              family: { $type: 'fontFamily', sans: { $value: ['Figtree'] } },
+              size: { $type: 'dimension', 5: dimension(1) },
+              weight: { $type: 'fontWeight', 400: { $value: 400 } },
+            },
+            tracking: { $type: 'dimension', none: dimension(0, 'px') },
+            leading: { $type: 'number', base: { $value: 1.6 } },
           },
-          tracking: { $type: 'dimension', none: dimension(0, 'px') },
-          leading: { $type: 'number', base: { $value: 1.6 } },
         },
         'semantic/text.tokens.json': {
           text: {
             $type: 'typography',
             body: {
               $value: {
-                fontFamily: '{font.family.sans}',
-                fontSize: '{font.size.5}',
-                fontWeight: '{font.weight.400}',
-                letterSpacing: '{tracking.none}',
-                lineHeight: '{leading.base}',
+                fontFamily: '{base.font.family.sans}',
+                fontSize: '{base.font.size.5}',
+                fontWeight: '{base.font.weight.400}',
+                letterSpacing: '{base.tracking.none}',
+                lineHeight: '{base.leading.base}',
               },
               $description: 'Body.',
             },
@@ -466,7 +477,7 @@ describe('references', () => {
     );
     const css = read('dist/tokens.css');
     expect(declaration(css, '--fossil-text-body-font-size')).toBe(
-      'var(--fossil-font-size-5)',
+      'var(--fossil-base-font-size-5)',
     );
     expect(declaration(css, '--fossil-text-default-font-size')).toBe(
       'var(--fossil-text-body-font-size)',
@@ -477,13 +488,15 @@ describe('references', () => {
     const read = await buildInto(
       fixture({
         'primitive/type.tokens.json': {
-          weight: { $type: 'fontWeight', semi: { $value: 'semi-bold' } },
+          base: {
+            weight: { $type: 'fontWeight', semi: { $value: 'semi-bold' } },
+          },
         },
       }),
     );
-    expect(declaration(read('dist/tokens.css'), '--fossil-weight-semi')).toBe(
-      '600',
-    );
+    expect(
+      declaration(read('dist/tokens.css'), '--fossil-base-weight-semi'),
+    ).toBe('600');
   });
 });
 
@@ -494,9 +507,12 @@ describe('deprecated tokens', () => {
       color: {
         $type: 'color',
         text: {
-          default: { $value: '{color.gray.600}', $description: 'Body text.' },
+          default: {
+            $value: '{base.color.gray.600}',
+            $description: 'Body text.',
+          },
           old: {
-            $value: '{color.gray.600}',
+            $value: '{base.color.gray.600}',
             $description: 'The old body text.',
             $deprecated: 'Renamed to color.text.default.',
             $extensions: {
@@ -511,7 +527,7 @@ describe('deprecated tokens', () => {
   it('keeps them in tokens.css and lists them for the lint config, but not as prop keys', async () => {
     const read = await buildInto(deprecated);
     expect(read('dist/tokens.css')).toContain(
-      '  /* The old body text. Deprecated: Renamed to color.text.default. */\n  --fossil-color-text-old: var(--fossil-color-gray-600);',
+      '  /* The old body text. Deprecated: Renamed to color.text.default. */\n  --fossil-color-text-old: var(--fossil-base-color-gray-600);',
     );
     expect(
       (JSON.parse(read('dist/lint.json')) as LintLists).deprecated,
