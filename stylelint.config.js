@@ -6,7 +6,13 @@ import { fossil } from '@fossil-design/stylelint-config';
  */
 const config = {
   ...fossil(),
-  ignoreFiles: ['**/dist/**', '**/storybook-static/**', '**/coverage/**'],
+  ignoreFiles: [
+    '**/dist/**',
+    '**/storybook-static/**',
+    '**/coverage/**',
+    // Deliberately off-system: tests/off-system.test.ts and the smoke test lint it and expect errors.
+    'smoke/off-system/**',
+  ],
 };
 
 export default config;

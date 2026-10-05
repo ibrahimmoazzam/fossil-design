@@ -1,0 +1,11 @@
+/* Deliberately off-system: see OffSystem.tsx. */
+.card {
+  /* A margin without a reason. */
+  margin-block-end: 8px;
+
+  /* A primitive token. */
+  background-color: var(--fossil-base-color-gray-100);
+
+  /* A hex colour. */
+  color: #1b4dff;
+}

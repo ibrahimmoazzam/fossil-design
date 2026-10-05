@@ -6,7 +6,8 @@
   "scripts": {
     "build": "next build",
     "typecheck": "tsc --noEmit",
-    "lint:css": "stylelint \"app/**/*.css\""
+    "lint:css": "stylelint \"app/**/*.css\"",
+    "lint:js": "eslint ."
   },
   "dependencies": {
     "motion": "14.0.0",
@@ -18,7 +19,9 @@
     "@types/node": "22.20.4",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "eslint": "10.12.0",
     "stylelint": "17.16.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0"
   }
 }
