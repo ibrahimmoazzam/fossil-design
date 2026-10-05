@@ -46,9 +46,12 @@ Option 3, with `base`. Every primitive sits under a top-level `base` group, and 
 
 The validator enforces it, so the folder and the name can't drift apart: a primitive whose path doesn't start with `base.` fails the build, and so does a semantic token under `base`. The group name is one constant, `PRIMITIVE_GROUP` in `packages/tokens/scripts/validate.ts`.
 
-Semantic names don't change. The folder rule from 0005 stands, and so does everything else in it.
+The folder rule from 0005 stands, and so does everything else in it.
 
-So that `base` means only this, a responsive prop's widthless key, which 0009 named `base`, becomes `default`: `padding={{ default: 'm', tablet: 'l' }}`. It applies at every width until a breakpoint overrides it.
+So that `base` means only this, two other names change to `default`:
+
+- **The semantic token `motion.duration.base`** becomes `motion.duration.default`, beside `fast` and `slow`. The old name stays, deprecated with `replacedBy`, so the linter names the replacement and the Figma sync renames the variable in place.
+- **A responsive prop's widthless key,** which 0009 named `base`: `padding={{ default: 'm', tablet: 'l' }}`. It applies at every width until a breakpoint overrides it.
 
 ## Consequences
 
@@ -56,5 +59,6 @@ So that `base` means only this, a responsive prop's widthless key, which 0009 na
 - `@fossil-design/tokens` 0.4.0 renames every primitive custom property. Nothing in Fossil's components uses them, so `@fossil-design/react` is unaffected. An app's site tokens that alias a primitive must switch to the new names. No primitive is kept under its old name, because before 1.0 nothing outside Fossil depends on them yet.
 - The next Figma apply creates the 82 `base/…` variables and re-points every semantic alias to them. The old primitive variables are left as orphans, since the sync never deletes; delete them by hand once the apply reports them. Nothing binds to a primitive directly.
 - In Figma, primitives sit under a `base/` folder inside the `Primitives` collection. That repeats the collection name, but keeps the variable's name equal to its token path, which the sync relies on.
-- `@fossil-design/react` 0.3.0 renames the responsive key: `{ base: 'm' }` becomes `{ default: 'm' }`, and the old key is a type error.
+- `@fossil-design/react` 0.3.0 renames the responsive key: `{ base: 'm' }` becomes `{ default: 'm' }`, and the old key is a type error. Its components use `--fossil-motion-duration-default`, so it needs tokens 0.4.0.
+- `--fossil-motion-duration-base` still works in 0.4.0, and the Stylelint config rejects it with its replacement named. A later minor release removes it.
 - The portfolio's token inventory names primitives the old way; the Phase 8 migration uses the new names.

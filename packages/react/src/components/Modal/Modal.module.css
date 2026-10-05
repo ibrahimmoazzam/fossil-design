@@ -37,7 +37,7 @@
   background-color: var(--fossil-color-background-scrim);
   pointer-events: none;
   backdrop-filter: blur(8px);
-  transition: opacity var(--fossil-motion-duration-base)
+  transition: opacity var(--fossil-motion-duration-default)
     var(--fossil-motion-easing-standard);
 }
 
@@ -58,7 +58,7 @@
 
 /* Fossil's own fade and scale. A panel rendered through renderPanel animates itself instead. */
 .animated {
-  transition-duration: var(--fossil-motion-duration-base);
+  transition-duration: var(--fossil-motion-duration-default);
   transition-property: opacity, scale;
   transition-timing-function: var(--fossil-motion-easing-standard);
 }
