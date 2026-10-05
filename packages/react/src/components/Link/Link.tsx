@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { ArrowOutwardIcon } from '../../generated/icons.js';
 import { cx } from '../../responsive.js';
+import { Box } from '../Box/Box.js';
 import type { IconComponent } from '../Icon/createIcon.js';
 import { Icon } from '../Icon/Icon.js';
 import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden.js';
@@ -59,11 +60,13 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
 
   const content = (text: ReactNode) => (
     <>
-      <span className={styles.text}>{text}</span>
+      <Box as="span" className={styles.text}>
+        {text}
+      </Box>
       {trailing && (
-        <span className={styles.icon}>
+        <Box as="span" className={styles.icon}>
           <Icon icon={trailing} />
-        </span>
+        </Box>
       )}
       {opensInNewTab && <VisuallyHidden> (opens in a new tab)</VisuallyHidden>}
     </>

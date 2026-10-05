@@ -125,6 +125,7 @@ export function Popover({
       <FloatingPortal root={portalRoot}>
         {mounted && (
           <FloatingFocusManager context={context} modal={false}>
+            {/* eslint-disable-next-line no-restricted-syntax -- Floating UI positions this element with inline position, top and left, which Box's style prop doesn't take */}
             <div
               ref={floatingRef}
               className={styles.popover}
