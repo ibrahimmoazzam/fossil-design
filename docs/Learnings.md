@@ -471,6 +471,7 @@ The class-name check needs `moduleResolution: "bundler"`: under `NodeNext`, Type
 ### Figma Make and plan constraints
 
 - **Make kits** are available to Full seats on paid plans. Creating one was confirmed on the higher-education Education plan.
+- **Publishing a kit needs Figma's npm registry.** Publishing uploads the kit as a package to Figma's private registry; a forum thread on publishing from CI shows republishing failing with "this package version already exists". On the Education team, publishing fails with "Your plan does not have npm registry access" (5 October 2026). Figma's npm help says it provides private registries for a Pro team or an organization, and staff say registry access is reaching Full seats in stages. A kit can't be published from Drafts either. Unpublished, a kit is usable only in its own file.
 - **Kit packages** must build with Vite. Kit docs require React 18, though new Make files have run React 19 since 12 August 2026.
 - **Public vs private packages:** any Make user can use a package from the public npm registry. Private packages need Figma's organization-scoped registry.
 - **Copying a Make preview into Figma Design** binds matching variables, but the layers are linked to neither the design system nor the Make file.
@@ -566,6 +567,7 @@ Building the component package's foundation settled these, each checked against 
 | Primitive names | Every primitive sits under a `base` group: `--fossil-base-color-gray-600` | Enforcement keeps primitives out of components, but Make's properties panel and hand-written CSS see every name. Primer marks its primitives `base-` the same way (ADR 0013) |
 | Terms | "Primitive" means the raw token tier only; product-specific components are "compositions" | Both words were overloaded, which confuses people and agents alike; one name per concept |
 | Library generation | A script writes each component's spec (names, variants, bindings) from code and checks the built result; the agent builds the frames | Names and bindings must be exact, so they come from code and get verified; only the frame layout needs judgment |
+| Make guidelines | Shipped in `@fossil-design/react`, with the kit optional | One copy that versions with the components, and it works on any paid plan: publishing a kit needs Figma's npm registry, which the Education team lacks |
 | Make kit tokens | From the npm package, not the Figma library | Make flattens library variables into raw CSS values that would compete with `--fossil-*` |
 | Margins | No margin prop on `Box`; a margin in CSS fails lint unless it's `0` or carries a disable comment with a reason | Harvested from the portfolio's rule: spacing comes from padding and `gap`, and a margin needs permission and a reason. A lint error that only a written reason can pass keeps the original "ask first" exception, and every use shows up in the escape count |
 | Figma mapping key | Shared plugin data under a `fossil` namespace | Agents writing through `use_figma` run as a different plugin and cannot read private plugin data |
@@ -662,7 +664,8 @@ Building the component package's foundation settled these, each checked against 
 - GitHub docs: About forks; Creating a repository from a template
 
 **AI design tools**
-- Figma Help Center: Get started with Make kits; Bring your design system package to a Make kit; Write design system guidelines for Make kits; Copy a Figma Make preview as design layers
+- Figma Help Center: Get started with Make kits; Bring your design system package to a Make kit; Use your design system package in Make kits; Working with npm; Write design system guidelines for Make kits; Copy a Figma Make preview as design layers
+- Figma Forum: npm registry not available despite a Full seat; Publishing a Figma Make kit from GitHub CI
 - Figma Help Center: Figma for Education; AI credits on the Education plan
 - Figma Forum, React 19 in Figma Make
 - Analysis of `get_design_context` output (zenn.dev, yokkomystery)
