@@ -1,5 +1,16 @@
 # @fossil-design/react
 
+## 0.3.0
+
+### Minor Changes
+
+- 589674d: A responsive prop's widthless key is now `default`, not `base`, because `base` now names primitive tokens: write `padding={{ default: 'm', tablet: 'l' }}`. The old key is a type error.
+
+### Patch Changes
+
+- Updated dependencies [b764993]
+  - @fossil-design/tokens@0.4.0
+
 ## 0.2.0
 
 ### Minor Changes
