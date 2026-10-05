@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-05
-- **Partly supersedes:** the naming in [0005](./0005-token-taxonomy.md)
+- **Partly supersedes:** the naming in [0005](./0005-token-taxonomy.md), and the responsive key in [0009](./0009-component-package.md)
 
 ## Context
 
@@ -48,11 +48,13 @@ The validator enforces it, so the folder and the name can't drift apart: a primi
 
 Semantic names don't change. The folder rule from 0005 stands, and so does everything else in it.
 
+So that `base` means only this, a responsive prop's widthless key, which 0009 named `base`, becomes `default`: `padding={{ default: 'm', tablet: 'l' }}`. It applies at every width until a breakpoint overrides it.
+
 ## Consequences
 
 - A designer who sees `base` in a Make or Figma dropdown, and a developer who types it, knows they've reached the wrong tier. The linter still makes the final call.
 - `@fossil-design/tokens` 0.4.0 renames every primitive custom property. Nothing in Fossil's components uses them, so `@fossil-design/react` is unaffected. An app's site tokens that alias a primitive must switch to the new names. No primitive is kept under its old name, because before 1.0 nothing outside Fossil depends on them yet.
 - The next Figma apply creates the 82 `base/…` variables and re-points every semantic alias to them. The old primitive variables are left as orphans, since the sync never deletes; delete them by hand once the apply reports them. Nothing binds to a primitive directly.
 - In Figma, primitives sit under a `base/` folder inside the `Primitives` collection. That repeats the collection name, but keeps the variable's name equal to its token path, which the sync relies on.
-- `base` is also the mobile key of a responsive prop (`padding={{ base: 'm', tablet: 'l' }}`). The two never meet in one place: one is part of a custom property name, the other a prop key. Changing either word means changing that constant or the responsive type.
+- `@fossil-design/react` 0.3.0 renames the responsive key: `{ base: 'm' }` becomes `{ default: 'm' }`, and the old key is a type error.
 - The portfolio's token inventory names primitives the old way; the Phase 8 migration uses the new names.

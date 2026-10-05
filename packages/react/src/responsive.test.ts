@@ -16,9 +16,9 @@ describe('responsiveClasses', () => {
     expect(responsiveClasses(styles, 'gap', 'm')).toEqual(['class:gap-m']);
   });
 
-  it('gives a class per breakpoint, base without a prefix', () => {
+  it('gives a class per breakpoint, default without a prefix', () => {
     expect(
-      responsiveClasses(styles, 'gap', { base: 's', tablet: 'l' }),
+      responsiveClasses(styles, 'gap', { default: 's', tablet: 'l' }),
     ).toEqual(['class:gap-s', 'class:tablet-gap-l']);
   });
 
@@ -30,12 +30,12 @@ describe('responsiveClasses', () => {
 
 describe('preferLonghand', () => {
   it('keeps the longhand at the same breakpoint', () => {
-    expect(preferLonghand('xs', 'l')).toEqual({ base: 'xs' });
+    expect(preferLonghand('xs', 'l')).toEqual({ default: 'xs' });
   });
 
   it('lets a wider breakpoint of the shorthand through', () => {
-    expect(preferLonghand('s', { base: 'm', tablet: 'l' })).toEqual({
-      base: 's',
+    expect(preferLonghand('s', { default: 'm', tablet: 'l' })).toEqual({
+      default: 's',
       tablet: 'l',
     });
   });

@@ -12,7 +12,7 @@ Each record states the context, the options considered, the decision and its con
 | [0006](./0006-token-build-outputs.md)    | Token build outputs                                       | Accepted                            |
 | [0007](./0007-figma-sync.md)             | The Figma sync                                            | Accepted                            |
 | [0008](./0008-stylelint-config.md)       | The shared Stylelint config                               | Accepted                            |
-| [0009](./0009-component-package.md)      | The component package                                     | Accepted                            |
+| [0009](./0009-component-package.md)      | The component package                                     | Accepted, partly superseded by 0013 |
 | [0010](./0010-content-components.md)     | Content components: icons, element substitution and media | Accepted                            |
 | [0011](./0011-interactive-components.md) | Interactive components: motion and extension points       | Accepted                            |
 | [0012](./0012-smoke-test.md)             | The consumption smoke test                                | Accepted                            |
