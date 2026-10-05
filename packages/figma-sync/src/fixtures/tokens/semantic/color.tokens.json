@@ -3,82 +3,82 @@
     "$type": "color",
     "background": {
       "transparent": {
-        "$value": "{color.transparent}",
+        "$value": "{base.color.transparent}",
         "$description": "No fill: ghost controls and background resets."
       },
       "page": {
-        "$value": "{color.white.400}",
+        "$value": "{base.color.white.400}",
         "$description": "The page ground.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.gray.950}"
+              "dark": "{base.color.gray.950}"
             }
           }
         }
       },
       "surface": {
-        "$value": "{color.white.500}",
+        "$value": "{base.color.white.500}",
         "$description": "Cards, panels, popovers and other surfaces that sit on the page.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.gray.900}"
+              "dark": "{base.color.gray.900}"
             }
           }
         }
       },
       "sunken": {
-        "$value": "{color.gray.200}",
+        "$value": "{base.color.gray.200}",
         "$description": "A fill set below the page, such as a tab track.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.gray.800}"
+              "dark": "{base.color.gray.800}"
             }
           }
         }
       },
       "raised": {
-        "$value": "{color.white.500}",
+        "$value": "{base.color.white.500}",
         "$description": "A fill that comes back up from a sunken one, such as the selected tab. Never the only sign of selection: its separation is under 3:1.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.black.400}"
+              "dark": "{base.color.black.400}"
             }
           }
         }
       },
       "hover": {
-        "$value": "{color.alpha.black-400-8}",
+        "$value": "{base.color.alpha.black-400-8}",
         "$description": "The wash behind a hovered row, pill or link.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.alpha.gray-50-8}"
+              "dark": "{base.color.alpha.gray-50-8}"
             }
           }
         }
       },
       "wash": {
-        "$value": "{color.yellow.100}",
+        "$value": "{base.color.yellow.100}",
         "$description": "A tint that marks a row without filling it, such as a table header.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.yellow.900}"
+              "dark": "{base.color.yellow.900}"
             }
           }
         }
       },
       "scrim": {
-        "$value": "{color.alpha.black-400-40}",
+        "$value": "{base.color.alpha.black-400-40}",
         "$description": "Behind a modal.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.alpha.black-500-60}"
+              "dark": "{base.color.alpha.black-500-60}"
             }
           }
         }
@@ -86,45 +86,45 @@
     },
     "text": {
       "default": {
-        "$value": "{color.black.400}",
+        "$value": "{base.color.black.400}",
         "$description": "Body text. 17.60:1 on the page in light, 18.17:1 in dark.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.gray.50}"
+              "dark": "{base.color.gray.50}"
             }
           }
         }
       },
       "muted": {
-        "$value": "{color.gray.600}",
+        "$value": "{base.color.gray.600}",
         "$description": "Secondary text. 7.38:1 on the page in light, 12.70:1 in dark.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.gray.300}"
+              "dark": "{base.color.gray.300}"
             }
           }
         }
       },
       "on-accent": {
-        "$value": "{color.white.500}",
+        "$value": "{base.color.white.500}",
         "$description": "Text and icons on an accent fill. 5.91:1 on accent.default in light, 7.70:1 in dark.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.black.400}"
+              "dark": "{base.color.black.400}"
             }
           }
         }
       },
       "on-highlight": {
-        "$value": "{color.white.500}",
+        "$value": "{base.color.white.500}",
         "$description": "Text and icons on a highlight fill. 5.20:1 on highlight.default in light, 13.05:1 in dark.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.black.400}"
+              "dark": "{base.color.black.400}"
             }
           }
         }
@@ -132,27 +132,27 @@
     },
     "border": {
       "default": {
-        "$value": "{color.gray.200}",
+        "$value": "{base.color.gray.200}",
         "$description": "A quiet container edge, meant to sit against a fill. Too faint to stand alone as a line.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.gray.800}"
+              "dark": "{base.color.gray.800}"
             }
           }
         }
       },
       "strong": {
-        "$value": "{color.gray.500}",
+        "$value": "{base.color.gray.500}",
         "$description": "A standalone rule or tick. One value serves both modes: 3.58:1 on the page in light, 4.96:1 in dark."
       },
       "hover": {
-        "$value": "{color.gray.600}",
+        "$value": "{base.color.gray.600}",
         "$description": "A control's edge on hover. 7.38:1 on the page in light, 12.70:1 in dark.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.gray.300}"
+              "dark": "{base.color.gray.300}"
             }
           }
         }
@@ -164,12 +164,12 @@
     },
     "accent": {
       "default": {
-        "$value": "{color.blue.600}",
+        "$value": "{base.color.blue.600}",
         "$description": "Links and primary actions. 5.43:1 on the page in light, 7.76:1 in dark.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.blue.400}"
+              "dark": "{base.color.blue.400}"
             }
           }
         }
@@ -177,12 +177,12 @@
     },
     "highlight": {
       "default": {
-        "$value": "{color.azure.600}",
+        "$value": "{base.color.azure.600}",
         "$description": "Small marks that should stand out: the current page, the caret, the selected tab. 4.78:1 on the page in light, 13.15:1 in dark.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.yellow.300}"
+              "dark": "{base.color.yellow.300}"
             }
           }
         }
@@ -196,12 +196,12 @@
     },
     "selection": {
       "background": {
-        "$value": "{color.azure.100}",
+        "$value": "{base.color.azure.100}",
         "$description": "Selected text. The selected text itself takes highlight.default.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.yellow.900}"
+              "dark": "{base.color.yellow.900}"
             }
           }
         }
@@ -209,12 +209,12 @@
     },
     "shadow": {
       "default": {
-        "$value": "{color.alpha.black-400-22}",
+        "$value": "{base.color.alpha.black-400-22}",
         "$description": "The colour of every shadow.",
         "$extensions": {
           "com.ibrahimmoazzam.fossil": {
             "modes": {
-              "dark": "{color.alpha.black-500-55}"
+              "dark": "{base.color.alpha.black-500-55}"
             }
           }
         }

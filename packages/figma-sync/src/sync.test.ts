@@ -154,53 +154,53 @@ describe('the tokens Figma gets', () => {
   const token = (path: string) => model.find((t) => t.path === path);
 
   it('converts values to Figma units', () => {
-    expect(token('color.gray.600')?.values).toEqual({
+    expect(token('base.color.gray.600')?.values).toEqual({
       Value: { hex: '#4a5159', alpha: 1 },
     });
-    expect(token('color.alpha.black-400-8')?.values.Value).toEqual({
+    expect(token('base.color.alpha.black-400-8')?.values.Value).toEqual({
       hex: '#0f0f10',
       alpha: 0.08,
     });
-    expect(token('space.100')?.values.Value).toBe(8);
-    expect(token('radius.md')?.values.Value).toBe(8);
-    expect(token('font.family.figtree')?.values.Value).toBe('Figtree');
-    expect(token('font.weight.400')?.values.Value).toBe(400);
-    expect(token('line-height.base')?.values.Value).toBe(1.6);
-    expect(token('duration.150')?.values.Value).toBe(0.15);
-    expect(token('easing.ease')?.values.Value).toEqual({
+    expect(token('base.space.100')?.values.Value).toBe(8);
+    expect(token('base.radius.md')?.values.Value).toBe(8);
+    expect(token('base.font.family.figtree')?.values.Value).toBe('Figtree');
+    expect(token('base.font.weight.400')?.values.Value).toBe(400);
+    expect(token('base.line-height.base')?.values.Value).toBe(1.6);
+    expect(token('base.duration.150')?.values.Value).toBe(0.15);
+    expect(token('base.easing.ease')?.values.Value).toEqual({
       bezier: [0.25, 0.1, 0.25, 1],
     });
     expect(token('motion.duration.fast')?.values.Light).toEqual({
-      alias: 'duration.150',
+      alias: 'base.duration.150',
     });
   });
 
   it('gives semantic tokens an alias in each mode', () => {
     expect(token('color.text.muted')?.values).toEqual({
-      Light: { alias: 'color.gray.600' },
-      Dark: { alias: 'color.gray.300' },
+      Light: { alias: 'base.color.gray.600' },
+      Dark: { alias: 'base.color.gray.300' },
     });
     expect(token('color.border.strong')?.values).toEqual({
-      Light: { alias: 'color.gray.500' },
-      Dark: { alias: 'color.gray.500' },
+      Light: { alias: 'base.color.gray.500' },
+      Dark: { alias: 'base.color.gray.500' },
     });
   });
 
   it('keeps the order the token files list them in', () => {
     const numbered = modelOf(source)
       .model.map((t) => t.path)
-      .filter((p) => /^space\.\d+$/.test(p));
+      .filter((p) => /^base\.space\.\d+$/.test(p));
     expect(numbered).toEqual([
-      'space.0',
-      'space.025',
-      'space.050',
-      'space.100',
-      'space.150',
-      'space.200',
-      'space.300',
-      'space.400',
-      'space.600',
-      'space.1000',
+      'base.space.0',
+      'base.space.025',
+      'base.space.050',
+      'base.space.100',
+      'base.space.150',
+      'base.space.200',
+      'base.space.300',
+      'base.space.400',
+      'base.space.600',
+      'base.space.1000',
     ]);
   });
 
@@ -209,7 +209,7 @@ describe('the tokens Figma gets', () => {
       'text.body',
       'border.default',
       'shadow.raised',
-      'border.style.solid',
+      'base.border.style.solid',
     ])
       expect(token(path), path).toBeUndefined();
   });
@@ -229,10 +229,10 @@ describe('the tokens Figma gets', () => {
       'EFFECT_FLOAT',
     ]);
     expect(scopes('focus.ring.offset')).toEqual(['EFFECT_FLOAT']);
-    expect(scopes('color.gray.600')).toEqual([]);
+    expect(scopes('base.color.gray.600')).toEqual([]);
     expect(scopes('layer.overlay')).toEqual([]);
     expect(scopes('motion.duration.fast')).toBeUndefined();
-    expect(scopes('easing.ease')).toBeUndefined();
+    expect(scopes('base.easing.ease')).toBeUndefined();
   });
 });
 
@@ -279,11 +279,11 @@ describe('applying to a fresh file', () => {
     const muted = figma.variable('color.text.muted');
     expect(muted.valuesByMode[figma.mode(muted, 'Light')]).toEqual({
       type: 'VARIABLE_ALIAS',
-      id: figma.variable('color.gray.600').id,
+      id: figma.variable('base.color.gray.600').id,
     });
     expect(muted.valuesByMode[figma.mode(muted, 'Dark')]).toEqual({
       type: 'VARIABLE_ALIAS',
-      id: figma.variable('color.gray.300').id,
+      id: figma.variable('base.color.gray.300').id,
     });
     const selected = figma.variable('color.border.selected');
     expect(selected.valuesByMode[figma.mode(selected, 'Light')]).toEqual({
@@ -293,23 +293,23 @@ describe('applying to a fresh file', () => {
   });
 
   it('holds primitive values in Figma units, with empty scopes', () => {
-    const gray = figma.variable('color.gray.600');
+    const gray = figma.variable('base.color.gray.600');
     expect(gray.valuesByMode[figma.mode(gray, 'Value')]).toEqual(
       float32(rgba('#4a5159')),
     );
     expect(gray.scopes).toEqual([]);
-    const space = figma.variable('space.100');
+    const space = figma.variable('base.space.100');
     expect(space.valuesByMode[figma.mode(space, 'Value')]).toBe(8);
     expect(figma.variable('space.m').scopes).toEqual(['GAP']);
   });
 
   it('holds durations in seconds and easing as a custom curve, and leaves their scopes alone', () => {
-    const duration = figma.variable('duration.150');
+    const duration = figma.variable('base.duration.150');
     expect(duration.resolvedType).toBe('TIMING');
     expect(duration.valuesByMode[figma.mode(duration, 'Value')]).toBe(
       Math.fround(0.15),
     );
-    const easing = figma.variable('easing.ease');
+    const easing = figma.variable('base.easing.ease');
     expect(easing.resolvedType).toBe('EASING');
     expect(easing.valuesByMode[figma.mode(easing, 'Value')]).toEqual({
       type: 'CUSTOM_CUBIC_BEZIER',
@@ -394,12 +394,15 @@ describe('integrity', () => {
     ).toThrow('cut off');
     expect(() =>
       readSnapshot([
-        { ...one, text: one.text.replace('color/gray/600', 'color/gray/601') },
+        {
+          ...one,
+          text: one.text.replace('base/color/gray/600', 'base/color/gray/601'),
+        },
         two,
       ]),
     ).toThrow("doesn't match its hash");
     expect(() => readSnapshot([one])).toThrow('Page 2 of');
-    const radius = figma.variable('radius.sm');
+    const radius = figma.variable('base.radius.sm');
     radius.setValueForMode(figma.mode(radius, 'Value'), 6);
     const later = await readAll(figma);
     expect(() => readSnapshot([one, ...later.slice(1)])).toThrow(
@@ -505,12 +508,12 @@ describe('the three-way diff', () => {
 
   it('brings back a value changed in Figma', async () => {
     const report = await roundTrip((f) => {
-      set(f, 'color.gray.600', 'Value', rgba('#4b525a'));
+      set(f, 'base.color.gray.600', 'Value', rgba('#4b525a'));
     });
     expect(report).toMatchObject({ refused: [], conflicts: [], pending: [] });
     expect(report.edits).toEqual([
       {
-        path: 'color.gray.600',
+        path: 'base.color.gray.600',
         mode: 'Value',
         from: { hex: '#4a5159', alpha: 1 },
         value: { hex: '#4b525a', alpha: 1 },
@@ -520,14 +523,14 @@ describe('the three-way diff', () => {
 
   it('brings back an alias re-pointed in one mode', async () => {
     const report = await roundTrip((f) => {
-      set(f, 'color.text.muted', 'Light', alias(f, 'color.gray.500'));
+      set(f, 'color.text.muted', 'Light', alias(f, 'base.color.gray.500'));
     });
     expect(report.edits).toEqual([
       {
         path: 'color.text.muted',
         mode: 'Light',
-        from: { alias: 'color.gray.600' },
-        value: { alias: 'color.gray.500' },
+        from: { alias: 'base.color.gray.600' },
+        value: { alias: 'base.color.gray.500' },
       },
     ]);
   });
@@ -536,7 +539,7 @@ describe('the three-way diff', () => {
     const changed = editFile(source, 'semantic/space.tokens.json', (json) => {
       must(
         (json.space as Record<string, Record<string, unknown> | undefined>).m,
-      ).$value = '{space.300}';
+      ).$value = '{base.space.300}';
     });
     const report = await roundTrip(() => undefined, changed);
     expect(report).toEqual({
@@ -544,8 +547,8 @@ describe('the three-way diff', () => {
       conflicts: [],
       refused: [],
       pending: [
-        'space.m (Light): {space.200} → {space.300}',
-        'space.m (Dark): {space.200} → {space.300}',
+        'space.m (Light): {base.space.200} → {base.space.300}',
+        'space.m (Dark): {base.space.200} → {base.space.300}',
       ],
     });
   });
@@ -554,14 +557,14 @@ describe('the three-way diff', () => {
     const changed = editFile(source, 'semantic/space.tokens.json', (json) => {
       must(
         (json.space as Record<string, Record<string, unknown> | undefined>).m,
-      ).$value = '{space.300}';
+      ).$value = '{base.space.300}';
     });
     const report = await roundTrip((f) => {
-      set(f, 'space.m', 'Light', alias(f, 'space.150'));
+      set(f, 'space.m', 'Light', alias(f, 'base.space.150'));
     }, changed);
     expect(report.edits).toEqual([]);
     expect(report.conflicts).toEqual([
-      'space.m (Light) changed in both places: {space.200} became {space.150} in Figma and {space.300} in code. Settle it in code, then apply.',
+      'space.m (Light) changed in both places: {base.space.200} became {base.space.150} in Figma and {base.space.300} in code. Settle it in code, then apply.',
     ]);
   });
 
@@ -600,9 +603,9 @@ describe('the three-way diff', () => {
     [
       'a primitive turned into an alias',
       (f: FakeFigma) => {
-        set(f, 'color.gray.500', 'Value', alias(f, 'color.gray.600'));
+        set(f, 'base.color.gray.500', 'Value', alias(f, 'base.color.gray.600'));
       },
-      'color.gray.500 (Value) became an alias of {color.gray.600} in Figma. A primitive holds a raw value: set one in Figma.',
+      'base.color.gray.500 (Value) became an alias of {base.color.gray.600} in Figma. A primitive holds a raw value: set one in Figma.',
     ],
   ])('refuses %s, with the change code needs', async (_, change, message) => {
     const report = await roundTrip(change);
@@ -612,25 +615,25 @@ describe('the three-way diff', () => {
 
   it('brings back a duration and a custom easing curve', async () => {
     const report = await roundTrip((f) => {
-      set(f, 'duration.200', 'Value', 0.25);
-      set(f, 'easing.ease', 'Value', {
+      set(f, 'base.duration.200', 'Value', 0.25);
+      set(f, 'base.easing.ease', 'Value', {
         type: 'CUSTOM_CUBIC_BEZIER',
         easingFunctionCubicBezier: { x1: 0.2, y1: 0, x2: 0, y2: 1 },
       });
     });
     expect(report.refused).toEqual([]);
     expect(report.edits.map((e) => [e.path, e.value])).toEqual([
-      ['duration.200', 0.25],
-      ['easing.ease', { bezier: [0.2, 0, 0, 1] }],
+      ['base.duration.200', 0.25],
+      ['base.easing.ease', { bezier: [0.2, 0, 0, 1] }],
     ]);
   });
 
   it('refuses one of Figma’s named easings', async () => {
     const report = await roundTrip((f) => {
-      set(f, 'easing.ease', 'Value', { type: 'EASE_IN' });
+      set(f, 'base.easing.ease', 'Value', { type: 'EASE_IN' });
     });
     expect(report.refused).toEqual([
-      "easing.ease (Value) uses Figma's EASE_IN easing. Fossil's easing tokens are cubic Béziers, and Figma doesn't document the curve behind a preset: set a custom curve in Figma instead.",
+      "base.easing.ease (Value) uses Figma's EASE_IN easing. Fossil's easing tokens are cubic Béziers, and Figma doesn't document the curve behind a preset: set a custom curve in Figma instead.",
     ]);
   });
 
@@ -661,19 +664,23 @@ describe('writing Figma’s values to the token source', () => {
       validate(source.map((f) => changed.find((c) => c.path === f.path) ?? f))
         .problems,
     ).toEqual([]);
-    return (path: string) =>
-      JSON.parse(
+    type Group = Record<
+      string,
+      Record<string, Record<string, Record<string, unknown>>>
+    >;
+    // A primitive file's tokens sit under base, so this returns that group.
+    return (path: string) => {
+      const json = JSON.parse(
         changed.find((c) => c.path === path)?.content ?? 'null',
-      ) as Record<
-        string,
-        Record<string, Record<string, Record<string, unknown>>>
-      >;
+      ) as Group & { base: Group };
+      return path.startsWith('primitive/') ? json.base : json;
+    };
   };
 
   it('writes a colour as a DTCG colour object', async () => {
     const file = await written([
       {
-        path: 'color.gray.600',
+        path: 'base.color.gray.600',
         mode: 'Value',
         from: undefined,
         value: { hex: '#4b525a', alpha: 1 },
@@ -690,7 +697,7 @@ describe('writing Figma’s values to the token source', () => {
 
   it('keeps a dimension in its own unit', async () => {
     const file = await written([
-      { path: 'space.100', mode: 'Value', from: undefined, value: 10 },
+      { path: 'base.space.100', mode: 'Value', from: undefined, value: 10 },
     ]);
     expect(file('primitive/space.tokens.json').space?.['100']?.$value).toEqual({
       value: 0.625,
@@ -700,9 +707,14 @@ describe('writing Figma’s values to the token source', () => {
 
   it('writes a duration in its own unit, and a curve as four numbers', async () => {
     const file = await written([
-      { path: 'duration.200', mode: 'Value', from: undefined, value: 0.25 },
       {
-        path: 'easing.ease',
+        path: 'base.duration.200',
+        mode: 'Value',
+        from: undefined,
+        value: 0.25,
+      },
+      {
+        path: 'base.easing.ease',
         mode: 'Value',
         from: undefined,
         value: { bezier: [0.2, 0, 0, 1] },
@@ -719,7 +731,7 @@ describe('writing Figma’s values to the token source', () => {
   it('replaces the first font and keeps the fallbacks', async () => {
     const file = await written([
       {
-        path: 'font.family.figtree',
+        path: 'base.font.family.figtree',
         mode: 'Value',
         from: undefined,
         value: 'Inter',
@@ -739,7 +751,7 @@ describe('writing Figma’s values to the token source', () => {
           path: 'color.text.muted',
           mode: 'Light',
           from: undefined,
-          value: { alias: 'color.gray.500' },
+          value: { alias: 'base.color.gray.500' },
         },
       ],
       FORMAT_FROM,
@@ -750,7 +762,7 @@ describe('writing Figma’s values to the token source', () => {
     const after = must(changed[0]).content.split('\n');
     expect(after).toHaveLength(before.length);
     expect(after.filter((line, i) => line !== before[i])).toEqual([
-      '        "$value": "{color.gray.500}",',
+      '        "$value": "{base.color.gray.500}",',
     ]);
   });
 
@@ -758,7 +770,14 @@ describe('writing Figma’s values to the token source', () => {
     const changed = await applyEdits(
       source,
       tokens,
-      [{ path: 'duration.200', mode: 'Value', from: undefined, value: 0.25 }],
+      [
+        {
+          path: 'base.duration.200',
+          mode: 'Value',
+          from: undefined,
+          value: 0.25,
+        },
+      ],
       FORMAT_FROM,
     );
     const before = must(
@@ -767,7 +786,7 @@ describe('writing Figma’s values to the token source', () => {
     const after = must(changed[0]).content.split('\n');
     expect(after).toHaveLength(before.length);
     expect(after.filter((line, i) => line !== before[i])).toEqual([
-      '        "value": 250,',
+      '          "value": 250,',
     ]);
   });
 
@@ -777,14 +796,14 @@ describe('writing Figma’s values to the token source', () => {
         path: 'color.border.strong',
         mode: 'Light',
         from: undefined,
-        value: { alias: 'color.gray.600' },
+        value: { alias: 'base.color.gray.600' },
       },
     ]);
     expect(
       file('semantic/color.tokens.json').color?.border?.strong,
     ).toMatchObject({
-      $value: '{color.gray.600}',
-      $extensions: { [VENDOR]: { modes: { dark: '{color.gray.500}' } } },
+      $value: '{base.color.gray.600}',
+      $extensions: { [VENDOR]: { modes: { dark: '{base.color.gray.500}' } } },
     });
   });
 
@@ -794,11 +813,11 @@ describe('writing Figma’s values to the token source', () => {
         path: 'color.text.muted',
         mode: 'Dark',
         from: undefined,
-        value: { alias: 'color.gray.600' },
+        value: { alias: 'base.color.gray.600' },
       },
     ]);
     const muted = file('semantic/color.tokens.json').color?.text?.muted;
-    expect(muted?.$value).toBe('{color.gray.600}');
+    expect(muted?.$value).toBe('{base.color.gray.600}');
     expect(muted).not.toHaveProperty('$extensions');
   });
 });

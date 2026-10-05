@@ -4,11 +4,11 @@
     "width": {
       "$type": "dimension",
       "default": {
-        "$value": "{border.width.1}",
+        "$value": "{base.border.width.1}",
         "$description": "Edges and rules: cards, inputs, tags, table blocks and dividers."
       },
       "hairline": {
-        "$value": "{border.width.half}",
+        "$value": "{base.border.width.half}",
         "$description": "The thin frame around images and video: one device pixel on a 2x screen."
       }
     },
@@ -16,7 +16,7 @@
       "$value": {
         "color": "{color.border.default}",
         "width": "{border.width.default}",
-        "style": "{border.style.solid}"
+        "style": "{base.border.style.solid}"
       },
       "$description": "Container edges: cards, inputs, controls."
     },
@@ -24,7 +24,7 @@
       "$value": {
         "color": "{color.border.strong}",
         "width": "{border.width.default}",
-        "style": "{border.style.solid}"
+        "style": "{base.border.style.solid}"
       },
       "$description": "A border that must read as a line: tags, table blocks, dividers."
     },
@@ -32,7 +32,7 @@
       "$value": {
         "color": "{color.border.default}",
         "width": "{border.width.hairline}",
-        "style": "{border.style.solid}"
+        "style": "{base.border.style.solid}"
       },
       "$description": "The thin frame around images and video."
     },
@@ -40,7 +40,7 @@
       "$value": {
         "color": "{color.focus.ring}",
         "width": "{focus.ring.width}",
-        "style": "{border.style.solid}"
+        "style": "{base.border.style.solid}"
       },
       "$description": "Focus outlines. Pair with focus.ring.offset."
     }
@@ -49,11 +49,11 @@
     "$type": "dimension",
     "ring": {
       "width": {
-        "$value": "{border.width.2}",
+        "$value": "{base.border.width.2}",
         "$description": "The width of the focus indicator, whether a box-shadow ring or border.focus's outline."
       },
       "offset": {
-        "$value": "{border.width.2}",
+        "$value": "{base.border.width.2}",
         "$description": "The gap between an element and its focus ring."
       }
     }

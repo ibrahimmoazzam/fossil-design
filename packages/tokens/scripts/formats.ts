@@ -6,7 +6,13 @@ import type {
   TokensFile,
 } from '../src/metadata.ts';
 import { contrastRatio } from './contrast.ts';
-import { isRecord, referenceOf, referencesIn, type Token } from './validate.ts';
+import {
+  isRecord,
+  PRIMITIVE_GROUP,
+  referenceOf,
+  referencesIn,
+  type Token,
+} from './validate.ts';
 
 /** A build that can't write valid output. Each problem names its token. */
 export class BuildError extends Error {
@@ -364,9 +370,10 @@ export type TokenKey<Group extends TokenGroup> =
 
 /** breakpoints.ts: each breakpoint's width and media query, since custom properties can't be used in media conditions. */
 export function breakpoints(entries: readonly Entry[], header: string): string {
+  const group = `${PRIMITIVE_GROUP}.breakpoint.`;
   const points = entries.flatMap(({ token, properties }) =>
-    token.path.startsWith('breakpoint.') && properties[0] !== undefined
-      ? [[token.path.slice('breakpoint.'.length), properties[0].literal]]
+    token.path.startsWith(group) && properties[0] !== undefined
+      ? [[token.path.slice(group.length), properties[0].literal]]
       : [],
   );
   const rows = (value: (width: string) => string) =>

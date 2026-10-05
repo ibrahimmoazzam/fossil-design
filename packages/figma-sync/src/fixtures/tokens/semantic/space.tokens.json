@@ -2,35 +2,35 @@
   "space": {
     "$type": "dimension",
     "2xs": {
-      "$value": "{space.050}",
+      "$value": "{base.space.050}",
       "$description": "Padding and gap: 4px."
     },
     "xs": {
-      "$value": "{space.100}",
+      "$value": "{base.space.100}",
       "$description": "Padding and gap: 8px."
     },
     "s": {
-      "$value": "{space.150}",
+      "$value": "{base.space.150}",
       "$description": "Padding and gap: 12px."
     },
     "m": {
-      "$value": "{space.200}",
+      "$value": "{base.space.200}",
       "$description": "Padding and gap: 16px."
     },
     "l": {
-      "$value": "{space.300}",
+      "$value": "{base.space.300}",
       "$description": "Padding and gap: 24px."
     },
     "xl": {
-      "$value": "{space.400}",
+      "$value": "{base.space.400}",
       "$description": "Padding and gap: 32px."
     },
     "2xl": {
-      "$value": "{space.600}",
+      "$value": "{base.space.600}",
       "$description": "Padding and gap: 48px."
     },
     "3xl": {
-      "$value": "{space.1000}",
+      "$value": "{base.space.1000}",
       "$description": "Padding and gap: 80px."
     }
   }

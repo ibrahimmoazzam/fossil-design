@@ -561,6 +561,7 @@ Building the component package's foundation settled these, each checked against 
 | Extension points | `Modal`'s `renderPanel` and `onShowingChange`, `Tabs`' `renderIndicator`, `Carousel`'s data attributes, `Link`'s `asChild` | Only where a library must own an element's lifecycle, and each library-neutral |
 | Translucent backgrounds in the contrast check | Laid over white and over black, keeping the lower ratio | A veil over a photo has unknown footage beneath it; the worst case is the honest check |
 | Token access | Components and compositions use semantic tokens only. Typed props accept only semantic token keys, and the Stylelint config rejects primitives outside a consumer's site-tokens file | Keeps the two tiers meaningful: changing a primitive value restyles everything built on it, which is also what makes Fossil adaptable |
+| Primitive names | Every primitive sits under a `base` group: `--fossil-base-color-gray-600` | Enforcement keeps primitives out of components, but Make's properties panel and hand-written CSS see every name. Primer marks its primitives `base-` the same way (ADR 0013) |
 | Terms | "Primitive" means the raw token tier only; product-specific components are "compositions" | Both words were overloaded, which confuses people and agents alike; one name per concept |
 | Library generation | A script writes each component's spec (names, variants, bindings) from code and checks the built result; the agent builds the frames | Names and bindings must be exact, so they come from code and get verified; only the frame layout needs judgment |
 | Make kit tokens | From the npm package, not the Figma library | Make flattens library variables into raw CSS values that would compete with `--fossil-*` |
@@ -632,6 +633,9 @@ Building the component package's foundation settled these, each checked against 
 - Brad Frost, Design system components, recipes, and snowflakes (2021); The art of design system recipes
 - Jeff Atwood, The Rule of Three; Rule of three (computer programming)
 - `ymandrikov/ai-design-system` (the `design-system` skill, README, contract formats, scenarios); `evilmartians/design-lint`; `evilmartians/agent-skills`
+
+**Token tier naming**
+- Material 3 design tokens (`md.ref`, `md.sys`, `md.comp`); Primer, Token names; Salesforce Lightning Design System 2, Color and global styling hooks; Fluent 2, Design tokens; Adobe Spectrum, Design tokens; Carbon, Color; Polaris v12 tokens
 
 **Primary case studies**
 - Uber, automating design specs with uSpec and the Figma Console MCP

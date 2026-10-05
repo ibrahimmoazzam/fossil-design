@@ -21,26 +21,28 @@ const file = (path: string, body: unknown): TokenFile => ({
 });
 
 const palette = file('primitive/color.tokens.json', {
-  color: {
-    $type: 'color',
-    gray: {
-      600: {
-        $value: {
-          colorSpace: 'srgb',
-          components: [0.29, 0.318, 0.349],
-          hex: '#4a5159',
+  base: {
+    color: {
+      $type: 'color',
+      gray: {
+        600: {
+          $value: {
+            colorSpace: 'srgb',
+            components: [0.29, 0.318, 0.349],
+            hex: '#4a5159',
+          },
         },
-      },
-      300: {
-        $value: {
-          colorSpace: 'srgb',
-          components: [0.804, 0.824, 0.847],
-          hex: '#cdd2d8',
+        300: {
+          $value: {
+            colorSpace: 'srgb',
+            components: [0.804, 0.824, 0.847],
+            hex: '#cdd2d8',
+          },
         },
       },
     },
+    space: { $type: 'dimension', 200: { $value: { value: 1, unit: 'rem' } } },
   },
-  space: { $type: 'dimension', 200: { $value: { value: 1, unit: 'rem' } } },
 });
 
 const muted = (token: Record<string, unknown>) =>
@@ -49,7 +51,7 @@ const muted = (token: Record<string, unknown>) =>
       $type: 'color',
       text: {
         muted: {
-          $value: '{color.gray.600}',
+          $value: '{base.color.gray.600}',
           $description: 'Secondary text.',
           ...token,
         },
@@ -84,15 +86,15 @@ describe('the token source', () => {
 describe('order', () => {
   it('keeps tokens in the order their file lists them, numbered names included', () => {
     const content =
-      '{"space":{"$type":"dimension","0":{"$value":{"value":0,"unit":"px"}},"025":{"$value":{"value":2,"unit":"px"}},"100":{"$value":{"value":8,"unit":"px"}}}}';
+      '{"base":{"space":{"$type":"dimension","0":{"$value":{"value":0,"unit":"px"}},"025":{"$value":{"value":2,"unit":"px"}},"100":{"$value":{"value":8,"unit":"px"}}}}}';
     const { tokens, problems } = validate([
       { path: 'primitive/space.tokens.json', content },
     ]);
     expect(problems).toEqual([]);
     expect(tokens.map((t) => t.path)).toEqual([
-      'space.0',
-      'space.025',
-      'space.100',
+      'base.space.0',
+      'base.space.025',
+      'base.space.100',
     ]);
   });
 
@@ -165,10 +167,38 @@ describe('tier rules', () => {
 
   it('rejects a primitive that references another token', () => {
     const alias = file('primitive/alias.tokens.json', {
-      color: { $type: 'color', copy: { $value: '{color.gray.600}' } },
+      base: {
+        color: { $type: 'color', copy: { $value: '{base.color.gray.600}' } },
+      },
     });
     expect(messages([palette, alias])).toContain(
       'A primitive holds a raw value, not a reference',
+    );
+  });
+
+  it('rejects a primitive outside the base group', () => {
+    const loose = file('primitive/loose.tokens.json', {
+      space: {
+        $type: 'dimension',
+        300: { $value: { value: 1.5, unit: 'rem' } },
+      },
+    });
+    expect(messages([palette, loose])).toContain(
+      "A primitive's path starts with base.",
+    );
+  });
+
+  it('rejects a semantic token in the base group', () => {
+    const misplaced = file('semantic/misplaced.tokens.json', {
+      base: {
+        color: {
+          $type: 'color',
+          ink: { $value: '{base.color.gray.600}', $description: 'Ink.' },
+        },
+      },
+    });
+    expect(messages([palette, misplaced])).toContain(
+      'Only primitives sit under base',
     );
   });
 
@@ -186,9 +216,11 @@ describe('tier rules', () => {
 
   it('rejects the same path in both tiers', () => {
     const twin = file('semantic/space.tokens.json', {
-      space: {
-        $type: 'dimension',
-        200: { $value: '{space.200}', $description: 'Twin.' },
+      base: {
+        space: {
+          $type: 'dimension',
+          200: { $value: { value: 1, unit: 'rem' }, $description: 'Twin.' },
+        },
       },
     });
     expect(
@@ -204,7 +236,7 @@ describe('tier rules', () => {
         $type: 'border',
         default: {
           $value: {
-            color: '{color.gray.600}',
+            color: '{base.color.gray.600}',
             width: { value: 1, unit: 'px' },
             style: 'solid',
           },
@@ -224,7 +256,9 @@ describe('modes', () => {
       messages([
         palette,
         muted({
-          $extensions: { [VENDOR]: { modes: { dark: '{color.gray.300}' } } },
+          $extensions: {
+            [VENDOR]: { modes: { dark: '{base.color.gray.300}' } },
+          },
         }),
       ]),
     ).toEqual([]);
@@ -244,11 +278,13 @@ describe('modes', () => {
 
   it('rejects a mode on a primitive', () => {
     const moded = file('primitive/moded.tokens.json', {
-      size: {
-        $type: 'dimension',
-        m: {
-          $value: { value: 1, unit: 'rem' },
-          $extensions: { [VENDOR]: { modes: { dark: '{space.200}' } } },
+      base: {
+        size: {
+          $type: 'dimension',
+          m: {
+            $value: { value: 1, unit: 'rem' },
+            $extensions: { [VENDOR]: { modes: { dark: '{base.space.200}' } } },
+          },
         },
       },
     });
@@ -262,7 +298,9 @@ describe('modes', () => {
       messages([
         palette,
         muted({
-          $extensions: { [VENDOR]: { modes: { dim: '{color.gray.300}' } } },
+          $extensions: {
+            [VENDOR]: { modes: { dim: '{base.color.gray.300}' } },
+          },
         }),
       ]),
     ).toContain('Unknown mode "dim"; Fossil\'s modes are dark');
@@ -272,13 +310,15 @@ describe('modes', () => {
 describe('references', () => {
   it('rejects a reference to a token that does not exist', () => {
     expect(
-      messages([palette, muted({ $value: '{color.gray.700}' })]),
-    ).toContain("$value references {color.gray.700}, which doesn't exist");
+      messages([palette, muted({ $value: '{base.color.gray.700}' })]),
+    ).toContain("$value references {base.color.gray.700}, which doesn't exist");
   });
 
   it('rejects a reference to a token of another type', () => {
-    expect(messages([palette, muted({ $value: '{space.200}' })])).toContain(
-      '$value references {space.200}, a dimension, where a color belongs',
+    expect(
+      messages([palette, muted({ $value: '{base.space.200}' })]),
+    ).toContain(
+      '$value references {base.space.200}, a dimension, where a color belongs',
     );
   });
 
@@ -299,7 +339,7 @@ describe('references', () => {
 describe('DTCG values', () => {
   it('rejects a hex string as a colour', () => {
     const hex = file('primitive/hex.tokens.json', {
-      color: { $type: 'color', ink: { $value: '#0f0f1038' } },
+      base: { color: { $type: 'color', ink: { $value: '#0f0f1038' } } },
     });
     expect(messages([hex])).toContain(
       '$value: A color value is an object: { colorSpace, components, alpha?, hex? }',
@@ -308,9 +348,11 @@ describe('DTCG values', () => {
 
   it('rejects a dimension in em', () => {
     const em = file('primitive/em.tokens.json', {
-      track: {
-        $type: 'dimension',
-        wide: { $value: { value: 0.04, unit: 'em' } },
+      base: {
+        track: {
+          $type: 'dimension',
+          wide: { $value: { value: 0.04, unit: 'em' } },
+        },
       },
     });
     expect(messages([em])).toContain(
@@ -320,12 +362,14 @@ describe('DTCG values', () => {
 
   it('rejects a typography value missing a part', () => {
     const text = file('primitive/text.tokens.json', {
-      text: {
-        $type: 'typography',
-        body: {
-          $value: {
-            fontFamily: 'Figtree',
-            fontSize: { value: 1, unit: 'rem' },
+      base: {
+        text: {
+          $type: 'typography',
+          body: {
+            $value: {
+              fontFamily: 'Figtree',
+              fontSize: { value: 1, unit: 'rem' },
+            },
           },
         },
       },
@@ -342,28 +386,28 @@ describe('contrast checks', () => {
 
   it('accepts the colours to check against and a minimum ratio', () => {
     expect(
-      messages(checked({ against: ['{color.gray.300}'], minimum: 4.5 })),
+      messages(checked({ against: ['{base.color.gray.300}'], minimum: 4.5 })),
     ).toEqual([]);
   });
 
   it('rejects a check against a token that does not exist', () => {
     expect(
-      messages(checked({ against: ['{color.gray.900}'], minimum: 4.5 })),
+      messages(checked({ against: ['{base.color.gray.900}'], minimum: 4.5 })),
     ).toContain(
-      "contrast is checked against {color.gray.900}, which doesn't exist",
+      "contrast is checked against {base.color.gray.900}, which doesn't exist",
     );
   });
 
   it('rejects a check against a token that is not a colour', () => {
     expect(
-      messages(checked({ against: ['{space.200}'], minimum: 4.5 })),
+      messages(checked({ against: ['{base.space.200}'], minimum: 4.5 })),
     ).toContain(
-      "contrast is checked against {space.200}, which isn't a colour",
+      "contrast is checked against {base.space.200}, which isn't a colour",
     );
   });
 
   it('rejects a check without a minimum', () => {
-    expect(messages(checked({ against: ['{color.gray.300}'] }))).toContain(
+    expect(messages(checked({ against: ['{base.color.gray.300}'] }))).toContain(
       'contrast is { "against": ["{color.background.page}"], "minimum": 4.5 }',
     );
   });
@@ -378,9 +422,12 @@ describe('lifecycle metadata', () => {
       color: {
         $type: 'color',
         text: {
-          default: { $value: '{color.gray.600}', $description: 'Body text.' },
+          default: {
+            $value: '{base.color.gray.600}',
+            $description: 'Body text.',
+          },
           old: {
-            $value: '{color.gray.600}',
+            $value: '{base.color.gray.600}',
             $description: 'Old.',
             $deprecated: deprecated,
             $extensions: { [VENDOR]: extension },
@@ -424,7 +471,9 @@ describe('lifecycle metadata', () => {
       messages([
         palette,
         muted({
-          $extensions: { [VENDOR]: { mode: { dark: '{color.gray.300}' } } },
+          $extensions: {
+            [VENDOR]: { mode: { dark: '{base.color.gray.300}' } },
+          },
         }),
       ]),
     ).toContain(`Unknown ${VENDOR} property mode`);

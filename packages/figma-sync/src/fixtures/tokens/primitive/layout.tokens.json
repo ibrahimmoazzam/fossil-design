@@ -1,46 +1,48 @@
 {
-  "breakpoint": {
-    "$type": "dimension",
-    "$description": "Minimum widths. Mobile is the default and has no breakpoint.",
-    "tablet": {
-      "$value": {
-        "value": 768,
-        "unit": "px"
-      }
-    },
-    "compact": {
-      "$value": {
-        "value": 1024,
-        "unit": "px"
-      }
-    },
-    "large": {
-      "$value": {
-        "value": 1440,
-        "unit": "px"
-      }
-    },
-    "max": {
-      "$value": {
-        "value": 1600,
-        "unit": "px"
-      }
-    }
-  },
-  "size": {
-    "$type": "dimension",
-    "48rem": {
-      "$value": {
-        "value": 48,
-        "unit": "rem"
+  "base": {
+    "breakpoint": {
+      "$type": "dimension",
+      "$description": "Minimum widths. Mobile is the default and has no breakpoint.",
+      "tablet": {
+        "$value": {
+          "value": 768,
+          "unit": "px"
+        }
       },
-      "$description": "A column width; the reading measure uses it."
-    }
-  },
-  "z-index": {
-    "$type": "number",
-    "100": {
-      "$value": 100
+      "compact": {
+        "$value": {
+          "value": 1024,
+          "unit": "px"
+        }
+      },
+      "large": {
+        "$value": {
+          "value": 1440,
+          "unit": "px"
+        }
+      },
+      "max": {
+        "$value": {
+          "value": 1600,
+          "unit": "px"
+        }
+      }
+    },
+    "size": {
+      "$type": "dimension",
+      "48rem": {
+        "$value": {
+          "value": 48,
+          "unit": "rem"
+        },
+        "$description": "A column width; the reading measure uses it."
+      }
+    },
+    "z-index": {
+      "$type": "number",
+      "100": {
+        "$value": 100
+      }
     }
   }
 }

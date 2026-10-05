@@ -1,31 +1,33 @@
 {
-  "border": {
-    "width": {
-      "$type": "dimension",
-      "half": {
-        "$value": {
-          "value": 0.5,
-          "unit": "px"
+  "base": {
+    "border": {
+      "width": {
+        "$type": "dimension",
+        "half": {
+          "$value": {
+            "value": 0.5,
+            "unit": "px"
+          },
+          "$description": "A hairline: one device pixel on a 2x screen."
         },
-        "$description": "A hairline: one device pixel on a 2x screen."
-      },
-      "1": {
-        "$value": {
-          "value": 1,
-          "unit": "px"
+        "1": {
+          "$value": {
+            "value": 1,
+            "unit": "px"
+          }
+        },
+        "2": {
+          "$value": {
+            "value": 2,
+            "unit": "px"
+          }
         }
       },
-      "2": {
-        "$value": {
-          "value": 2,
-          "unit": "px"
+      "style": {
+        "$type": "strokeStyle",
+        "solid": {
+          "$value": "solid"
         }
-      }
-    },
-    "style": {
-      "$type": "strokeStyle",
-      "solid": {
-        "$value": "solid"
       }
     }
   }

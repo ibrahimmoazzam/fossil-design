@@ -3,30 +3,30 @@
     "family": {
       "$type": "fontFamily",
       "heading": {
-        "$value": "{font.family.space-grotesk}",
+        "$value": "{base.font.family.space-grotesk}",
         "$description": "Headings. An app can point this at its own face; the portfolio uses Roobert."
       },
       "body": {
-        "$value": "{font.family.figtree}",
+        "$value": "{base.font.family.figtree}",
         "$description": "Body text."
       },
       "mono": {
-        "$value": "{font.family.space-mono}",
+        "$value": "{base.font.family.space-mono}",
         "$description": "Labels and code. An app can point this at its own face; the portfolio uses Roobert Mono."
       }
     },
     "weight": {
       "$type": "fontWeight",
       "regular": {
-        "$value": "{font.weight.400}",
+        "$value": "{base.font.weight.400}",
         "$description": "Normal weight, for returning to it inside a heavier style."
       },
       "emphasis": {
-        "$value": "{font.weight.500}",
+        "$value": "{base.font.weight.500}",
         "$description": "Emphasis that shouldn't read as bold: a selected tab, emphasised inline text."
       },
       "strong": {
-        "$value": "{font.weight.600}",
+        "$value": "{base.font.weight.600}",
         "$description": "Strong text and the current item in a list of links."
       }
     }
@@ -36,70 +36,70 @@
     "body": {
       "$value": {
         "fontFamily": "{font.family.body}",
-        "fontSize": "{font.size.5}",
-        "fontWeight": "{font.weight.400}",
-        "letterSpacing": "{letter-spacing.none}",
-        "lineHeight": "{line-height.base}"
+        "fontSize": "{base.font.size.5}",
+        "fontWeight": "{base.font.weight.400}",
+        "letterSpacing": "{base.letter-spacing.none}",
+        "lineHeight": "{base.line-height.base}"
       },
       "$description": "Default running text."
     },
     "prose": {
       "$value": {
         "fontFamily": "{font.family.body}",
-        "fontSize": "{font.size.5}",
-        "fontWeight": "{font.weight.400}",
-        "letterSpacing": "{letter-spacing.none}",
-        "lineHeight": "{line-height.relaxed}"
+        "fontSize": "{base.font.size.5}",
+        "fontWeight": "{base.font.weight.400}",
+        "letterSpacing": "{base.letter-spacing.none}",
+        "lineHeight": "{base.line-height.relaxed}"
       },
       "$description": "Long-form reading, with more room between lines: case-study prose, card bodies."
     },
     "small": {
       "$value": {
         "fontFamily": "{font.family.body}",
-        "fontSize": "{font.size.4}",
-        "fontWeight": "{font.weight.400}",
-        "letterSpacing": "{letter-spacing.none}",
-        "lineHeight": "{line-height.base}"
+        "fontSize": "{base.font.size.4}",
+        "fontWeight": "{base.font.weight.400}",
+        "letterSpacing": "{base.letter-spacing.none}",
+        "lineHeight": "{base.line-height.base}"
       },
       "$description": "Blurbs, list items and chat bubbles."
     },
     "caption": {
       "$value": {
         "fontFamily": "{font.family.body}",
-        "fontSize": "{font.size.3}",
-        "fontWeight": "{font.weight.400}",
-        "letterSpacing": "{letter-spacing.none}",
-        "lineHeight": "{line-height.base}"
+        "fontSize": "{base.font.size.3}",
+        "fontWeight": "{base.font.weight.400}",
+        "letterSpacing": "{base.letter-spacing.none}",
+        "lineHeight": "{base.line-height.base}"
       },
       "$description": "Figure captions, popovers and suggestions."
     },
     "fine": {
       "$value": {
         "fontFamily": "{font.family.body}",
-        "fontSize": "{font.size.2}",
-        "fontWeight": "{font.weight.400}",
-        "letterSpacing": "{letter-spacing.none}",
-        "lineHeight": "{line-height.snug}"
+        "fontSize": "{base.font.size.2}",
+        "fontWeight": "{base.font.weight.400}",
+        "letterSpacing": "{base.letter-spacing.none}",
+        "lineHeight": "{base.line-height.snug}"
       },
       "$description": "Tags, tooltips and video captions."
     },
     "label": {
       "$value": {
         "fontFamily": "{font.family.mono}",
-        "fontSize": "{font.size.1}",
-        "fontWeight": "{font.weight.400}",
-        "letterSpacing": "{letter-spacing.wide}",
-        "lineHeight": "{line-height.tight}"
+        "fontSize": "{base.font.size.1}",
+        "fontWeight": "{base.font.weight.400}",
+        "letterSpacing": "{base.letter-spacing.wide}",
+        "lineHeight": "{base.line-height.tight}"
       },
       "$description": "Eyebrows and metadata. Components add text-transform: uppercase."
     },
     "control": {
       "$value": {
         "fontFamily": "{font.family.body}",
-        "fontSize": "{font.size.5}",
-        "fontWeight": "{font.weight.500}",
-        "letterSpacing": "{letter-spacing.none}",
-        "lineHeight": "{line-height.none}"
+        "fontSize": "{base.font.size.5}",
+        "fontWeight": "{base.font.weight.500}",
+        "letterSpacing": "{base.letter-spacing.none}",
+        "lineHeight": "{base.line-height.none}"
       },
       "$description": "Buttons and tabs: one line, so the line box equals the text."
     },
@@ -107,50 +107,50 @@
       "xs": {
         "$value": {
           "fontFamily": "{font.family.heading}",
-          "fontSize": "{font.size.6}",
-          "fontWeight": "{font.weight.600}",
-          "letterSpacing": "{letter-spacing.none}",
-          "lineHeight": "{line-height.snug}"
+          "fontSize": "{base.font.size.6}",
+          "fontWeight": "{base.font.weight.600}",
+          "letterSpacing": "{base.letter-spacing.none}",
+          "lineHeight": "{base.line-height.snug}"
         },
         "$description": "Content-card titles."
       },
       "s": {
         "$value": {
           "fontFamily": "{font.family.heading}",
-          "fontSize": "{font.size.8}",
-          "fontWeight": "{font.weight.600}",
-          "letterSpacing": "{letter-spacing.none}",
-          "lineHeight": "{line-height.snug}"
+          "fontSize": "{base.font.size.8}",
+          "fontWeight": "{base.font.weight.600}",
+          "letterSpacing": "{base.letter-spacing.none}",
+          "lineHeight": "{base.line-height.snug}"
         },
         "$description": "Card and modal titles."
       },
       "m": {
         "$value": {
           "fontFamily": "{font.family.heading}",
-          "fontSize": "{font.size.9}",
-          "fontWeight": "{font.weight.600}",
-          "letterSpacing": "{letter-spacing.none}",
-          "lineHeight": "{line-height.snug}"
+          "fontSize": "{base.font.size.9}",
+          "fontWeight": "{base.font.weight.600}",
+          "letterSpacing": "{base.letter-spacing.none}",
+          "lineHeight": "{base.line-height.snug}"
         },
         "$description": "Section headings in long-form content."
       },
       "l": {
         "$value": {
           "fontFamily": "{font.family.heading}",
-          "fontSize": "{font.size.10}",
-          "fontWeight": "{font.weight.600}",
-          "letterSpacing": "{letter-spacing.none}",
-          "lineHeight": "{line-height.snug}"
+          "fontSize": "{base.font.size.10}",
+          "fontWeight": "{base.font.weight.600}",
+          "letterSpacing": "{base.letter-spacing.none}",
+          "lineHeight": "{base.line-height.snug}"
         },
         "$description": "Major section headings and pull quotes."
       },
       "xl": {
         "$value": {
           "fontFamily": "{font.family.heading}",
-          "fontSize": "{font.size.11}",
-          "fontWeight": "{font.weight.600}",
-          "letterSpacing": "{letter-spacing.none}",
-          "lineHeight": "{line-height.tight}"
+          "fontSize": "{base.font.size.11}",
+          "fontWeight": "{base.font.weight.600}",
+          "letterSpacing": "{base.letter-spacing.none}",
+          "lineHeight": "{base.line-height.tight}"
         },
         "$description": "Page titles at a fixed size."
       }

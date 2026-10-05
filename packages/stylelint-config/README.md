@@ -19,7 +19,7 @@ export { default } from '@fossil-design/stylelint-config';
 
 - **Tokens, not raw values.** Colour, fill, stroke, padding, gap, radius, font family, size and weight, letter-spacing, line-height and durations take a custom property, including inside shorthands such as `border` and `transition`. Plain keywords such as `inherit`, `transparent`, `currentColor`, `none` and `0` are fine.
 - **Custom properties that exist.** Every `var()` names a Fossil token, one of your site tokens, or a property declared in the same stylesheet. A `var()` with a fallback, such as `var(--card-gap, var(--fossil-space-m))`, is a knob and passes.
-- **Semantic tokens only.** Primitive tokens such as `--fossil-color-gray-600` are rejected, and so is a raw colour anywhere, local custom properties and shadows included. A deprecated token is rejected with its replacement named.
+- **Semantic tokens only.** Primitive tokens such as `--fossil-base-color-gray-600` are rejected, and so is a raw colour anywhere, local custom properties and shadows included. A deprecated token is rejected with its replacement named.
 - **No margins** except `0`.
 - **Disable comments explain themselves.** Each needs a reason after `--`, must disable something, and must name a real rule.
 
@@ -46,7 +46,7 @@ Their custom properties count as known everywhere. Inside those files, and only 
 ```css
 /* src/styles/site-tokens.css */
 :root {
-  --site-color-brand: var(--fossil-color-azure-600);
+  --site-color-brand: var(--fossil-base-color-azure-600);
   --site-color-coffee: #6f4e37;
 }
 ```

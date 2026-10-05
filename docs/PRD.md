@@ -254,7 +254,7 @@ Phases are ordered by dependency. Each has an explicit exit criterion. Do not st
    - Record which `src/components/ui/` components move into Fossil (Phase 4). App-aware compositions such as `NavBar`, `Footer` and `CaseStudyCard` stay in the portfolio.
    - Breakpoints need extra care. Custom properties can't be used in media conditions, and the portfolio already works around this, so Phase 2 also emits breakpoints as TypeScript constants.
 2. **Define the token taxonomy.** Two tiers only, decided by folder: `src/primitive/` and `src/semantic/`. The same path in both tiers is a build error.
-   - **Primitive:** raw values with no semantic meaning. `color.gray.100`, `space.200`, `radius.md`, `font.size.3`.
+   - **Primitive:** raw values with no semantic meaning, under a `base` group so the name says it isn't for direct use (ADR 0013). `base.color.gray.100`, `base.space.200`, `base.radius.md`, `base.font.size.3`.
    - **Semantic:** references to primitive tokens, named by intent. `color.background.surface`, `color.text.muted`, `space.m`. A semantic token holding a literal value fails the build.
    - **Composite tokens** (typography, shadow, border) follow the same rule part by part: a semantic composite's parts are all references, and a primitive contains none.
    - **Type scale.** The portfolio has one type token and about 30 distinct font sizes in its CSS, so define a primitive size scale and a semantic text scale. Its 8 fluid `clamp()` sizes stay in components: DTCG and Figma can't express them.
