@@ -1,6 +1,6 @@
 {
   "name": "@fossil-design/eslint-config",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Shared ESLint config for Fossil Design: layout goes through Box, and every disable says why.",
   "keywords": [
     "design-system",
