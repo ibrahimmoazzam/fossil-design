@@ -585,11 +585,20 @@ Always-on context beat retrieval, which is the same finding behind Fossil's alwa
    - component details delegated to the bundled docs and Storybook MCP;
    - the escape-hatch policy and gap-logging rule stated explicitly.
 8. **Completeness check in CI.** The docs generator fails if a component lacks its JSDoc contract.
+9. **Split the Figma library into foundations and components.** Today one file holds both. Two published libraries let a team swap or switch off either half in a design file:
+   - **Foundations library:** the variables, the text and effect styles, and the icons. It is what `figma:apply` and the styles script write. A team that forks Fossil for its own brand replaces this one and keeps the components.
+   - **Components library:** the component sets and components, with every binding pointing at a foundations variable. A team that builds its own components in another UI library, such as one on Base UI, replaces this one and keeps the foundations.
+   - Each is its own file that nobody designs in, published on its own. A designer turns on whichever the file needs, from the libraries panel. Fossil's own design files turn on both.
+   - Components in the components file bind to the foundations library's published variables, imported by key (`figma.variables.importVariableByKeyAsync`, which only returns the library's variable from a different file). The library spec and check name variables as they do today; only where a script finds the variable changes.
+   - **Verify first, on the scratch files:** that a component bound to an imported variable keeps the binding after publishing and when a foundations update is accepted, that the library check can read imported variables' names, and that `get_design_context` still reports `var(--fossil-*)` for them. Record the result in `docs/Learnings.md`.
+   - Write an ADR for the split. The skill's workflow, the spec and the check need to say which file each step runs against, and the sync's stamped commit stays on the foundations file.
+   - The real Figma files are made as two, once the split is verified, and the Phase 5b scratch file is the test bed. Education plan: confirm each file is in the team's project and that "can edit" members can publish.
 
 **Exit criterion:**
 - Docs and Make guidelines regenerate from source, and CI fails on an undocumented component.
 - A new Make file with only the package installed and a one-line `Guidelines.md` renders `Box`, `Button` and `Card` on-system, with no kit.
 - In a scratch consumer repo, the bin adds the `AGENTS.md` block, and an agent can list Fossil's components and token rules from installed files alone, offline.
+- Foundations and components are two published libraries, and a design file that turns on only the foundations library can bind to Fossil's variables without a Fossil component. A components library bound to the foundations passes the library check.
 
 ---
 
