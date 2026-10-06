@@ -32,16 +32,20 @@
   "sideEffects": [
     "*.css"
   ],
+  "bin": {
+    "fossil-agents-md": "./dist/bin/agents-md.js"
+  },
   "files": [
     "dist",
-    "docs"
+    "docs",
+    "guidelines"
   ],
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
     "generate": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate.ts && vite-css-modules",
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && pnpm run generate && vite build && tsc -p tsconfig.build.json && pnpm run docs",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && pnpm run generate && vite build && tsc -p tsconfig.build.json && tsc -p tsconfig.bin.json && pnpm run docs",
     "docs": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/docs.ts",
     "typecheck": "pnpm run generate && tsc",
     "storybook": "storybook dev --port 6006",

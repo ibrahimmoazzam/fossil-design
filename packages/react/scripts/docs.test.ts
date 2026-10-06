@@ -2,14 +2,20 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import * as fossil from '../src/index.ts';
 import {
+  agentsBlock,
+  blockMarkers,
   collect,
+  componentList,
   componentNames,
+  demote,
   element,
   fill,
   freeNames,
   readContract,
   readExamples,
   readStories,
+  unloadedFonts,
+  type ComponentDocs,
   type Inputs,
   type Prop,
 } from './docs.ts';
@@ -226,6 +232,76 @@ describe('the docs placeholders', () => {
       'Fossil and {{ default }}',
     );
     expect(() => fill('{{nope}}', {})).toThrow('unknown placeholder {{nope}}');
+  });
+});
+
+describe('the AGENTS.md block', () => {
+  it('names its markers after the npm scope', () => {
+    expect(blockMarkers('@fossil-design')).toEqual({
+      start: '<!-- BEGIN:fossil-design-agent-rules -->',
+      end: '<!-- END:fossil-design-agent-rules -->',
+    });
+  });
+
+  it('wraps the body in its markers, with Prettier kept off it', () => {
+    expect(
+      agentsBlock(
+        '\n## Rules\n\nBe kind.\n',
+        blockMarkers('@acme'),
+        'Managed.',
+      ),
+    ).toBe(
+      [
+        '<!-- BEGIN:acme-agent-rules -->',
+        '<!-- Managed. -->',
+        '<!-- prettier-ignore-start -->',
+        '',
+        '## Rules',
+        '',
+        'Be kind.',
+        '',
+        '<!-- prettier-ignore-end -->',
+        '<!-- END:acme-agent-rules -->',
+        '',
+      ].join('\n'),
+    );
+  });
+
+  it('moves headings down a level, so the rules sit under its heading', () => {
+    expect(demote('## Building\n\n### Gaps\n\nNot #1.', 1)).toBe(
+      '### Building\n\n#### Gaps\n\nNot #1.',
+    );
+  });
+
+  it('lists the components by group, then the icons', () => {
+    const component = (name: string, group: string) =>
+      ({ name, group }) as ComponentDocs;
+    expect(
+      componentList(
+        [
+          component('Box', 'Layout'),
+          component('Button', 'Actions'),
+          component('Stack', 'Layout'),
+        ],
+        ['CloseIcon'],
+      ),
+    ).toBe(
+      [
+        '- Layout: `Box`, `Stack`',
+        '- Actions: `Button`',
+        '- Icons, for any `icon` prop: `CloseIcon`, or any SVG component of your own',
+      ].join('\n'),
+    );
+  });
+});
+
+describe('the Make setup', () => {
+  it('names the fonts it never loads, as written or in a URL', () => {
+    const setup =
+      'family=Space+Grotesk:wght@700 and Figtree, from Google Fonts';
+    expect(
+      unloadedFonts(setup, ['Space Grotesk', 'Figtree', 'Space Mono']),
+    ).toEqual(['Space Mono']);
   });
 });
 

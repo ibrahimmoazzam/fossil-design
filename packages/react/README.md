@@ -65,7 +65,25 @@ Each component exports its variants as a constant, such as `textVariants`, for d
 
 ## Docs for agents
 
-The package carries its own docs, in `node_modules/@fossil-design/react/docs/`, so a coding agent reads the version you installed rather than its training data. `index.md` lists every component; `foundations.md` has the rules, the escape hatches and the token scales; each component's file says when to use it and when not to, its states, its accessibility, its props and examples. `components.json` and `tokens.json` hold the same as JSON. Point your agent at them from your `AGENTS.md`.
+The package carries its own docs, in `node_modules/@fossil-design/react/docs/`, so a coding agent reads the version you installed rather than its training data. `index.md` lists every component; `foundations.md` has the rules, the escape hatches and the token scales; each component's file says when to use it and when not to, its states, its accessibility, its props and examples. `components.json` and `tokens.json` hold the same as JSON.
+
+Point your agent at them with the package's bin, from your app's root:
+
+```sh
+npx fossil-agents-md
+```
+
+It writes Fossil's rules, the token scales, the components and the paths to their docs into your `AGENTS.md`, between `<!-- BEGIN:fossil-design-agent-rules -->` and `<!-- END:fossil-design-agent-rules -->`, and adds `@AGENTS.md` to your `CLAUDE.md` if you have one. Run it again after upgrading; it replaces only the block. `npx fossil-agents-md --check` changes nothing, and fails when the block is out of date, for CI.
+
+## Figma Make
+
+Install `@fossil-design/react` in the Make file, then make the file's `guidelines/Guidelines.md` this one line:
+
+```md
+Read node_modules/@fossil-design/react/guidelines/Guidelines.md before writing any code, and follow it.
+```
+
+The package's own guidelines set up the stylesheet and the fonts, tell Make to skip its scaffold's Tailwind classes, then route it through the docs. They match the version installed. In a Make kit, the kit's `Guidelines.md` is the same line.
 
 ## Icons
 

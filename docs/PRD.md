@@ -573,11 +573,11 @@ Always-on context beat retrieval, which is the same finding behind Fossil's alwa
 4. **Storybook MCP for Fossil's own development.**
    - Install `@storybook/addon-mcp`, which requires `@storybook/addon-vitest`, and set `componentsManifest: true` in `.storybook/main.ts`. Manifests are off by default.
    - Agents working on Fossil use it to write stories and run tests. Do not build a custom component MCP server.
-5. **Make guidelines, shipped in the package.** Generate `@fossil-design/react/guidelines/` at build time from the same docs: `Guidelines.md`, `setup.md` (stylesheet import and theme), `tokens.md`, and one file per component. They version with the package, so a prototype gets the guidelines that match the components it installed.
+5. **Make guidelines, shipped in the package.** Generate `@fossil-design/react/guidelines/` at build time from the same sources as the docs: `Guidelines.md`, and `setup.md` (stylesheet, fonts and theme). `Guidelines.md` routes to `setup.md` and into the bundled docs (foundations, the index, tokens and each component's file) by full path, rather than copying them. They version with the package, so a prototype gets the guidelines that match the components it installed.
    - Only `Guidelines.md` is required. Make always reads it first and reads the other files only when `Guidelines.md` points to them, so it must route to each one explicitly.
    - Figma recommends several short files over a few long ones.
    - **Without a kit:** a Make file installs the package from npm, and its own `Guidelines.md` is one line pointing at `node_modules/@fossil-design/react/guidelines/Guidelines.md`. Publishing a kit needs Figma's npm registry, which the Education team doesn't have (Learnings, section 5).
-   - **Check first** that Make's agent reads files under `node_modules`. If it doesn't, the package also serves the folder as plain files a designer can copy in, and the one-line pointer becomes a documented copy step.
+   - **Checked** (October 2026): Make's agent reads files under `node_modules`, so the guidelines route into the bundled docs with no copy step.
    - **With a kit,** where publishing works, the kit's guidelines are the same pointer, and a release reaches every Make file by updating the package version in the kit.
 6. **Format split,** following the Indeed benchmark: JSON for anything machine-consumed (component APIs, props, variants, token values), and Markdown for instructions and rules.
 7. **Finalise Fossil's own `AGENTS.md`:**
