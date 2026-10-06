@@ -1,6 +1,6 @@
 {
   "name": "@fossil-design/stylelint-config",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Shared Stylelint config for Fossil Design: semantic tokens only, no raw values, no margins.",
   "keywords": [
     "design-system",
