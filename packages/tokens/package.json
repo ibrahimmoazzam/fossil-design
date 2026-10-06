@@ -1,6 +1,6 @@
 {
   "name": "@fossil-design/tokens",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Design tokens for Fossil Design: DTCG source files and the Style Dictionary build that turns them into CSS, JSON and TypeScript.",
   "keywords": [
     "design-system",
