@@ -24,6 +24,11 @@ export interface LibraryComponent {
   layers?: string[];
   /** Layers with token bindings that Figma leaves out, and why. */
   skip?: Record<string, string>;
+  /**
+   * Layers without token bindings that Figma still draws, and how: a decoration in raw values, such
+   * as Link's dots. The check doesn't read them, so the sheet is all the agent has.
+   */
+  drawn?: Record<string, string>;
   /** Layers that exist only in some variants. */
   when?: Record<string, Record<string, string>>;
   derived?: Record<string, DerivedAxis>;
@@ -104,6 +109,12 @@ export const COMPONENTS: Readonly<Record<string, LibraryComponent>> = {
       "An icon: one of Fossil's, or the app's own. Decorative unless it has a label.",
   },
   Link: {
+    drawn: {
+      // Figma drops a text underline's paint opacity, so a native dotted underline can't be dim.
+      'text::after':
+        "The resting track of dots, inside `text`, a frame around the label: a line centred 0.1em below the label's bottom edge and stretched to its width, stroked in the text's colour variable at 0.16em with round caps and a dash pattern of 0.01 and 0.4em less 0.01, at 35% layer opacity. Hover and focus fill it in; Figma shows the resting state.",
+      icon: 'The `Icon` instance at 35% layer opacity, as at rest. It lights up with the dots on hover and focus.',
+    },
     properties: { children: 'TEXT', icon: 'BOOLEAN' },
     description:
       'A link with a dotted underline that fills in on hover and focus.',

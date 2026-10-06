@@ -90,6 +90,14 @@ function component(c: ComponentFacts): string {
       `Left out: ${left.map(([layer, why]) => `\`${layer}\`, ${why[0]?.toLowerCase() ?? ''}${why.slice(1)}`).join(' ')}`,
       '',
     );
+  const drawn = Object.entries(c.drawn);
+  if (drawn.length > 0)
+    lines.push(
+      'Drawn in every variant, with no token to bind, so the check leaves them to you:',
+      '',
+      ...drawn.map(([layer, how]) => `- \`${layer}\`: ${how}`),
+      '',
+    );
   for (const variant of c.variants) {
     if (s.axes.length > 0) lines.push(`### ${variant.name}`, '');
     for (const layer of variant.layers) {

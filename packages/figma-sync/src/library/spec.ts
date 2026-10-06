@@ -47,6 +47,8 @@ export interface ComponentFacts {
   skipped: string[];
   /** Layers left out of Figma, and why. */
   leftOut: Record<string, string>;
+  /** Layers without token bindings that Figma still draws, and how. */
+  drawn: Record<string, string>;
 }
 
 export interface Library {
@@ -671,6 +673,11 @@ export function buildLibrary(
         problems.push(
           `${name}: the library table names the layer ${layer}, which ${name} doesn't have.`,
         );
+    for (const layer of Object.keys(table.drawn ?? {}))
+      if (!code.stylesheet.rules.some((r) => r.selector === `.${layer}`))
+        problems.push(
+          `${name}: the library table's drawn names ${layer}, which ${name}'s styles don't have.`,
+        );
     for (const layer of Object.keys(table.when ?? {}))
       if (!code.stylesheet.rules.some((r) => r.classes[0] === layer))
         problems.push(
@@ -705,6 +712,7 @@ export function buildLibrary(
       variants,
       skipped: [...skipped],
       leftOut: skip,
+      drawn: { ...table.drawn },
     });
   }
 

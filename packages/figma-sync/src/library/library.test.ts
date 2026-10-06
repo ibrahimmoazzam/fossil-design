@@ -628,11 +628,27 @@ describe('the library spec', () => {
     expect(sheet).toContain('- An instance of `Glyph` with size=s.');
   });
 
+  it('writes what Figma draws without a token into the sheet', () => {
+    const sheet = buildSheet(
+      build({
+        ...TABLE,
+        Chip: {
+          ...TABLE.Chip,
+          drawn: { 'chip::before': 'A dot, by hand.' },
+          description: 'A chip.',
+        },
+      }),
+      stylesSpec(TOKENS, []).spec,
+    );
+    expect(sheet).toContain('- `chip::before`: A dot, by hand.');
+  });
+
   it('reports a table that has fallen behind the code', () => {
     const problems = build({
       Chip: {
         ...TABLE.Chip,
         layers: ['inner', 'chip::before', 'gone'],
+        drawn: { 'chip::after': 'Nothing there.' },
         properties: { label: 'TEXT', colour: 'TEXT' },
         description: 'A chip.',
       },
@@ -647,6 +663,7 @@ describe('the library spec', () => {
         "Text: the default tone, loud, isn't one of its variants.",
         "Chip: the layer chip[aria-pressed='true'] has token bindings but isn't in the library table's layers or skip.",
         "Chip: the library table names the layer gone, which Chip doesn't have.",
+        "Chip: the library table's drawn names chip::after, which Chip's styles don't have.",
       ]),
     );
   });
