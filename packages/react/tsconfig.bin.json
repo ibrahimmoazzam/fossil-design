@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "scripts",
+    "outDir": "dist/bin",
+    "declaration": false,
+    "types": ["node"]
+  },
+  "files": ["scripts/agents-md.ts"]
+}

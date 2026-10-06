@@ -83,8 +83,10 @@ export const Surfaces: Story = {
 };
 
 /**
- * A grid of cards that fits as many columns as there's room for. `style` is the sanctioned escape
- * for the column template, which tokens can't express.
+ * Columns that follow the screen: one on a phone, more as room allows, with no media query.
+ * `style` is the sanctioned escape for the column template, which tokens can't express, but it
+ * can't change per breakpoint. For a set count per breakpoint, give the grid a class whose
+ * `grid-template-columns` changes in a `min-width` media query.
  */
 export const Grid: Story = {
   tags: ['example'],
@@ -93,7 +95,9 @@ export const Grid: Story = {
       as="ul"
       display="grid"
       gap={{ default: 's', tablet: 'm' }}
-      style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(14rem, 1fr))' }}
+      style={{
+        gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 14rem), 1fr))',
+      }}
     >
       {['Tokens in git', 'Typed components', 'Figma variables'].map((title) => (
         <Card key={title} as="li" title={title} titleAs="h3">

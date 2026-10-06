@@ -1,7 +1,9 @@
 // Installs Fossil's packed tarballs into apps outside the workspace, with npm, as a consumer
 // would, then type-checks each app, lints it with the shared configs, builds it and checks what
 // it renders. A workspace symlink would hide broken exports, declarations and directives.
-// Last, it adds a deliberately off-system component and checks that lint rejects it.
+// Then it runs the AGENTS.md bin, as an app would, and checks every installed path the block
+// and the Make guidelines name. Last, it adds a deliberately off-system component and checks that
+// lint rejects it.
 import { spawnSync } from 'node:child_process';
 import {
   cpSync,
@@ -11,6 +13,7 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -87,6 +90,59 @@ async function check(app: string, dir: string) {
       'fossil-button-',
     );
   }
+}
+
+/**
+ * Runs the bin from the installed package, then checks that the block landed, that CLAUDE.md
+ * imports it, that a second run with --check passes, and that every file the block and the Make
+ * guidelines point an agent at was installed.
+ */
+function checkAgentsMd(dir: string) {
+  writeFileSync(join(dir, 'CLAUDE.md'), '# Smoke app\n');
+  const bin = ['--loglevel=error', '--no-install', 'fossil-agents-md'];
+  run('npx', bin, dir, env);
+  run('npx', [...bin, '--check'], dir, env);
+  const agents = readFileSync(join(dir, 'AGENTS.md'), 'utf8');
+  expectIncludes(
+    'AGENTS.md',
+    agents,
+    '<!-- BEGIN:fossil-design-agent-rules -->',
+    '### Components',
+    '<!-- END:fossil-design-agent-rules -->',
+  );
+  expectIncludes(
+    'CLAUDE.md',
+    readFileSync(join(dir, 'CLAUDE.md'), 'utf8'),
+    '@AGENTS.md',
+  );
+
+  const installed = join(dir, 'node_modules/@fossil-design/react');
+  const guidelines = readFileSync(
+    join(installed, 'guidelines/Guidelines.md'),
+    'utf8',
+  );
+  const paths = [agents, guidelines].flatMap((text) => [
+    ...[...text.matchAll(/node_modules\/@fossil-design\/react\/[\w./-]*/g)].map(
+      ([path]) => join(dir, path),
+    ),
+    ...[...text.matchAll(/`(\w+\.md)`/g)]
+      .map(([, file = '']) => file)
+      .filter((file) => file !== 'AGENTS.md')
+      .map((file) =>
+        join(installed, file === 'setup.md' ? 'guidelines' : 'docs', file),
+      ),
+  ]);
+  const components =
+    /### Components\n[\s\S]*?\n\n([\s\S]*?)\n\n/.exec(agents)?.[1] ?? '';
+  for (const line of components.split('\n'))
+    if (!line.startsWith('- Icons'))
+      for (const [, name = ''] of line.matchAll(/`([A-Z]\w+)`/g))
+        paths.push(join(installed, 'docs/components', `${name}.md`));
+  const missing = paths.filter((path) => !existsSync(path));
+  if (missing.length > 0)
+    throw new Error(
+      `The agent docs point at files that weren't installed:\n${missing.join('\n')}`,
+    );
 }
 
 /** An ESLint result has `messages`; a Stylelint one has `warnings`. */
@@ -177,6 +233,10 @@ try {
     }
     await check(app, dir);
     process.stdout.write(`${app}: renders from the packed tarballs\n`);
+    checkAgentsMd(dir);
+    process.stdout.write(
+      `${app}: the bin writes the AGENTS.md block, and every file it names is installed\n`,
+    );
     checkOffSystem(app, dir);
     process.stdout.write(`${app}: lint rejects an off-system component\n`);
   }

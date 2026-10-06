@@ -3,9 +3,12 @@
  * installed version. Everything comes from source: each component's JSDoc contract and props
  * through react-docgen-typescript, its examples from its stories tagged `example`, its variant
  * maps from the build, and the foundations and the token reference from the token build.
+ * From the same sources it writes the block `fossil-agents-md` puts in an app's AGENTS.md, and
+ * the Figma Make guidelines in guidelines/.
  *
  * It writes nothing and lists every problem if a component lacks part of its contract, a prop
- * lacks a description, or an example is missing or uses something an app doesn't have.
+ * lacks a description, an example is missing or uses something an app doesn't have, the block
+ * outgrows its budget, or the Make setup doesn't load a font the text styles use.
  */
 import {
   existsSync,
@@ -16,6 +19,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { createRequire } from 'node:module';
+import { breakpoints } from '@fossil-design/tokens';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
@@ -792,6 +796,63 @@ export function fill(
   });
 }
 
+/** Moves every Markdown heading down `by` levels, so a document can sit under another's heading. */
+export const demote = (markdown: string, by: number): string =>
+  markdown.replace(
+    /^(#{1,6}) /gm,
+    (_, hashes: string) => `${hashes}${'#'.repeat(by)} `,
+  );
+
+/** The AGENTS.md block's largest size. Vercel's index came down to 8 KB with no loss in their evals. */
+export const BLOCK_BUDGET = 8 * 1024;
+
+/** The comments around the AGENTS.md block, named after the npm scope as Next.js names its own. */
+export function blockMarkers(scope: string): { start: string; end: string } {
+  const name = `${scope.replace(/^@/, '')}-agent-rules`;
+  return { start: `<!-- BEGIN:${name} -->`, end: `<!-- END:${name} -->` };
+}
+
+/** The block, between its markers, with Prettier kept off it so a check can compare it as written. */
+export function agentsBlock(
+  body: string,
+  markers: { start: string; end: string },
+  note: string,
+): string {
+  return `${[
+    markers.start,
+    `<!-- ${note} -->`,
+    '<!-- prettier-ignore-start -->',
+    '',
+    body.trim(),
+    '',
+    '<!-- prettier-ignore-end -->',
+    markers.end,
+  ].join('\n')}\n`;
+}
+
+/** Each Storybook group's components on a line, then the icons. */
+export function componentList(
+  components: readonly ComponentDocs[],
+  icons: readonly string[],
+): string {
+  const groups = new Map<string, string[]>();
+  for (const c of components)
+    groups.set(c.group, [...(groups.get(c.group) ?? []), c.name]);
+  return [
+    ...[...groups].map(
+      ([group, names]) => `- ${group}: ${names.map(code).join(', ')}`,
+    ),
+    `- Icons, for any \`icon\` prop: ${icons.map(code).join(', ')}, or any SVG component of your own`,
+  ].join('\n');
+}
+
+/** The font families a setup guide never names. */
+export const unloadedFonts = (setup: string, families: readonly string[]) =>
+  families.filter(
+    (family) =>
+      !setup.includes(family) && !setup.includes(family.replaceAll(' ', '+')),
+  );
+
 const stripHeader = (markdown: string) =>
   markdown.replace(/^<!--.*?-->\n+/s, '');
 
@@ -802,6 +863,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     name: string;
     version: string;
     bugs: string;
+    bin: Record<string, string>;
   };
   const config = JSON.parse(
     readFileSync(join(root, '../../fossil.config.json'), 'utf8'),
@@ -812,27 +874,49 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const inputs: Inputs = { root, exports, packageName: pkg.name };
 
   const { components, problems } = collect(inputs);
-  if (problems.length > 0) {
+  const fail = (what: string) => {
     for (const problem of problems) console.error(`✗ ${problem}`);
     console.error(
-      `\n${String(problems.length)} problem${problems.length === 1 ? '' : 's'} in the component docs. Nothing was written.`,
+      `\n${String(problems.length)} problem${problems.length === 1 ? '' : 's'} in ${what}. Nothing was written.`,
     );
     process.exit(1);
-  }
+  };
+  if (problems.length > 0) fail('the component docs');
 
   const header = `${pkg.name} ${pkg.version}, generated from its source. Matches the installed version.`;
   const tokensDist = dirname(
     require.resolve('@fossil-design/tokens/tokens.json'),
   );
+  const tokens = JSON.parse(
+    readFileSync(join(tokensDist, 'tokens.json'), 'utf8'),
+  ) as { tokens: Record<string, { tier: string; value: unknown }> };
+  const fonts = Object.entries(tokens.tokens)
+    .filter(
+      ([path, t]) =>
+        t.tier === 'semantic' &&
+        path.startsWith('font.family.') &&
+        Array.isArray(t.value),
+    )
+    .map(([, t]) => String((t.value as unknown[])[0]));
   const icons = Object.keys(exports).filter(
     (name) => name.endsWith('Icon') && name !== 'Icon',
   );
-  const rules = fill(readFileSync(join(root, 'docs-src/rules.md'), 'utf8'), {
-    name: config.name,
-    prefix: config.cssPrefix,
-    scope: config.npmScope,
-    gapForm: `${pkg.bugs}/new?template=gap.yml`,
-  });
+  const installed = `node_modules/${pkg.name}`;
+  const source = (path: string, values: Record<string, string> = {}) =>
+    fill(readFileSync(join(root, 'docs-src', path), 'utf8'), {
+      name: config.name,
+      prefix: config.cssPrefix,
+      scope: config.npmScope,
+      package: pkg.name,
+      version: pkg.version,
+      docs: `${installed}/docs`,
+      guidelines: `${installed}/guidelines`,
+      gapForm: `${pkg.bugs}/new?template=gap.yml`,
+      tablet: breakpoints.tablet,
+      fonts: list(fonts),
+      ...values,
+    });
+  const rules = source('rules.md');
   const foundations = [
     `<!-- ${header} -->`,
     '',
@@ -840,12 +924,41 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     '',
     rules.trim(),
     '',
+    source('figma.md').trim(),
+    '',
     '## Tokens',
     '',
-    stripHeader(readFileSync(join(tokensDist, 'foundations.md'), 'utf8'))
-      .trim()
-      .replaceAll(/^## /gm, '### '),
+    demote(
+      stripHeader(readFileSync(join(tokensDist, 'foundations.md'), 'utf8')),
+      1,
+    ).trim(),
   ].join('\n');
+
+  const block = agentsBlock(
+    source('agents.md', {
+      rules: demote(rules, 1).trim(),
+      tokens: stripHeader(
+        readFileSync(join(tokensDist, 'foundations-brief.md'), 'utf8'),
+      ).trim(),
+      components: componentList(components, icons),
+    }),
+    blockMarkers(config.npmScope),
+    `Managed by ${Object.keys(pkg.bin)[0] ?? ''}, from ${pkg.name} ${pkg.version}. Running it replaces only this block.`,
+  );
+  const blockSize = Buffer.byteLength(block);
+  if (blockSize > BLOCK_BUDGET)
+    problems.push(
+      `the AGENTS.md block is ${String(blockSize)} bytes, over its budget of ${String(BLOCK_BUDGET)}. It's always in an agent's context: shorten docs-src/agents.md or docs-src/rules.md, or move detail into foundations.md`,
+    );
+  const guidelines = {
+    'Guidelines.md': source('guidelines/Guidelines.md'),
+    'setup.md': source('guidelines/setup.md'),
+  };
+  for (const font of unloadedFonts(guidelines['setup.md'], fonts))
+    problems.push(
+      `docs-src/guidelines/setup.md doesn't load ${font}, which the text styles use`,
+    );
+  if (problems.length > 0) fail('the agent docs');
 
   const out = join(root, 'docs');
   rmSync(out, { recursive: true, force: true });
@@ -883,7 +996,17 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       `components/${component.name}.md`,
       componentMarkdown(component, pkg.name, header),
     );
+  write('agents-block.md', block);
+
+  const guidelinesOut = join(root, 'guidelines');
+  rmSync(guidelinesOut, { recursive: true, force: true });
+  mkdirSync(guidelinesOut);
+  for (const [path, text] of Object.entries(guidelines))
+    writeFileSync(
+      join(guidelinesOut, path),
+      `<!-- ${header} -->\n\n${text.trim()}\n`,
+    );
   console.log(
-    `Wrote docs for ${String(components.length)} components into docs/.`,
+    `Wrote docs for ${String(components.length)} components into docs/, an AGENTS.md block of ${String(blockSize)} bytes, and the Make guidelines into guidelines/.`,
   );
 }

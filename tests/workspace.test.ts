@@ -10,6 +10,7 @@ interface Manifest {
   repository?: { type?: string; url?: string; directory?: string };
   publishConfig?: { access?: string };
   scripts?: Record<string, string>;
+  bin?: Record<string, string>;
 }
 
 const packagesDir = new URL('../packages/', import.meta.url);
@@ -40,6 +41,16 @@ describe('fossil.config.json', () => {
       expect(manifest.name).toBe(`${config.npmScope}/${dir}`);
     },
   );
+});
+
+describe('the AGENTS.md bin', () => {
+  // A fork's apps run it by name, so it carries the fork's prefix, as its packages carry its scope.
+  it('is named after the CSS prefix, and runs from the build', () => {
+    const react = workspaces.find(({ dir }) => dir === 'react');
+    expect(react?.manifest.bin).toEqual({
+      [`${config.cssPrefix}-agents-md`]: './dist/bin/agents-md.js',
+    });
+  });
 });
 
 describe.each(published)('$manifest.name', ({ dir, manifest }) => {
