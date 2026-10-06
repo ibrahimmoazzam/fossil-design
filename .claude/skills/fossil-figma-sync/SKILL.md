@@ -1,18 +1,18 @@
 ---
 name: fossil-figma-sync
-description: Syncs Fossil Design's tokens with Figma variables through the Figma MCP server's use_figma tool. Use when asked to apply or push tokens to Figma, update Figma variables from code, pull or bring back value changes a designer made in Figma, read Figma variables, or open a pull request from Figma edits.
-compatibility: Needs the Figma MCP server with use_figma and Figma's figma-use skill, a Full seat with edit access to the file, and git, pnpm and gh.
+description: Syncs Fossil Design's tokens with Figma variables, and builds and checks Fossil's Figma component library, through the Figma MCP server's use_figma tool. Use when asked to apply or push tokens to Figma, update Figma variables from code, pull or bring back value changes a designer made in Figma, read Figma variables, open a pull request from Figma edits, or build, update or check the component library in Figma.
+compatibility: Needs the Figma MCP server with use_figma and Figma's figma-use skill (and figma-generate-library for the component library), a Full seat with edit access to the file, and git, pnpm and gh.
 ---
 
 # Fossil Figma sync
 
-Fossil's tokens live in git, in `packages/tokens/src`. This skill puts them into Figma as variables, and brings back the values designers change in Figma as a pull request. The logic is Fossil's own tested code in `packages/figma-sync`. Your job is to carry its generated scripts to Figma and its results back, unchanged.
+Fossil's tokens live in git, in `packages/tokens/src`. This skill puts them into Figma as variables, brings back the values designers change in Figma as a pull request, and builds the component library from code. The logic is Fossil's own tested code in `packages/figma-sync`. Your job is to carry its generated scripts to Figma and its results back, unchanged, and to build each component's frames from the spec it writes.
 
 ## Rules
 
-- **Never write Plugin API code for variables yourself.** Every `use_figma` call in this skill sends a script that `pnpm figma:*` generated, exactly as the file holds it. Don't fix, shorten, reformat or wrap it. Each script hashes itself and refuses to run if anything changed.
+- **Never write Plugin API code for variables, text styles, effect styles or icons yourself.** Those `use_figma` calls send a script that `pnpm figma:*` generated, exactly as the file holds it. Don't fix, shorten, reformat or wrap it. Each script hashes itself and refuses to run if anything changed. Only the component frames are yours to write.
 - **Always include `figma-use` in `skillNames`** when calling `use_figma`, as Figma requires.
-- **Ask before writing to a Figma file.** Before the first apply script in a session, ask the user whether to change the variables in that file, naming it, and wait for a yes. A pasted URL isn't a yes, and permission systems such as Claude Code's auto mode look for that explicit answer. Reads need no confirmation.
+- **Ask before writing to a Figma file.** Before the first apply script, styles script or component build in a session, ask the user whether to change that file, naming it and what will change, and wait for a yes. A pasted URL isn't a yes, and permission systems such as Claude Code's auto mode look for that explicit answer. Reads need no confirmation.
 - **Save read results exactly as `use_figma` returns them.** Never edit a saved result: `figma:diff` checks its hash.
 - **Don't work around an error.** If a script says it was changed, generate it again and resend it exactly. An apply script that failed for another reason can be sent again, because each one only changes what differs. Otherwise stop and report the error.
 
@@ -30,7 +30,7 @@ Fossil's tokens live in git, in `packages/tokens/src`. This skill puts them into
    - the last returns `commit`, `missing`, `orphans` and `unstamped`, and stamps the commit only when nothing is missing.
 3. If `missing` isn't empty, a part didn't finish. Send the parts again in order, then the last script.
 4. Tell the user what changed, then explain anything left over:
-   - **`orphans`** are variables for tokens deleted in code. They stay in Figma until the Figma component library is regenerated without them, so nothing loses its binding.
+   - **`orphans`** are variables for tokens deleted in code. They stay in Figma until the Figma component library is regenerated without them, so nothing loses its binding. **`boundBy`** names the library components that still bind each one; update those, then the user can delete the variable.
    - **`unstamped`** are variables someone added in Figma. The next diff refuses them.
 
 A second apply right after the first changes nothing. That's the check that the first one worked.
@@ -65,3 +65,35 @@ The diff brings back values only: a primitive's value, or which variable a seman
 | One of Figma's named easings                     | Set a custom cubic Bézier                                                                          |
 | A mode added or renamed                          | Modes are defined in code                                                                          |
 | A value changed in Figma and differently in code | Settle it in code, then apply                                                                      |
+
+## The component library
+
+The library lives on the file's **Components** page, one section per component. `pnpm figma:library-spec` reads every component's variant map, JSX and CSS Module and decides everything that must be exact: names, variants, properties, and the variable or style each property uses. You turn that into frames. `pnpm figma:library-check` reads the result back and compares it with the spec.
+
+Load Figma's `figma-generate-library` skill as well as `figma-use`, and name both in `skillNames`. The file's variables must already be applied from `main` (see Apply above).
+
+1. Run `pnpm figma:library-spec`. It writes three files to `packages/figma-sync/.figma/`:
+   - `library.md`, the build sheet: for each component, its variant and component properties, then every variant's layers, with the variable or style each one binds and the raw layout values to follow;
+   - `library-spec.json`, the same spec as data;
+   - `styles.js`, the script for the text styles, effect styles, the Components page and the icon glyph components.
+2. Send `styles.js` to `use_figma`, exactly as it is. It checks fonts and variables before it writes anything, and a second run changes nothing.
+3. Build each component the sheet lists, nested components first (`Icon` before `Button`, `Figure` before `Clip`), with your own `use_figma` code:
+   - Put it in a section named after it on the Components page. A component with variants is a component set with the default variant at the top left.
+   - Name every layer the sheet lists exactly as written: it is the CSS class, or the state selector, it stands for, such as `tab[aria-selected='true']`.
+   - Bind everything the sheet names, and nothing to a raw value: every fill, stroke, padding, gap and radius is a variable. Text uses the text style named, or each part bound when the sheet lists parts.
+   - Nest the library's own components as instances, with the variants the sheet gives, never as copies.
+   - Add the component properties the sheet lists, named exactly as written, and set the description it gives.
+4. Run `pnpm figma:library-check`, or `pnpm figma:library-check Button` for one component. Send each `check-<n>.js` exactly as it is, save each result exactly as it comes back to `.figma/check-<n>.json`, then run `pnpm figma:library-check report`. Fix what it lists and check again until it passes.
+
+After a release that changes a component, run the spec and the check again, and update only what the check reports. Update a component in place: deleting a component that others nest breaks their instances.
+
+### Traps in the Plugin API
+
+Each was measured live; `docs/Learnings.md` has the detail.
+
+- A script whose text contains an `svg` tag is rewritten by `use_figma`, which breaks every Fossil script's hash. Build SVG markup at run time.
+- `figma.skipInvisibleInstanceChildren` starts on, which hides what's inside a hidden instance, such as a Button's hidden icon. Turn it off before reading or changing one.
+- A slot and its `SLOT` property share one name. To keep a layer name from the sheet, such as `frame`, put the slot inside that layer.
+- Don't rename an icon's glyph instance. Left alone, it takes the name of whichever icon it's swapped to, which is how `get_design_context` reports `<CloseIcon />`.
+- Setting `textCase` on a text layer detaches its text style. Case stays in code.
+- After changing a main component, its instances elsewhere don't show the change until the next `use_figma` call. Edit an override on them, such as a nested icon's colour, in a call of its own.

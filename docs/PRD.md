@@ -1,6 +1,6 @@
 # Fossil Design: Product Requirements Document
 
-**Status:** Draft for implementation, revised after the Phase 2 and Phase 4 dry run (1 October 2026) and at the start of Phase 4 (4 October 2026)
+**Status:** Draft for implementation, revised after the Phase 2 and Phase 4 dry run (1 October 2026), at the start of Phase 4 (4 October 2026) and during Phase 5b (6 October 2026)
 **Audience:** Claude Code, and any human contributor
 **Companion document:** `Learnings.md` contains the competitive research and the rationale behind every decision here. Read it if a decision seems arbitrary; it probably is not.
 
@@ -177,7 +177,7 @@ Publish through trusted publishing via OIDC from GitHub Actions, never a long-li
 |---|---|---|---|
 | Tokens | Two tiers: *primitive* tokens hold raw values; *semantic* tokens are aliases named by intent | Fossil `packages/tokens` | Variables |
 | `Box` | The base component: a closed set of elements with token-typed props. Nothing else renders a raw `<div>` | Fossil `packages/react` | Auto-layout frames bound to variables |
-| Components | `Text`, `Stack`, `Button` and the rest of the Phase 4 set, with variants from a typed variant map | Fossil `packages/react` | Component sets (Phase 5b), except `Box` and `Stack` |
+| Components | `Text`, `Stack`, `Button` and the rest of the Phase 4 set, with variants from a typed variant map | Fossil `packages/react` | Component sets (Phase 5b), except `Box`, `Stack` and `VisuallyHidden` |
 | Patterns | Documented ways to combine components, with no new code | Fossil's generated docs | None |
 | Compositions | Product-specific components built from Fossil, such as `NavBar` and `CaseStudyCard` | Portfolio `src/components/` | Built by designers from Fossil instances |
 | Screens | Pages made of compositions and components | Portfolio `src/app/` | Canvas frames and Make prototypes |
@@ -200,7 +200,7 @@ Design tools consume the git source; they never replace it.
 - **Renames happen in code.** The token keeps a `$deprecated` alias for consumers. The next apply renames the existing Figma variable in place, found by the token path stamped on it, so every binding in the library survives. Deprecated aliases never reach Figma.
 - **Additions and deletions are code-only.** A variable created in Figma has no `$description`, no considered tier placement and no review, so it is a proposal rather than a change.
 
-Figma owns scalar values (color, number, string, boolean). Code owns composite tokens (typography, shadow), because native Figma Variables cannot represent them. In Figma they appear as text and effect styles generated in Phase 5b, with their parts bound to variables.
+Figma owns scalar values (color, number, string, boolean). Code owns composite tokens (typography, shadow), because native Figma Variables cannot represent them. In Figma they appear as text and effect styles generated in Phase 5b, with their parts bound to variables. Line height is the exception: Figma reads a number variable on it as pixels, so text styles set it as a percentage.
 
 ---
 
@@ -432,7 +432,7 @@ Build against the Phase 1 inventory of the finished portfolio, not a guessed pag
      - `onShowingChange` lets the portfolio stop and start Lenis;
      - elsewhere, `asChild` covers element substitution.
 6. **Fonts: none shipped.** Font-family tokens name font stacks, and the consuming app loads the font files.
-   - The reference brand uses open fonts from Google Fonts. Those are available in Figma, so `use_figma` can build text styles with them.
+   - The reference brand uses open fonts from Google Fonts. Those are available in Figma, so `use_figma` can build text styles with them. Figma's copy of Space Grotesk has no SemiBold, so the headings are set at Bold (700).
    - The portfolio keeps Roobert, loaded through `next/font`.
 7. **Stories and tests.**
    - Every component gets a Storybook story with a play function exercising its interactive states.
@@ -518,29 +518,29 @@ Both configs combine core and widely used rules with lists generated from the to
 
 This library is required. It narrows output on the design side the way the closed `Box` API narrows it in code. When Claude Code reads a canvas design through the Figma MCP server, an instance of a Fossil component arrives as `Button` with a `tone` prop. A frame drawn from raw shapes arrives as generic boxes the agent has to guess about. All Figma design work, whether by hand or with the Figma agent, starts from this library.
 
-**How it runs.** The same split as the token sync. Scripts decide everything that must be exact: names, variants and which variable each property uses. They also check the result. The agent does the part that needs judgment, turning each component's JSX and styles into Figma frames.
+**How it runs.** The same split as the token sync. Scripts decide everything that must be exact: names, variants, properties and which variable each property uses. They also create the styles and icons, and check the result. The agent does the part that needs judgment, turning each component's JSX and styles into Figma frames (ADR 0015).
 
-**`Box` and `Stack` stay out of the library.** Figma's auto layout already does their job. A frame whose spacing and fills are bound to Fossil variables reaches Claude Code as `var(--fossil-*)` values, which map straight onto `Box` or `Stack` props. The spec and the check skip both.
+**`Box`, `Stack` and `VisuallyHidden` stay out of the library.** Figma's auto layout already does the job of `Box` and `Stack`. A frame whose spacing and fills are bound to Fossil variables reaches Claude Code as `var(--fossil-*)` values, which map straight onto their props. `VisuallyHidden` renders nothing visible, so its instance would be an invisible layer. The spec and the check skip all three.
 
 **Tasks**
 1. **Library spec.** `pnpm figma:library-spec` generates a spec for each component from code:
-   - its name, and its variant properties and values, from its variant map;
-   - which token each styled property uses in each variant, read from the `var(--fossil-*)` references in each variant's class in its CSS Module (parsed with PostCSS).
+   - its name, and its variant properties and values, from its variant map, with code's defaults;
+   - which token each styled property uses in each variant, from its CSS Module (parsed with PostCSS) and its JSX (read with the TypeScript compiler). The JSX says which variant classes share an element, which `Box` and `Text` props an element takes, and which library components it nests;
+   - its component properties, named after its props: text, boolean, instance swap or slot.
 
-   Typography and shadow tokens map to text and effect styles.
-2. **Build.** Claude Code builds each component set through `use_figma`, with Figma's `figma-use` and `figma-generate-library` skills. It reuses the Phase 3 variables and never creates new ones.
-   - For each variant, it lays out auto-layout frames from the component's JSX and stories.
+   Layers are named after the CSS class, or the state selector, they stand for, such as `tab[aria-selected='true']`. A small reviewed table in `figma-sync` records what code can't say: each component's root layer, the layers Figma must have, derived axes such as `Button`'s `iconOnly`, and the kind of each property. Every name in it is checked against code. Typography and shadow tokens map to text and effect styles. The spec also writes a build sheet in Figma's names.
+2. **Styles, then components.** A generated styles script creates the text and effect styles, with their parts bound to variables, and one component per icon, named after its React export. Line height is set as a percentage, since Figma reads a number variable on it as pixels. The reference brand's open fonts are what make the text styles possible, because `use_figma` can't load custom fonts. Then Claude Code builds each component through `use_figma`, with Figma's `figma-use` and `figma-generate-library` skills, on one Components page with a section per component. It reuses the Phase 3 variables and never creates new ones.
+   - For each variant, it lays out auto-layout frames from the component's JSX and stories and the build sheet.
    - It binds every property to the variable the spec names: `setBoundVariable` for sizes, padding, gap and radius, and `setBoundVariableForPaint` for fills and strokes.
-   - It creates the text and effect styles with their parts bound to variables (`setBoundVariable` on the style, `setBoundVariableForEffect` for shadows). The reference brand's open fonts are what make the text styles possible, because `use_figma` can't load custom fonts.
 
    Build one component at a time. On the Education plan, Figma's MCP calls are capped at 200 a day and 10 a minute. Figma's own rate-limit page lists 15 a minute for Professional but says Education uses Professional's limits at 10, so plan for 10.
-3. **Naming parity replaces Code Connect.** Figma component names, variant property names and variant values match the React component names, prop names and variant map exactly. The spec supplies them, so the agent never chooses a name. Without Code Connect, `get_design_context` returns the component name (`data-name`), variant properties as TypeScript prop unions, and variables as `var(--fossil-*, fallback)`. Matching names are what let Claude Code map those onto `@fossil-design/react`.
-4. **Library check.** `pnpm figma:library-check` reads the library back through `use_figma` and compares it with the spec. It checks component names, variant properties and values, and every binding. An unbound fill, spacing or radius, or a binding to the wrong variable, fails.
+3. **Naming parity replaces Code Connect.** Figma component names, variant property names and variant values match the React component names, prop names and variant map exactly. The spec supplies them, so the agent never chooses a name. Without Code Connect, `get_design_context` returns an instance with only text and boolean overrides as a call such as `<Button children="Save changes" icon />`, and anything else as markup with `data-name` and variables as `var(--fossil-*, fallback)`. Matching names are what let Claude Code map either onto `@fossil-design/react`.
+4. **Library check.** `pnpm figma:library-check` writes a hashed script that compares the library in Figma with the spec, and verifies the result it returns. It checks component names, descriptions, variant properties and values, defaults, component properties, nested library instances and every binding. An unbound fill, stroke, spacing or radius, or a binding to the wrong variable, fails.
    - It runs locally, not in CI. The REST endpoints on this plan return variable IDs but not names, so a CI check would need a committed snapshot to map them.
-5. **Skill.** Add a library workflow to the `fossil-figma-sync` skill: generate the spec, build one component, run the check, and repeat.
-6. After a release that changes a component's API, regenerate the spec and re-run the build in `figma-generate-library`'s reconciliation mode, which updates only what changed.
+5. **Skill.** Add a library workflow to the `fossil-figma-sync` skill: generate the spec, run the styles script, build one component, run the check, and repeat.
+6. After a release that changes a component's API, regenerate the spec, run the check, and update only what it reports, in place, as `figma-generate-library`'s reconciliation mode does.
 
-**Exit criterion:** every component in the manifest except `Box` and `Stack` has a Figma component set with matching names and variants, every property bound to the variable the spec names, and the library check passes.
+**Exit criterion:** every component in the manifest except `Box`, `Stack` and `VisuallyHidden` has a Figma component set with matching names and variants, every property bound to the variable the spec names, and the library check passes.
 
 ---
 

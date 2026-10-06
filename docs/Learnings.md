@@ -306,7 +306,7 @@ Checked again in October 2026, while building Phase 3 (ADR 0007):
 - **Setup in Claude Code:** `claude plugin install figma@claude-plugins-official` installs the server and Figma's skills together; `/mcp` signs in.
 
 Measured live on a scratch file in October 2026, during Phase 3's checks:
-- **The scripts' self-check works.** `Function.prototype.toString` in Figma's sandbox returns each function's source as sent, so a generated script's hash of itself passes. `use_figma` accepted a 23 KB script.
+- **The scripts' self-check works.** `Function.prototype.toString` in Figma's sandbox returns each function's source as sent, so a generated script's hash of itself passes. `use_figma` accepted a 23 KB script. (Unless the script contains an `svg` tag, found in Phase 5b; see below.)
 - **Numbers are 32-bit floats.** Every number Figma stores comes back rounded to single precision: `1.2` as `1.2000000476837158`, `0.15` seconds as `0.15000000596046448`, and colour channels and curve points the same way. Comparing with `===` sees a change on every run.
 - **Descriptions come back HTML-escaped.** Figma stores `&`, `<`, `>`, `"` and `'` in a variable's description as `&amp;`, `&lt;`, `&gt;`, `&quot;` and `&#39;`. Nothing else changes, and an entity already in the text is escaped again.
 - **Timing and easing.** Both types accept aliases, and an easing variable holds a custom cubic Bézier. Setting scopes on either throws `Cannot set scopes on this variable type`, as figwright reported.
@@ -534,6 +534,28 @@ Building the ESLint config, the escape count and the off-system check settled th
 - **pnpm 12.8's `minimumReleaseAge`** refuses a version published within the cutoff. `pnpm add` of such a version writes `minimumReleaseAgeExclude` entries into `pnpm-workspace.yaml` by itself; Fossil drops them and waits for the version to age instead.
 - **`git grep -z` on a tree** prints `rev:path`, the line number and the text separated by NUL bytes, so the escape count reads a base commit without checking it out.
 
+### The Phase 5b build (October 2026)
+
+Building the Figma component library on the scratch file settled these, each measured live through `use_figma` unless a source is given:
+
+- **`use_figma` rewrites a script that contains an `svg` tag.** With `<svg` anywhere in its text, even inside a string, the script is re-printed before it runs, every function re-indented, so `Function.prototype.toString` no longer returns the source sent and each Fossil script's hash fails. Probes isolated it: an escaped quote, quoted object keys, a URL or a template literal change nothing, while a string holding `<svg></svg>` does. Fossil builds SVG markup at run time, and its generator refuses a script with an `svg` or `path` tag.
+- **`figma.skipInvisibleInstanceChildren` starts on** in `use_figma`, so the inside of a hidden instance, such as a `Button`'s hidden icon, can't be found until a script turns it off.
+- **Binding `strokeWeight`** stores the binding on `strokeTopWeight`, `strokeRightWeight`, `strokeBottomWeight` and `strokeLeftWeight`; `boundVariables.strokeWeight` stays empty.
+- **A component's description comes back HTML-escaped,** as a variable's does.
+- **A number variable bound to line height is read as pixels** (Figma forum, "Allow percentages for line height"), so a unitless 1.6 can't bind. Text styles set line height as a percentage instead. Line height and letter spacing come back as 32-bit floats.
+- **Figma's Space Grotesk has Light, Regular, Medium and Bold only,** no SemiBold, though Google Fonts' current version has it. Figtree and Space Mono have every weight Fossil uses. A variable font's `fontName` gains `variationSettings`.
+- **Setting `textCase` on a text layer detaches its text style,** since case is part of a Figma text style.
+- **Slots** reached general availability in the Plugin API on 10 June 2026 (`createSlot`, a `SLOT` property, `slotSettings`). A slot and its `SLOT` property share one name: renaming the property renames the slot, and `editComponentProperty` refuses a rename to the name it already has. A slot can be moved into a frame inside the component. Replacing slot content in an instance through `use_figma` was still unreliable in July 2026 (Figma forum).
+- **After a main component changes,** its instances elsewhere don't show the change until the next `use_figma` call.
+- **A renamed instance keeps its name when swapped;** one left alone takes the name of the component it's swapped to.
+- **Twice, a script that failed partway left nothing behind,** though `figma-use` no longer promises that. Fossil's scripts still check before they write.
+- **`get_design_context` without Code Connect:**
+  - an instance whose overrides are only text and boolean properties arrives as a call, such as `<Button children="Save changes" icon />`, with a generated props type: variant properties as string unions (`"true"` and `"false"` become `boolean`), text properties as `string` and booleans as `boolean`, all under the Figma names;
+  - an instance with a swapped nested instance, or with an instance-swap property set, is inlined as markup with `data-name="Button"`, its values as `var(--fossil-…, fallback)`;
+  - a glyph instance named after its component arrives as `<CloseIcon />`;
+  - component descriptions and the text styles used are listed after the code.
+- **Figma's MCP rate-limit page** still gives Education 200 calls a day and 10 a minute, and doesn't mention `use_figma`.
+
 ---
 
 ## 6. Decisions and rationale
@@ -580,6 +602,12 @@ Building the ESLint config, the escape count and the off-system check settled th
 | Primitive names | Every primitive sits under a `base` group: `--fossil-base-color-gray-600` | Enforcement keeps primitives out of components, but Make's properties panel and hand-written CSS see every name. Primer marks its primitives `base-` the same way (ADR 0013) |
 | Terms | "Primitive" means the raw token tier only; product-specific components are "compositions" | Both words were overloaded, which confuses people and agents alike; one name per concept |
 | Library generation | A script writes each component's spec (names, variants, bindings) from code and checks the built result; the agent builds the frames | Names and bindings must be exact, so they come from code and get verified; only the frame layout needs judgment |
+| Library spec sources | Each component's JSX through the TypeScript compiler, its CSS Module through PostCSS, and a small reviewed table for what code can't say | CSS alone misses the token props components pass to `Box` and `Text` in JSX; a render needs a DOM and real input for portals and measured states (ADR 0015) |
+| Library styles and icons | A generated script, stamped and checked before it writes, like the variables' apply | Every name and binding comes from the token build, so none is the agent's choice |
+| Library layout | One Components page, a section per component; layers named after the CSS class or state selector they stand for | The check reads the whole library with one page switch, and code names every layer it looks for |
+| Figma properties | Named after the props: text, boolean, instance swap for `Icon`'s glyph, slots for an app's content; no state variants | `get_design_context` returns them under those names; a `state` property would name a prop that doesn't exist |
+| `VisuallyHidden` in Figma | Left out of the library, with `Box` and `Stack` | It renders nothing visible, so an instance would be an invisible layer |
+| Heading weight | 700, Space Grotesk Bold | Figma's Space Grotesk has no SemiBold, so at 600 code and Figma's text styles couldn't match |
 | Make guidelines | Shipped in `@fossil-design/react`, with the kit optional | One copy that versions with the components, and it works on any paid plan: publishing a kit needs Figma's npm registry, which the Education team lacks |
 | Make kit tokens | From the npm package, not the Figma library | Make flattens library variables into raw CSS values that would compete with `--fossil-*` |
 | Margins | No margin prop on `Box`; a margin in CSS fails lint unless it's `0` or carries a disable comment with a reason | Harvested from the portfolio's rule: spacing comes from padding and `gap`, and a margin needs permission and a reason. A lint error that only a written reason can pass keeps the original "ask first" exception, and every use shows up in the escape count |
@@ -699,6 +727,12 @@ Building the ESLint config, the escape count and the off-system check settled th
 - npm download statistics API, GitHub changelog on npm 2FA-bypass tokens
 - Figma Forum threads on the remote MCP server's client allowlist and OAuth requirements
 - Agent Skills specification (`agentskills/agentskills`, agentskills.io); Cursor skills documentation
+
+**Figma component library (October 2026)**
+- Figma Plugin API updates, 10 June 2026 (slots: `SlotNode`, `createSlot`, `SLOT` properties); `SlotNode` and `ComponentNode` references
+- Figma Forum: Allow percentages for line height; Figma MCP: Claude unable to replace slot contents
+- Figma MCP server developer docs, rate limits and access (re-checked 5 October 2026)
+- `figma/mcp-server-guide` skills `figma-use`, `figma-generate-library` and `figma-design-to-code`, with the Plugin API typings they ship
 
 **Dry run and pruning (September–October 2026)**
 - agents.md (format, supported tools, stewardship); GitHub Blog, How to write a great agents.md: lessons from over 2,500 repositories; Primer React `.github/copilot-instructions.md`
