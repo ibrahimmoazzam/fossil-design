@@ -313,6 +313,44 @@ describe('building the token source', () => {
     );
     expect(agents).toContain('| `--fossil-color-text-muted` | Secondary text.');
   });
+
+  it('writes the same foundations to foundations.md, a heading level up', () => {
+    const markdown = read('dist/foundations.md');
+    expect(markdown).toMatch(
+      /^<!-- .* -->\n\nStyle with these semantic tokens/,
+    );
+    const inBlock = agents
+      .slice(
+        agents.indexOf('### Spacing'),
+        agents.indexOf('<!-- prettier-ignore-end'),
+      )
+      .replaceAll(/^###/gm, '##');
+    expect(markdown.slice(markdown.indexOf('## Spacing')).trim()).toBe(
+      inBlock.trim(),
+    );
+  });
+
+  it('lists every semantic token in use in tokens.md, with its values and replacement', () => {
+    const reference = read('dist/tokens.md');
+    expect(reference.indexOf('\n## color\n')).toBeLessThan(
+      reference.indexOf('\n## space\n'),
+    );
+    expect(reference).toContain(
+      '| `color.text.muted` | `--fossil-color-text-muted` | #4a5159 | #cdd2d8 | Secondary text. |',
+    );
+    expect(reference).toContain(
+      '| `space.m` | `--fossil-space-m` | 1rem (16px) |  |',
+    );
+    expect(reference).toContain(
+      '| `color.background.veil` | `--fossil-color-background-veil` | #000000 at 60% |',
+    );
+    expect(reference).toContain(
+      '| `motion.duration.base` | `--fossil-motion-duration-base` | `--fossil-motion-duration-default` |',
+    );
+    for (const [path, token] of Object.entries(json.tokens))
+      if (token.tier === 'semantic' && token.deprecated === undefined)
+        expect(reference, path).toContain(`| \`${path}\` |`);
+  });
 });
 
 describe('a broken token fails the build with a clear message, before anything is written', () => {
