@@ -16,6 +16,12 @@ import {
   type TokenFile,
 } from '../../tokens/scripts/validate.ts';
 import { diff, summary } from './diff.ts';
+import {
+  LibraryError,
+  libraryCheck,
+  libraryReport,
+  librarySpec,
+} from './library/cli.ts';
 import { figmaTokens } from './model.ts';
 import { script } from './scripts.ts';
 import { readSnapshot, SnapshotError } from './snapshot.ts';
@@ -173,17 +179,26 @@ async function compare(dryRun: boolean): Promise<void> {
   );
 }
 
-const [command, arg] = process.argv.slice(2);
+const [command, ...args] = process.argv.slice(2);
+const [arg] = args;
 try {
   if (command === 'apply') apply();
   else if (command === 'read') read(arg);
   else if (command === 'diff') await compare(arg === '--dry-run');
+  else if (command === 'library-spec') librarySpec();
+  else if (command === 'library-check' && arg === 'report') {
+    if (!libraryReport()) process.exitCode = 1;
+  } else if (command === 'library-check') libraryCheck(args);
   else
     throw new UsageError(
-      'Usage: cli.ts apply | read [page] | diff [--dry-run]',
+      'Usage: cli.ts apply | read [page] | diff [--dry-run] | library-spec | library-check [component...] | library-check report',
     );
 } catch (error) {
-  if (!(error instanceof UsageError || error instanceof SnapshotError))
+  if (!(
+    error instanceof UsageError ||
+    error instanceof SnapshotError ||
+    error instanceof LibraryError
+  ))
     throw error;
   console.error(
     error instanceof SnapshotError ? error.problems.join('\n') : error.message,

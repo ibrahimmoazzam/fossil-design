@@ -9,9 +9,12 @@
     "apply": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts apply",
     "read": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts read",
     "diff": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts diff",
+    "library-spec": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts library-spec",
+    "library-check": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts library-check",
     "typecheck": "tsc"
   },
   "devDependencies": {
+    "postcss": "^8.5.28",
     "prettier": "^3.9.9",
     "typescript": "catalog:"
   }

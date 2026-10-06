@@ -233,6 +233,9 @@ importers:
 
   packages/figma-sync:
     devDependencies:
+      postcss:
+        specifier: ^8.5.28
+        version: 8.5.28
       prettier:
         specifier: ^3.9.9
         version: 3.9.9
