@@ -2,7 +2,7 @@
 
 Fossil Design, or Fossil for short, is an open-source design system for agentic coding: tokens in git flow into CSS, typed React components, Figma variables and a generated Figma component library, with lint configs and agent docs that keep generated UI on-system. Teams adopt it by forking it as a template. The published `@fossil-design/*` packages are the reference brand, harvested from the author's portfolio site.
 
-The repo foundation, the token build, the Figma sync, `@fossil-design/react`, both lint configs and the Figma component library are in place. Phase 6, the agent context layer, is under way: the docs bundled in `@fossil-design/react` are in place. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
+The repo foundation, the token build, the Figma sync, `@fossil-design/react`, both lint configs and the Figma component library are in place. Phase 6, the agent context layer, is under way: the docs, the `AGENTS.md` block and the Figma Make guidelines bundled in `@fossil-design/react` are in place, and splitting the Figma library into foundations and components is next. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
 
 ## Commands
 
@@ -25,8 +25,8 @@ pnpm changeset                   # record a release note for a package change
 - One test project: `pnpm test --project workspace`. Nested projects take their parent's name: `pnpm test --project 'react*'` runs `react (unit)`, `react (browser)` and `react (storybook)`. Watch mode: `pnpm exec vitest`.
 - The browser tests need Chromium once per machine: `pnpm --filter react exec playwright install chromium`.
 - Storybook: `pnpm --filter react storybook`, at `localhost:6006`. Its MCP server is at `localhost:6006/mcp`, and `.mcp.json` registers it for Claude Code.
-- `pnpm --filter react docs` writes the docs bundled in `@fossil-design/react` from each component's JSDoc contract and its stories tagged `example`. The package's build runs it last and fails on an undocumented component (ADR 0016). `packages/react/AGENTS.md` has the format.
-- `pnpm smoke [next|vite]` copies the apps in `smoke/` to a temporary folder, installs the packed tarballs with npm, then type-checks, lints, builds and checks what they render. Last, it copies the off-system component in `smoke/off-system/` into each app and expects lint to reject every line of it. It needs the network. Set `FOSSIL_KEEP_SMOKE=1` to keep the folder.
+- `pnpm --filter react docs` writes the docs bundled in `@fossil-design/react` from each component's JSDoc contract and its stories tagged `example`. From the same sources it writes the block the package's `fossil-agents-md` bin puts in an app's `AGENTS.md`, and the Figma Make guidelines in `guidelines/`. The package's build runs it last, and fails on an undocumented component or a block over 8 KB (ADRs 0016 and 0017). `packages/react/AGENTS.md` has the format.
+- `pnpm smoke [next|vite]` copies the apps in `smoke/` to a temporary folder, installs the packed tarballs with npm, then type-checks, lints, builds and checks what they render. Then it runs `fossil-agents-md` in each app and checks every installed file the block and the Make guidelines name. Last, it copies the off-system component in `smoke/off-system/` into each app and expects lint to reject every line of it. It needs the network. Set `FOSSIL_KEEP_SMOKE=1` to keep the folder.
 - `pnpm --filter react generate` writes `Box`'s CSS and the `.module.css.d.ts` types. The react package's `build` and `typecheck` run it first. Neither output is committed.
 - Check the token source without building: `pnpm --filter tokens validate`. Token files live in `packages/tokens/src/primitive/` and `src/semantic/`; ADR 0005 holds their rules.
 - The token build writes `tokens.css`, `tokens.json`, `lint.json`, `foundations.md` and `tokens.md` to `packages/tokens/dist/`, the TypeScript in `src/generated/`, and the foundations block in this file. Commit the block with the token change; CI fails if the build changes it. ADR 0006 covers each output, and ADR 0016 the two Markdown files.
@@ -55,7 +55,7 @@ Phase 0 pinned the tooling below; later phases pin the rest when they add it.
 ```
 fossil.config.json     system name, CSS prefix, npm scope
 packages/tokens        DTCG source and the Style Dictionary build
-packages/react         components (CSS Modules), stories, bundled agent docs
+packages/react         components (CSS Modules), stories, bundled agent docs, Make guidelines, the AGENTS.md bin
 packages/eslint-config, packages/stylelint-config
 packages/figma-sync    Figma sync and component library: core, scripts and checks (private)
 .claude/skills         the fossil-figma-sync skill
@@ -86,8 +86,29 @@ docs/gaps.md           logging gaps, and recording a decision for each
 - **No margins.** Space with padding and `gap`. `margin: 0` resets are fine.
 - **Mobile-first.** Base styles for mobile, `min-width` media queries only.
 - **Layout through `Box` and `Stack`.** No raw `<div>`, `<section>` or other element `Box` renders; ESLint rejects them.
-- **Escapes are visible, not forbidden.** `Box`'s `style` prop is the sanctioned escape. Anything else needs a disable comment with its reason after `--`; CI counts them on each pull request. Three for the same need is a gap: log it as `docs/gaps.md` describes.
+- **Escapes are visible, not forbidden,** and gaps are logged. Both are spelled out below.
 - **Sparse comments.** Only a non-obvious why. Explanations for the user go in chat, not code.
+
+### Escape hatches
+
+1. **Sanctioned:** `Box`'s `style` prop, for what tokens can't express: `gridTemplateAreas`, `gridTemplateColumns`, `aspectRatio` and `transform`. It needs no comment.
+2. **Logged:** anything else needs a disable comment with its reason after `--`, as in `/* stylelint-disable-next-line <rule> -- <the reason> */`. A margin other than `0` also needs the person's approval first. `pnpm escapes` counts these comments, and CI lists the ones each pull request adds.
+3. **A signal:** the same escape three times is a gap.
+
+### Gaps
+
+A gap is a place where Fossil fell short: something couldn't be built from its components and tokens, something generic was rebuilt, or an escape was logged. Draft it with four fields, show the person, and let them decide whether to file it on the gap form:
+
+- **Where:** the file, and the task.
+- **Needed:** what the task needed. The need, not a solution.
+- **Offered:** what Fossil offered, and why it fell short.
+- **Evidence:** the code written instead, or the escape comment.
+
+`docs/gaps.md` covers reviewing gaps and closing each with a decision: component, pattern or keep local.
+
+### Components
+
+Don't copy component details into this file. Each component's contract is the JSDoc in `packages/react/src/components/<Name>/<Name>.tsx`: when to use it, when not to, its states and its accessibility. After a build, `packages/react/docs/` has each one rendered with its props, variants and examples, as apps receive it. With Storybook running, its MCP server serves the same through its docs tools, and runs a story's tests with `test-run`.
 
 ### An on-system component
 
@@ -250,7 +271,7 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 **Never**
 
 - Hand-write Figma Plugin API code for variables. Use the generated scripts.
-- Edit a generated file: token build outputs (including the foundations block in this file), CSS Module types, `Box`'s CSS, bundled docs.
+- Edit a generated file: token build outputs (including the foundations block in this file), CSS Module types, `Box`'s CSS, bundled docs and Make guidelines. Change `packages/react/docs-src/` instead.
 - Upgrade TypeScript to 7.
 - Publish to npm from a local machine, except each package's first version during the Phase 0 bootstrap.
 - Commit secrets, tokens or `.env` files.
@@ -259,15 +280,15 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 
 A change is done when all of these pass. Run them in this order: `pnpm build && pnpm lint && pnpm typecheck && pnpm test && pnpm check:packages`.
 
-| Check                                                                                                                                             | Command                                            | Covers today                                                                                                                                                                                                                     |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The token build, with its validation                                                                                                              | `pnpm --filter tokens build`, part of `pnpm build` | Validation of the DTCG source, then every Style Dictionary output                                                                                                                                                                |
-| ESLint and Stylelint, with Fossil's shared configs                                                                                                | `pnpm lint`                                        | ESLint with Fossil's own config on every script and component, then Prettier; Stylelint with Fossil's own config on every stylesheet                                                                                             |
-| Type-checking, after generating CSS Module types                                                                                                  | `pnpm typecheck`                                   | All packages, with CSS Module types generated first                                                                                                                                                                              |
-| Tests: Storybook interaction tests, axe checks with zero violations, real-input browser tests for native behaviour such as Escape on a `<dialog>` | `pnpm test`                                        | Workspace, token, lint config and React unit tests, including the off-system component; every story with axe; real-input tests for focus, hover and the native behaviour of every interactive component                          |
-| Packed tarballs pass publint and attw                                                                                                             | `pnpm check:packages`                              | Every published package                                                                                                                                                                                                          |
-| The packed packages install, type-check, build and render in a consumer app                                                                       | `pnpm smoke`                                       | A Next 16 app with a Server Component page and Motion on `Modal`, and a Vite app on React 18. CI runs it on every pull request; run it locally when a change touches the build, the exports, a client component or a lint config |
-| A changeset, if a package's public surface changed                                                                                                | `pnpm changeset`                                   | Yes                                                                                                                                                                                                                              |
+| Check                                                                                                                                             | Command                                            | Covers today                                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The token build, with its validation                                                                                                              | `pnpm --filter tokens build`, part of `pnpm build` | Validation of the DTCG source, then every Style Dictionary output                                                                                                                                                                                                           |
+| ESLint and Stylelint, with Fossil's shared configs                                                                                                | `pnpm lint`                                        | ESLint with Fossil's own config on every script and component, then Prettier; Stylelint with Fossil's own config on every stylesheet                                                                                                                                        |
+| Type-checking, after generating CSS Module types                                                                                                  | `pnpm typecheck`                                   | All packages, with CSS Module types generated first                                                                                                                                                                                                                         |
+| Tests: Storybook interaction tests, axe checks with zero violations, real-input browser tests for native behaviour such as Escape on a `<dialog>` | `pnpm test`                                        | Workspace, token, lint config and React unit tests, including the off-system component; every story with axe; real-input tests for focus, hover and the native behaviour of every interactive component                                                                     |
+| Packed tarballs pass publint and attw                                                                                                             | `pnpm check:packages`                              | Every published package                                                                                                                                                                                                                                                     |
+| The packed packages install, type-check, build and render in a consumer app                                                                       | `pnpm smoke`                                       | A Next 16 app with a Server Component page and Motion on `Modal`, a Vite app on React 18, and the AGENTS.md bin in both. CI runs it on every pull request; run it locally when a change touches the build, the exports, a client component, a lint config or the agent docs |
+| A changeset, if a package's public surface changed                                                                                                | `pnpm changeset`                                   | Yes                                                                                                                                                                                                                                                                         |
 
 ## Conventions
 
