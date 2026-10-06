@@ -19,3 +19,4 @@ Each record states the context, the options considered, the decision and its con
 | [0013](./0013-base-primitives.md)         | Primitive tokens live under `base`                        | Accepted                            |
 | [0014](./0014-enforcement.md)             | The ESLint config, the escape count and the gap log       | Accepted                            |
 | [0015](./0015-figma-component-library.md) | The Figma component library                               | Accepted                            |
+| [0016](./0016-bundled-agent-docs.md)      | Agent docs bundled in the component package               | Accepted                            |

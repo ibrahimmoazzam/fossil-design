@@ -52,6 +52,7 @@ export interface TooltipProps {
   delay?: number;
   /** The open state, to control it. */
   open?: boolean;
+  /** Called with `true` when it opens and `false` when it closes, whatever closed it. */
   onOpenChange?: (open: boolean) => void;
 }
 
@@ -87,6 +88,35 @@ function fitToLines(surface: HTMLElement) {
 /**
  * A short label for a control, shown on hover and focus and read as the control's description.
  * It stays open while the pointer travels onto it, and Escape dismisses it (WCAG 1.4.13).
+ *
+ * ## When to use
+ *
+ * - A word more about a control, such as what an icon-only button does or its keyboard shortcut.
+ *
+ * ## When not to use
+ *
+ * - Anything interactive, such as a link: use `Popover`.
+ * - A control's only name: give the button visible text or a `label`. The tooltip is its
+ *   description.
+ * - Something people need on a touch screen, where nothing hovers: put it on the page.
+ *
+ * ## States
+ *
+ * Closed, or open after `delay` (150ms) of hover, or at once on keyboard focus. An optional arrow
+ * points at the trigger.
+ *
+ * ## Accessibility
+ *
+ * ### Built in
+ *
+ * `role="tooltip"`, tied to the trigger as its description. It opens on focus as well as hover,
+ * stays open while the pointer moves onto it, and Escape dismisses it without moving focus
+ * (WCAG 1.4.13). Animations stop under `prefers-reduced-motion`.
+ *
+ * ### Up to you
+ *
+ * Pass one focusable trigger that holds a ref, usually a `Button`. Keep the text short, and never
+ * the only place something important is said.
  */
 export function Tooltip({
   content,

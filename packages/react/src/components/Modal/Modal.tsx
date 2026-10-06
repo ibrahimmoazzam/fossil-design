@@ -31,6 +31,7 @@ export interface ModalRenderPanel {
 }
 
 export interface ModalProps {
+  /** Whether the dialog is open. Keep it in state, and set it from `onOpenChange`. */
   open: boolean;
   /** Called with `false` for every way out: the close button, Escape and a click outside. */
   onOpenChange: (open: boolean) => void;
@@ -42,6 +43,7 @@ export interface ModalProps {
   headerContent?: ReactNode;
   /** Sizes the panel from the app's stylesheet. */
   className?: string;
+  /** The dialog's content, under its header. */
   children: ReactNode;
   /**
    * Renders the panel yourself, to animate it with a library such as Motion. Fossil keeps the
@@ -60,6 +62,36 @@ export interface ModalProps {
  * A modal dialog on the native `<dialog>`, which provides the focus trap, Escape, an inert page
  * behind and the top layer. Fossil adds the exit animation, focus on the title when it opens, a
  * scroll lock and dismissal by clicking outside.
+ *
+ * ## When to use
+ *
+ * - A task or detail that needs the reader's full attention before they go back to the page, such
+ *   as a project's details or a confirmation.
+ *
+ * ## When not to use
+ *
+ * - Detail beside a control, with the page still usable: use `Popover`.
+ * - A short label for a control: use `Tooltip`.
+ * - Content that could sit on the page, or a flow of several steps: give it a section or a page.
+ *
+ * ## States
+ *
+ * Open and closed, animated both ways. It stays up until its exit animation ends, and
+ * `onShowingChange` reports when it starts and stops showing.
+ *
+ * ## Accessibility
+ *
+ * ### Built in
+ *
+ * A native modal `<dialog>`: focus stays inside, the page behind is inert, and Escape closes it.
+ * Focus starts on the title, which names the dialog, and goes back to the trigger on close. A close
+ * button named "Close". The page behind doesn't scroll. Animations stop under
+ * `prefers-reduced-motion`.
+ *
+ * ### Up to you
+ *
+ * Keep `open` in state and set it to `false` in `onOpenChange`, which every way out calls. Give
+ * it a `title` that says what it is. Open it from a `Button`, so focus has somewhere to go back to.
  */
 export function Modal({
   open,

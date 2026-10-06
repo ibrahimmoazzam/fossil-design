@@ -3,11 +3,15 @@ import { expect, waitFor } from 'storybook/test';
 import { recordClip } from '../../../.storybook/record-clip.js';
 import { Clip } from './Clip.js';
 
+// The stories record a clip in the browser instead, so the repository holds no video files.
+/** The URL of your video. */
+const video = '';
+
 const meta = {
   title: 'Content/Clip',
   component: Clip,
   args: {
-    src: '',
+    src: video,
     caption:
       'A dot slides from the left edge of the frame to the right, then starts again.',
   },
@@ -22,6 +26,7 @@ type Story = StoryObj<typeof meta>;
 
 /** It plays on its own, and the toggle, named for what it will do, stops it. */
 export const Default: Story = {
+  tags: ['example'],
   play: async ({ canvas, userEvent }) => {
     const video = canvas.getByRole('figure').querySelector('video');
     if (!video) throw new Error('Clip did not render a video');

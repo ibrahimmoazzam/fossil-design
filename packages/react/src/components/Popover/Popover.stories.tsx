@@ -26,7 +26,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** A click on the trigger opens it. Its content may hold links and controls, unlike a tooltip's. */
 export const Default: Story = {
+  tags: ['example'],
   play: async ({ canvas, canvasElement, args, userEvent }) => {
     const page = within(canvasElement.ownerDocument.body);
     const trigger = canvas.getByRole('button', { name: 'About' });

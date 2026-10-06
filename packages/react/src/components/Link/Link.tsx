@@ -31,6 +31,7 @@ export type LinkProps = Omit<ComponentPropsWithRef<'a'>, 'className'> & {
   asChild?: boolean;
   /** A decorative icon after the text, saying what the link or action does. */
   icon?: IconComponent;
+  /** Classes from the app's own stylesheet, added to Fossil's. */
   className?: string;
 };
 
@@ -43,6 +44,37 @@ interface ChildProps {
 /**
  * A link with a dotted underline that fills in on hover and focus, in the link's own colour.
  * A link that opens a new tab gets an outward arrow and says so to screen readers.
+ *
+ * ## When to use
+ *
+ * - Going to another page, a section or a URL.
+ * - `tone="accent"` for a link in running text, and `inherit` where the setting already marks it,
+ *   such as a footer.
+ * - A router's link, such as `next/link`, as the single child with `asChild`.
+ * - An action in running text that reads like a link: `asChild` around a `<button>`.
+ *
+ * ## When not to use
+ *
+ * - An action shown as a control, such as submitting a form: use `Button`.
+ * - Jumping past the navigation: use `SkipLink`.
+ *
+ * ## States
+ *
+ * Hover and `:focus-visible` fill in the underline, and keyboard focus adds a focus ring. With
+ * `target="_blank"`, an outward arrow.
+ *
+ * ## Accessibility
+ *
+ * ### Built in
+ *
+ * A native `<a>`, or with `asChild` the child's own element, so the browser's link or button
+ * behaviour stays. A focus ring on keyboard focus. With `target="_blank"`, a visually hidden
+ * "(opens in a new tab)". The underline's animation stops under `prefers-reduced-motion`.
+ *
+ * ### Up to you
+ *
+ * Write link text that makes sense on its own, never "click here". With `asChild`, pass exactly
+ * one element; a `<button>` child needs `type="button"`.
  */
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   { tone = 'inherit', asChild = false, icon, className, children, ...rest },

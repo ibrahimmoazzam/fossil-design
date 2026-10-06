@@ -6,13 +6,14 @@ Fossil's React components. This file covers working on them; the root `AGENTS.md
 
 ```sh
 pnpm --filter react generate      # Box's CSS, the icons and every .module.css.d.ts
-pnpm --filter react build         # generate, vite build, then tsc for the declarations
+pnpm --filter react build         # generate, vite build, tsc for the declarations, then docs
+pnpm --filter react docs          # the bundled docs in docs/, from JSDoc and stories; needs a build first
 pnpm --filter react typecheck     # generate, then tsc
 pnpm --filter react storybook     # Storybook at localhost:6006
 pnpm test --project 'react*'      # unit tests, real-input tests, then every story in Chromium with axe
 ```
 
-Build `@fossil-design/tokens` first; `pnpm build` from the root does it in order. The browser tests need Chromium once per machine: `pnpm --filter react exec playwright install chromium`.
+Build `@fossil-design/tokens` first; `pnpm build` from the root does it in order. With Storybook running, its MCP server is at `localhost:6006/mcp`, and the root `.mcp.json` registers it for Claude Code: use its docs tools to look up a component, and `test-run` to run a story's tests. The browser tests need Chromium once per machine: `pnpm --filter react exec playwright install chromium`.
 
 ## Layout
 
@@ -23,6 +24,8 @@ Build `@fossil-design/tokens` first; `pnpm build` from the root does it in order
 - `src/responsive.ts` holds `Responsive<T>` and the helpers that turn responsive props into classes.
 - `src/hooks/` holds `usePresence`, which keeps an element mounted until its CSS transitions finish, and `usePrefersReducedMotion`.
 - `src/components/Floating/` is shared by `Popover` and `Tooltip`: the surface's look, the portal into a `<dialog>`, and reading a trigger's ref on React 18 and 19. It isn't a component.
+- `scripts/docs.ts` writes `docs/`, the docs bundled in the package (ADR 0016): an index, the foundations, the token reference, one Markdown file per component and `components.json`. `docs/` isn't committed. `scripts/docgen.ts` holds the react-docgen-typescript options it shares with Storybook.
+- `docs-src/rules.md` is the hand-written part of `docs/foundations.md`: the rules for apps, escape hatches, gap logging and implementing a Figma design. `{{name}}`, `{{prefix}}`, `{{scope}}` and `{{gapForm}}` are filled from `fossil.config.json` and `package.json`.
 - `.storybook/` holds the Storybook config. `token-px.ts` converts a token to the pixels a play function compares against, and `focus-start.ts` puts focus at the start of the page before a real Tab.
 - `*.browser.test.tsx` files hold the real-input tests. They render a story with `composeStories(stories).Story.run()`, then drive it with `userEvent` and `page` from `vitest/browser`.
 
@@ -39,6 +42,8 @@ Build `@fossil-design/tokens` first; `pnpm build` from the root does it in order
 - **Element substitution through `asChild`.** A component that styles an element an app may need to swap, such as `Link` for a router's link, takes `asChild` and clones its single child, merging `className`. Use React's `cloneElement`, not a library.
 - **Icons as components.** Take an `IconComponent`, not a name, so an app's own SVGs work beside Fossil's.
 - **Tests.** Every component has stories whose play functions exercise its states. axe runs on every story and must pass in light and dark; add a story with `globals: { theme: 'dark' }` where colour matters. Anything that relies on native handling, such as Escape on a `<dialog>`, light dismiss or `:focus-visible`, needs a real-input browser test.
+- **Document every component in its JSDoc.** A summary, then `## When to use`, `## When not to use`, `## States` and `## Accessibility`, which splits into `### Built in` and `### Up to you`. Every prop has a description. Name the better component in "When not to use".
+- **Tag examples.** Tag one or more stories `example`, each with a JSDoc comment saying why an app would do this. Write them as an app would: a `render` that takes no args, or args alone. They may use only `@fossil-design/react`'s and React's exports, or a module-level constant with a JSDoc comment saying what the app puts there, such as an image URL. `pnpm --filter react docs` fails on anything missing, and so does the build.
 - **A changeset** with any change to the public surface.
 
 ## Known issues
@@ -65,4 +70,8 @@ Traps the dry run and the build found, so nobody has to find them again:
 - A test clicking around a `<dialog>` should aim at the space beside the panel, not at the frame's very edge, where the click may never reach the page.
 - Give a component that returns `createElement(...)` an explicit return type. An inferred one copies this `@types/react` version's props into the declaration, which a consumer on another version can't read. The smoke test's type-check catches it.
 - Use `useIsomorphicLayoutEffect`, never `useLayoutEffect`: React 18 warns when a layout effect renders on the server. The smoke test fails on any warning from React 18's server render.
+- react-docgen-typescript misreads a component exported through a type assertion, such as `Box`, `Stack` and `Text`, when another export in its file has a JSDoc comment: it takes that comment as the component's and finds no props. On a `forwardRef` component the comment becomes a second component instead. Keep JSDoc off a component file's other exports; use a line comment.
+- react-docgen-typescript skips an undocumented `children` unless `skipChildrenPropWithoutDoc` is off, which `scripts/docgen.ts` sets so the docs check sees it.
+- `typescript.reactDocgenTypescriptOptions` in `.storybook/main.ts` replaces Storybook's defaults rather than merging, so `scripts/docgen.ts` repeats them.
+- Storybook's manifest snippets print spies, story helpers and some wrong JSX, such as a fragment child with its parentheses as text. The bundled docs read the example stories' own source instead.
 - A Vite app without `@vitejs/plugin-react` sees a `MODULE_LEVEL_DIRECTIVE` notice for each `'use client'` module. The plugin silences them, and Vite's React template includes it.

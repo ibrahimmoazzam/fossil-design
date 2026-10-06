@@ -75,6 +75,31 @@ export const Default: Story = {
   },
 };
 
+/**
+ * The app keeps `open` in state: the trigger sets it, and every way out calls
+ * `onOpenChange(false)`.
+ */
+export const ProjectDetails: Story = {
+  tags: ['example'],
+  render: function ProjectDetails() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Open details
+        </Button>
+        <Modal open={open} onOpenChange={setOpen} title="Project details">
+          <Text>A design system for agentic coding.</Text>
+        </Modal>
+      </>
+    );
+  },
+};
+
 export const WithHeaderContent: Story = {
   args: { headerContent: <Button size="s">Share</Button> },
   render: (args) => <Demo {...args} startOpen />,

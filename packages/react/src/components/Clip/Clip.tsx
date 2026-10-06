@@ -22,6 +22,7 @@ export interface ClipProps {
   caption: ReactNode;
   /** Keeps the caption for assistive technology only, when the surrounding text already says it all. */
   captionHidden?: boolean;
+  /** Classes from the app's own stylesheet, added to Fossil's. */
   className?: string;
 }
 
@@ -29,6 +30,36 @@ export interface ClipProps {
  * A short, silent interface recording: what a GIF used to be, at a fraction of the bytes.
  * It plays on its own, so WCAG 2.2.2 requires a way to stop it, and the toggle is part of the
  * component rather than an option. It starts paused for anyone who prefers reduced motion.
+ *
+ * ## When to use
+ *
+ * - A short, silent, looping screen recording that shows an interaction, in place of an animated
+ *   GIF.
+ * - The same playback for a video framed by something else, such as a card: use
+ *   `useClipPlayback`.
+ *
+ * ## When not to use
+ *
+ * - Video with sound or narration: use a `<video>` with controls, in a `Figure`.
+ * - A still image: use `Figure`.
+ *
+ * ## States
+ *
+ * Playing or paused. It plays while on screen unless the reader prefers reduced motion or has
+ * pressed pause, and always pauses off screen.
+ *
+ * ## Accessibility
+ *
+ * ### Built in
+ *
+ * A play and pause button named for what it will do, "Play" or "Pause" (WCAG 2.2.2). Paused for
+ * anyone who prefers reduced motion, until they press play. Muted, so it never makes a sound. The
+ * caption is required: it is the text alternative WCAG 1.2.1 asks for.
+ *
+ * ### Up to you
+ *
+ * Write a `caption` that describes what happens in the clip. Give a `poster`, so readers who don't
+ * play it still see a frame.
  */
 export function Clip({
   src,

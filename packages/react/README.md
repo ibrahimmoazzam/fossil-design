@@ -63,6 +63,10 @@ export function Note() {
 
 Each component exports its variants as a constant, such as `textVariants`, for docs and tools to read.
 
+## Docs for agents
+
+The package carries its own docs, in `node_modules/@fossil-design/react/docs/`, so a coding agent reads the version you installed rather than its training data. `index.md` lists every component; `foundations.md` has the rules, the escape hatches and the token scales; each component's file says when to use it and when not to, its states, its accessibility, its props and examples. `components.json` and `tokens.json` hold the same as JSON. Point your agent at them from your `AGENTS.md`.
+
 ## Icons
 
 Fossil ships the [Material Symbols](https://fonts.google.com/icons) its components use, as React components: `ArrowOutwardIcon`, `ChevronLeftIcon`, `ChevronRightIcon`, `CloseIcon`, `PauseIcon` and `PlayArrowIcon`. They are © Google, under the Apache License 2.0, included as `dist/licenses/material-symbols.txt`. For any other icon, pass your own SVG component to `Icon`.

@@ -1,4 +1,4 @@
 /* Story-only: fixed card widths, so the track overflows at any viewport. */
-.demo {
+.cards {
   --carousel-item-width: 16rem;
 }

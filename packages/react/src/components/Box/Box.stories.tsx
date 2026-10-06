@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect } from 'storybook/test';
 import { tokenPx } from '../../../.storybook/token-px.js';
+import { Card } from '../Card/Card.js';
 import { Text } from '../Text/Text.js';
 import { Box } from './Box.js';
 import { boxVariants } from './variants.js';
@@ -19,7 +20,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** A filled panel: its padding, fill and corners all come from tokens. */
 export const Default: Story = {
+  tags: ['example'],
   play: async ({ canvasElement }) => {
     const box = canvasElement.firstElementChild;
     if (!(box instanceof HTMLElement)) throw new Error('Box did not render');
@@ -74,6 +77,28 @@ export const Surfaces: Story = {
         <Box key={surface} surface={surface} padding="m" radius="surface">
           <Text>surface=&quot;{surface}&quot;</Text>
         </Box>
+      ))}
+    </Box>
+  ),
+};
+
+/**
+ * A grid of cards that fits as many columns as there's room for. `style` is the sanctioned escape
+ * for the column template, which tokens can't express.
+ */
+export const Grid: Story = {
+  tags: ['example'],
+  render: () => (
+    <Box
+      as="ul"
+      display="grid"
+      gap={{ default: 's', tablet: 'm' }}
+      style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(14rem, 1fr))' }}
+    >
+      {['Tokens in git', 'Typed components', 'Figma variables'].map((title) => (
+        <Card key={title} as="li" title={title} titleAs="h3">
+          One part of the pipeline, reviewed as code.
+        </Card>
       ))}
     </Box>
   ),

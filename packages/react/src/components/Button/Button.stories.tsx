@@ -22,7 +22,9 @@ export const Secondary: Story = {
   },
 };
 
+/** The main action in a view. Every other button keeps the default, `secondary`. */
 export const Primary: Story = {
+  tags: ['example'],
   args: { tone: 'primary' },
 };
 
@@ -30,12 +32,15 @@ export const Small: Story = {
   args: { size: 's' },
 };
 
+/** An icon before the text. It's decorative, because the text names the button. */
 export const WithIcon: Story = {
+  tags: ['example'],
   args: { icon: ArrowOutwardIcon, children: 'Open the case study' },
 };
 
 /** An icon-only button is round, and named by its label. */
 export const IconOnly: Story = {
+  tags: ['example'],
   args: { icon: CloseIcon, label: 'Close', children: undefined },
   play: async ({ canvas }) => {
     const button = canvas.getByRole('button', { name: 'Close' });

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
 import { Figure } from './Figure.js';
 
+/** The URL of your image. */
 const image = `data:image/svg+xml,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"><rect width="640" height="360" fill="#c6daec"/><circle cx="320" cy="180" r="90" fill="#0a6fbf"/></svg>',
 )}`;
@@ -28,6 +29,7 @@ type Story = StoryObj<typeof meta>;
 
 /** The caption is the figure's figcaption, which browsers use to name the figure. */
 export const Captioned: Story = {
+  tags: ['example'],
   play: async ({ canvas }) => {
     const figure = canvas.getByRole('figure');
     const caption = within(figure).getByText(

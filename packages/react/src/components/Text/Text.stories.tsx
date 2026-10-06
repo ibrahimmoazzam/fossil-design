@@ -23,7 +23,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Body: Story = {};
 
+/** A heading: the style sets its size, and `as` its level in the outline. */
 export const Heading: Story = {
+  tags: ['example'],
   args: { as: 'h2', variant: 'heading-l', children: 'A section heading' },
   play: async ({ canvas }) => {
     const heading = canvas.getByRole('heading', {
@@ -34,6 +36,16 @@ export const Heading: Story = {
       tokenPx('--fossil-text-heading-l-font-size'),
     );
     await expect(getComputedStyle(heading).marginBlockStart).toBe('0px');
+  },
+};
+
+/** Secondary text, such as a date under a title: a smaller style in the muted tone. */
+export const Secondary: Story = {
+  tags: ['example'],
+  args: {
+    variant: 'caption',
+    tone: 'muted',
+    children: 'Updated 6 October 2026',
   },
 };
 

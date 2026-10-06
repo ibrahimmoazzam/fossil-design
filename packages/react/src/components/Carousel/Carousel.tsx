@@ -33,7 +33,11 @@ export interface CarouselProps {
   indicator?: CarouselIndicator;
   /** Space between cards. Defaults to `l`. */
   gap?: SpaceToken;
-  /** Sets the knobs in Carousel's stylesheet, such as `--carousel-gutter`, from the app's own CSS. */
+  /**
+   * Classes from the app's own stylesheet, which set the carousel's knobs: `--carousel-gutter`,
+   * the inset at both ends; `--carousel-item-width`, a fixed card width; and `--carousel-bleed`,
+   * room around the cards for a focus ring or a shadow.
+   */
   className?: string;
   /** Data attributes go on the root, for tools that look for them, such as a smooth-scroll library. */
   [data: `data-${string}`]: string | number | boolean | undefined;
@@ -78,6 +82,37 @@ function scrollLeftFor(track: HTMLElement, item: HTMLElement) {
  * A horizontally scrolling list of cards. Scrolling is the browser's own, with scroll snap, so
  * the wheel, a trackpad, touch, the arrow keys and focus all move it, and the cards stay in
  * normal flow for screen readers. The controls appear only while the cards overflow.
+ *
+ * ## When to use
+ *
+ * - A row of parallel cards, such as projects, wider than the screen, where scrolling sideways is
+ *   expected.
+ * - `indicator="dots"` where 44px buttons would crowd small cards.
+ *
+ * ## When not to use
+ *
+ * - Content everyone must see: a carousel hides most of its cards. Lay them out in a grid with
+ *   `Box`.
+ * - Views of one thing, one at a time: use `Tabs`.
+ *
+ * ## States
+ *
+ * The controls appear once the cards overflow. The backward or forward button is unavailable at
+ * either end. With dots, the dot for the card at the leading edge is current.
+ *
+ * ## Accessibility
+ *
+ * ### Built in
+ *
+ * The cards are a list named by `label`, in normal flow. While the cards overflow, the track is a
+ * tab stop, so the arrow keys scroll it. The buttons are named "Scroll {label} backward" and
+ * "forward", and stay focusable at either end with `aria-disabled`. Each dot is named
+ * "{label}: 2 of 6" and marks the current card. Smooth scrolling stops under
+ * `prefers-reduced-motion`.
+ *
+ * ### Up to you
+ *
+ * Give it a `label` naming the set, such as "Projects". Pass one child per card.
  */
 export function Carousel({
   label,

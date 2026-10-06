@@ -557,6 +557,20 @@ Building the Figma component library on the scratch file settled these, each mea
   - component descriptions and the text styles used are listed after the code.
 - **Figma's MCP rate-limit page** still gives Education 200 calls a day and 10 a minute, and doesn't mention `use_figma`.
 
+
+### The Phase 6 build (October 2026)
+
+Building the bundled docs settled these, each checked against the installed version or the source given:
+
+- **Storybook 10.6** ([manifests](https://storybook.js.org/docs/ai/manifests.md), [best practices](https://storybook.js.org/docs/ai/best-practices.md)):
+  - `features.componentsManifest` is still off by default. The manifest, at `/manifests/components.json` in a build, carries each component's JSDoc, its props and a snippet per story, and a story leaves it with `tags: ['!manifest']`. Storybook recommends `react-docgen-typescript`, and JSDoc on components, props and stories.
+  - Its snippets print what a story does: `onClick={fn()}` spies, story-only helpers, and wrong JSX for some children, such as `<Card>(<>…</>)</Card>`, a fragment printed with its parentheses as text. `features.experimentalCodeExamples` doesn't change the manifest's snippets.
+  - `typescript.reactDocgenTypescriptOptions` replaces Storybook's defaults rather than merging with them.
+  - `@storybook/addon-mcp` 10.6.1 serves `docs-list`, `docs-show` and `docs-show-story`, `test-run`, and the development tools at `localhost:6006/mcp`. `docs-show` returns a component's JSDoc as written, so the contract's Markdown sections reach it.
+- **react-docgen-typescript 2.4** (June 2025, still the latest) runs on TypeScript 6.0 and parses all 16 components in about a second. It skips an undocumented `children` unless `skipChildrenPropWithoutDoc` is off. When another export in a file has a JSDoc comment, it misreads a component exported through a type assertion (`Box`, `Stack`, `Text`): it takes that comment as the component's and finds no props. On a `forwardRef` component, it reports the commented export as a second component instead.
+- **Next.js 16.3** ([AI agents guide](https://nextjs.org/docs/app/guides/ai-agents)) writes its `AGENTS.md` block itself when `next dev` detects an agent, between `<!-- BEGIN:nextjs-agent-rules -->` and `<!-- END:nextjs-agent-rules -->`, keeps what's outside the markers, and adds `@AGENTS.md` to `CLAUDE.md`. The block has become one instruction to read `node_modules/next/dist/docs/`; the 16.2 codemod's compressed index is now the legacy path. `agentRules: false` opts out.
+- **Claude Code** reads project MCP servers from `.mcp.json`, with `"type": "http"` for a streamable HTTP server, and asks each person to approve them in an interactive session ([docs](https://code.claude.com/docs/en/mcp)).
+
 ---
 
 ## 6. Decisions and rationale
@@ -622,6 +636,8 @@ Building the Figma component library on the scratch file settled these, each mea
 | Spacing | One semantic scale for padding and gap; primitives named as a percentage of 8px | The portfolio uses every step for both; Carbon and Atlassian do the same; the 8px percentage has room for 2px |
 | Colour values | DTCG colour objects, transparency in `alpha` | 2025.10 doesn't accept hex strings; Style Dictionary 5.5.5 reads the objects natively |
 | Inventory record | In the portfolio repository, not in Fossil | The Phase 8 migration runs there, the record only serves that site, and the repository is private |
+| Component contract | Markdown sections in each component's JSDoc: a summary, When to use, When not to use, States, and Accessibility split into Built in and Up to you | One description that reaches the type declarations, the editor, Storybook's manifest and the bundled docs; Markdown in the description shows as written everywhere, while each tool decides how to show a custom tag (ADR 0016) |
+| Docs examples | Stories tagged `example`, read from their source and checked to use only what an app has | They render and pass axe like every story; Storybook's manifest snippets print spies, story helpers and some wrong JSX (ADR 0016) |
 | Component context | Markdown docs bundled in `@fossil-design/react`, indexed by a generated `AGENTS.md` block; Storybook `addon-mcp` for Fossil's own development | The Next.js pattern: version-matched, offline, no server to run. Vercel's evals found an always-on index beat skill-based retrieval (100% vs 53–79%) |
 | Token context | `tokens.json`, a `tokens.md` in the bundled docs, and foundation rules in the `AGENTS.md` block | Foundations must be always-on; one token build feeds every rendering |
 | Distribution | Public npm, `0.x` during development, `1.0.0` at Phase 8. Each package's first version is published by hand, then OIDC | Separate site repo removes `workspace:`; `0.x` keeps renames cheap while the taxonomy churns; `npm trust` needs the package to exist first |

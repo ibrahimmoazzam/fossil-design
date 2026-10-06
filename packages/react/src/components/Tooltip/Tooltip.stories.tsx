@@ -18,6 +18,7 @@ type Story = StoryObj<typeof meta>;
 
 /** Focus opens it at once, and it describes its trigger. */
 export const Default: Story = {
+  tags: ['example'],
   play: async ({ canvas, canvasElement }) => {
     const page = within(canvasElement.ownerDocument.body);
     const trigger = canvas.getByRole('button', { name: 'Close' });

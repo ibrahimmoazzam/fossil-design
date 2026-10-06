@@ -24,9 +24,10 @@ type Story = StoryObj<typeof meta>;
 
 /** Beside text, an icon is decorative: hidden from assistive technology, sized to the text. */
 export const Decorative: Story = {
-  render: (args) => (
+  tags: ['example'],
+  render: () => (
     <Text>
-      <Icon {...args} /> Close
+      <Icon icon={CloseIcon} /> Close
     </Text>
   ),
   play: async ({ canvasElement }) => {
@@ -39,7 +40,9 @@ export const Decorative: Story = {
   },
 };
 
+/** An icon with no text beside it means something on its own, so its `label` names it. */
 export const Labelled: Story = {
+  tags: ['example'],
   args: { label: 'Close' },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('img', { name: 'Close' })).toBeVisible();

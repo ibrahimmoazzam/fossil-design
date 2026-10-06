@@ -2,7 +2,7 @@
 
 Fossil Design, or Fossil for short, is an open-source design system for agentic coding: tokens in git flow into CSS, typed React components, Figma variables and a generated Figma component library, with lint configs and agent docs that keep generated UI on-system. Teams adopt it by forking it as a template. The published `@fossil-design/*` packages are the reference brand, harvested from the author's portfolio site.
 
-The repo foundation, the token build, the Figma sync, `@fossil-design/react`, both lint configs and the Figma component library are in place. Phase 6, the agent context layer, comes next. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
+The repo foundation, the token build, the Figma sync, `@fossil-design/react`, both lint configs and the Figma component library are in place. Phase 6, the agent context layer, is under way: the docs bundled in `@fossil-design/react` are in place. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
 
 ## Commands
 
@@ -24,11 +24,12 @@ pnpm changeset                   # record a release note for a package change
 - One package: `pnpm --filter <folder> <script>`, for example `pnpm --filter tokens build`.
 - One test project: `pnpm test --project workspace`. Nested projects take their parent's name: `pnpm test --project 'react*'` runs `react (unit)`, `react (browser)` and `react (storybook)`. Watch mode: `pnpm exec vitest`.
 - The browser tests need Chromium once per machine: `pnpm --filter react exec playwright install chromium`.
-- Storybook: `pnpm --filter react storybook`, at `localhost:6006`.
+- Storybook: `pnpm --filter react storybook`, at `localhost:6006`. Its MCP server is at `localhost:6006/mcp`, and `.mcp.json` registers it for Claude Code.
+- `pnpm --filter react docs` writes the docs bundled in `@fossil-design/react` from each component's JSDoc contract and its stories tagged `example`. The package's build runs it last and fails on an undocumented component (ADR 0016). `packages/react/AGENTS.md` has the format.
 - `pnpm smoke [next|vite]` copies the apps in `smoke/` to a temporary folder, installs the packed tarballs with npm, then type-checks, lints, builds and checks what they render. Last, it copies the off-system component in `smoke/off-system/` into each app and expects lint to reject every line of it. It needs the network. Set `FOSSIL_KEEP_SMOKE=1` to keep the folder.
 - `pnpm --filter react generate` writes `Box`'s CSS and the `.module.css.d.ts` types. The react package's `build` and `typecheck` run it first. Neither output is committed.
 - Check the token source without building: `pnpm --filter tokens validate`. Token files live in `packages/tokens/src/primitive/` and `src/semantic/`; ADR 0005 holds their rules.
-- The token build writes `tokens.css`, `tokens.json` and `lint.json` to `packages/tokens/dist/`, the TypeScript in `src/generated/`, and the foundations block in this file. Commit the block with the token change; CI fails if the build changes it. ADR 0006 covers each output.
+- The token build writes `tokens.css`, `tokens.json`, `lint.json`, `foundations.md` and `tokens.md` to `packages/tokens/dist/`, the TypeScript in `src/generated/`, and the foundations block in this file. Commit the block with the token change; CI fails if the build changes it. ADR 0006 covers each output, and ADR 0016 the two Markdown files.
 - List deprecated tokens and their replacements: `pnpm --filter tokens deprecations`, after a build.
 - Sync tokens with Figma: `pnpm figma:apply`, `pnpm figma:read` and `pnpm figma:diff` write scripts and compare their results. Run a sync through the `fossil-figma-sync` skill in `.claude/skills/`, which needs the Figma MCP server. `packages/figma-sync/AGENTS.md` covers working on the sync itself.
 - Build the Figma component library: `pnpm figma:library-spec` writes the spec, a build sheet and the styles script; `pnpm figma:library-check` writes the check, and `pnpm figma:library-check report` verifies its results. Follow the same skill's library workflow.
@@ -152,6 +153,17 @@ For padding and `gap`. Never margin.
 | `space.xl` | `--fossil-space-xl` | 32px |
 | `space.2xl` | `--fossil-space-2xl` | 48px |
 | `space.3xl` | `--fossil-space-3xl` | 80px |
+
+### Breakpoints
+
+Mobile first: style for the smallest screen, then add `@media (min-width: …)` rules for wider ones. A custom property can't go in a media condition, so write the width itself. In JavaScript, the tokens package exports each query as `mediaQueries`.
+
+| Breakpoint | From |
+| --- | --- |
+| `tablet` | 768px |
+| `compact` | 1024px |
+| `large` | 1440px |
+| `max` | 1600px |
 
 ### Type
 

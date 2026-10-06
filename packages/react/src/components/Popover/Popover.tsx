@@ -49,6 +49,7 @@ export interface PopoverProps {
   arrow?: boolean;
   /** The open state, to control it. */
   open?: boolean;
+  /** Called with `true` when it opens and `false` when it closes, whatever closed it. */
   onOpenChange?: (open: boolean) => void;
 }
 
@@ -56,6 +57,33 @@ export interface PopoverProps {
  * A click-triggered panel beside its trigger, for content that may be interactive. It isn't
  * modal: the page stays live, Escape or a click outside closes it, and tabbing past its end
  * closes it and moves on.
+ *
+ * ## When to use
+ *
+ * - Detail or a few actions beside a control, such as a project's links.
+ *
+ * ## When not to use
+ *
+ * - A short text label on hover or focus: use `Tooltip`.
+ * - A task that needs the reader's full attention: use `Modal`.
+ *
+ * ## States
+ *
+ * Open and closed, animated both ways, with an optional arrow to the trigger.
+ *
+ * ## Accessibility
+ *
+ * ### Built in
+ *
+ * The trigger opens it on click, Enter or Space, with `aria-expanded`. The panel has
+ * `role="dialog"` and is named by `label`. Focus moves into it when it opens and back to the
+ * trigger on Escape; tabbing past its end closes it. It flips and shifts to stay on screen.
+ * Animations stop under `prefers-reduced-motion`.
+ *
+ * ### Up to you
+ *
+ * Pass one trigger element that holds a ref, usually a `Button`, with a name of its own. Give the
+ * popover a `label`. Keep it short; long or essential content belongs in a `Modal` or on the page.
  */
 export function Popover({
   content,

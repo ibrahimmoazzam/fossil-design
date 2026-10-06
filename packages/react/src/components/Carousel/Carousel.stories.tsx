@@ -4,6 +4,9 @@ import { Card } from '../Card/Card.js';
 import { Carousel } from './Carousel.js';
 import demo from './stories.module.css';
 
+/** Your CSS Module. Its class sets the carousel's knobs, such as `--carousel-item-width: 16rem`. */
+const styles = demo;
+
 const cards = [
   'Tokens in git',
   'Typed components',
@@ -20,7 +23,7 @@ const cards = [
 const meta = {
   title: 'Layout/Carousel',
   component: Carousel,
-  args: { label: 'Pipeline', className: demo.demo, children: cards },
+  args: { label: 'Pipeline', className: demo.cards, children: cards },
 } satisfies Meta<typeof Carousel>;
 
 export default meta;
@@ -42,6 +45,25 @@ export const Buttons: Story = {
     await waitFor(() => expect(track.scrollLeft).toBeGreaterThan(0));
     await waitFor(() => expect(back).toHaveAttribute('aria-disabled', 'false'));
   },
+};
+
+/** A row of cards wider than the screen, sized from the app's stylesheet. */
+export const Projects: Story = {
+  tags: ['example'],
+  render: () => (
+    <Carousel label="Projects" className={styles.cards}>
+      {[
+        'Tokens in git',
+        'Typed components',
+        'Figma variables',
+        'Lint configs',
+      ].map((title) => (
+        <Card key={title} title={title} titleAs="h3">
+          One part of the pipeline, reviewed as code.
+        </Card>
+      ))}
+    </Carousel>
+  ),
 };
 
 export const Dots: Story = {
