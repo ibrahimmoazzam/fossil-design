@@ -113,6 +113,11 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
             options.prefix,
             header,
           ),
+        'fossil/foundations-brief': ({ dictionary }) =>
+          render.foundationsBrief(
+            render.tokensFile(entries(dictionary)),
+            header,
+          ),
         'fossil/reference': ({ dictionary }) =>
           render.tokenReference(render.tokensFile(entries(dictionary)), header),
         'fossil/foundations': ({ dictionary }) =>
@@ -140,6 +145,10 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
           {
             destination: 'dist/foundations.md',
             format: 'fossil/foundations-md',
+          },
+          {
+            destination: 'dist/foundations-brief.md',
+            format: 'fossil/foundations-brief',
           },
           { destination: 'dist/tokens.md', format: 'fossil/reference' },
           { destination: 'dist/lint.json.d.cts', format: 'fossil/lint-types' },

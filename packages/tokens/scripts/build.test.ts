@@ -330,6 +330,45 @@ describe('building the token source', () => {
     );
   });
 
+  it('writes the foundations in brief, with every semantic token in use', () => {
+    const brief = read('dist/foundations-brief.md');
+    expect(brief).toContain(
+      '- **Spacing**, `--fossil-space-…`, for padding and `gap`: `2xs` 4px,',
+    );
+    expect(brief).toContain('`tablet` 768px, `compact` 1024px');
+    expect(brief).toContain(
+      '`text.body` is `--fossil-text-body-font-family`, `-font-size`, `-font-weight`, `-letter-spacing` and `-line-height`.',
+    );
+    expect(brief).toContain(
+      '  - `heading.s` (heading, 22px, 700): Card and modal titles.',
+    );
+    expect(brief).toContain('  - `text-muted`: Secondary text.');
+    expect(brief).toContain('`--fossil-radius-{compact,control,surface,pill}`');
+    // Each name appears whole, or as its stem and the rest.
+    const expanded = brief.replaceAll(
+      /`(--[\w-]+-)\{([^}]+)\}`/g,
+      (_, stem: string, rest: string) =>
+        rest
+          .split(',')
+          .map((r) => `\`${stem}${r}\``)
+          .join(' '),
+    );
+    for (const [path, token] of Object.entries(json.tokens))
+      if (token.tier === 'semantic' && token.deprecated === undefined) {
+        const last = path.split('.').at(-1) ?? '';
+        const shown =
+          expanded.includes(`\`${name(path)}\``) ||
+          (path.startsWith('space.') && expanded.includes(`\`${last}\` `)) ||
+          (path.startsWith('color.') &&
+            expanded.includes(
+              `\`${name(path).replace('--fossil-color-', '')}\`:`,
+            )) ||
+          (path.startsWith('text.') &&
+            expanded.includes(`\`${path.slice('text.'.length)}\` (`));
+        expect(shown, path).toBe(true);
+      }
+  });
+
   it('lists every semantic token in use in tokens.md, with its values and replacement', () => {
     const reference = read('dist/tokens.md');
     expect(reference.indexOf('\n## color\n')).toBeLessThan(

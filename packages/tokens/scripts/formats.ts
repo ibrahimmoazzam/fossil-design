@@ -433,11 +433,8 @@ const inUse = (tokens: TokensFile['tokens']) =>
 const lead = (prefix: string) =>
   `Style with these semantic tokens, as \`var(--${prefix}-…)\`. Each one switches between light and dark by itself. Sizes are at a 16px root; the tokens are in rem.`;
 
-/**
- * The spacing scale, the type scale and the semantic colours, plus the names of every other
- * semantic token, under headings at `level`.
- */
-function foundationTables({ tokens }: TokensFile, level: number): string[] {
+/** The semantic tokens the foundations show, by kind, and the breakpoint widths. */
+function foundationTokens({ tokens }: TokensFile) {
   const semantic = inUse(tokens);
   const spacing = semantic.filter(
     ([path, t]) => path.startsWith('space.') && t.type === 'dimension',
@@ -451,6 +448,31 @@ function foundationTables({ tokens }: TokensFile, level: number): string[] {
     const group = entry[0].split('.').slice(0, -1).join('.');
     others.set(group, [...(others.get(group) ?? []), ...cssVars(entry[1])]);
   }
+  const widths = Object.entries(tokens).filter(([path]) =>
+    path.startsWith(`${PRIMITIVE_GROUP}.breakpoint.`),
+  );
+  return { spacing, text, colours, others, widths };
+}
+
+/** A text style's font role, such as `heading`, and its value's parts. */
+function textStyle(t: TokenMetadata) {
+  const v = isRecord(t.value) ? t.value : {};
+  const family =
+    isRecord(t.aliasOf) && typeof t.aliasOf.fontFamily === 'string'
+      ? (t.aliasOf.fontFamily.split('.').at(-1) ?? '')
+      : String(Array.isArray(v.fontFamily) ? v.fontFamily[0] : v.fontFamily);
+  return { family, value: v };
+}
+
+const lastSegment = (path: string) => path.split('.').at(-1) ?? path;
+
+/**
+ * The spacing scale, the type scale and the semantic colours, plus the names of every other
+ * semantic token, under headings at `level`.
+ */
+function foundationTables(file: TokensFile, level: number): string[] {
+  const { tokens } = file;
+  const { spacing, text, colours, others, widths } = foundationTokens(file);
   // WCAG doesn't round: 4.499:1 fails 4.5:1, so the table shows ratios rounded down.
   const ratio = (n: number | undefined) =>
     n === undefined ? '?' : `${(Math.floor(n * 100) / 100).toFixed(2)}:1`;
@@ -469,17 +491,10 @@ function foundationTables({ tokens }: TokensFile, level: number): string[] {
   };
 
   const typeRows = text.map(([path, t]) => {
-    const v = isRecord(t.value) ? t.value : {};
-    const family =
-      isRecord(t.aliasOf) && typeof t.aliasOf.fontFamily === 'string'
-        ? (t.aliasOf.fontFamily.split('.').at(-1) ?? '')
-        : String(Array.isArray(v.fontFamily) ? v.fontFamily[0] : v.fontFamily);
+    const { family, value: v } = textStyle(t);
     return `| ${code(path)} | ${family} | ${px(v.fontSize)} | ${String(v.fontWeight)} | ${String(v.lineHeight)} | ${px(v.letterSpacing)} | ${cell(t.description ?? '')} |`;
   });
   const example = text[0] === undefined ? [] : cssVars(text[0][1]);
-  const widths = Object.entries(tokens).filter(([path]) =>
-    path.startsWith(`${PRIMITIVE_GROUP}.breakpoint.`),
-  );
   const heading = (title: string) => `${'#'.repeat(level)} ${title}`;
 
   return [
@@ -501,8 +516,7 @@ function foundationTables({ tokens }: TokensFile, level: number): string[] {
     '| Breakpoint | From |',
     '| --- | --- |',
     ...widths.map(
-      ([path, t]) =>
-        `| ${code(path.split('.').at(-1) ?? path)} | ${px(t.value)} |`,
+      ([path, t]) => `| ${code(lastSegment(path))} | ${px(t.value)} |`,
     ),
     '',
     heading('Type'),
@@ -558,6 +572,58 @@ export function foundationsMarkdown(
   header: string,
 ): string {
   return `${[`<!-- ${header} -->`, '', lead(prefix), '', ...foundationTables(file, 2)].join('\n')}\n`;
+}
+
+/** What a set of custom properties share, up to a hyphen: `--fossil-radius-`. */
+function stemOf(vars: readonly string[]): string {
+  const shared = vars.reduce((a, b) => {
+    let i = 0;
+    while (i < a.length && a[i] === b[i]) i++;
+    return a.slice(0, i);
+  });
+  return shared.slice(0, shared.lastIndexOf('-') + 1);
+}
+
+/** Custom properties that share a stem, as `--fossil-radius-{control,surface}`. */
+function braces(vars: readonly string[]): string {
+  if (vars.length < 2) return vars.map(code).join('');
+  const stem = stemOf(vars);
+  return code(`${stem}{${vars.map((v) => v.slice(stem.length)).join(',')}}`);
+}
+
+/**
+ * foundations-brief.md: the same foundations in about half the space, for an app's
+ * AGENTS.md block, which is always in an agent's context. Each scale is a line, each text style
+ * and colour keeps its use, and the other tokens are listed by name.
+ */
+export function foundationsBrief(file: TokensFile, header: string): string {
+  const { spacing, text, colours, others, widths } = foundationTokens(file);
+  const first = text[0];
+  const parts = first === undefined ? [] : cssVars(first[1]);
+  const textStem = parts.length < 2 ? '' : stemOf(parts);
+  const space = spacing.flatMap(([, t]) => cssVars(t));
+  const spaceStem = space.length < 2 ? '' : stemOf(space);
+  const colour = colours.flatMap(([, t]) => cssVars(t));
+  const colourStem = colour.length < 2 ? '' : stemOf(colour);
+  return `${[
+    `<!-- ${header} -->`,
+    '',
+    'Sizes are at a 16px root.',
+    '',
+    `- **Spacing**, ${code(`${spaceStem}…`)}, for padding and \`gap\`: ${spacing.map(([, t]) => `${code(cssVars(t).join('').slice(spaceStem.length))} ${px(t.value)}`).join(', ')}.`,
+    `- **Breakpoints**, for \`min-width\` queries: ${widths.map(([path, t]) => `${code(lastSegment(path))} ${px(t.value)}`).join(', ')}.`,
+    `- **Text styles**, each five custom properties${first === undefined ? '' : `: ${code(first[0])} is ${list(parts.map((v, i) => code(i === 0 ? v : v.slice(textStem.length - 1))))}`}. By name:`,
+    ...text.map(([path, t]) => {
+      const { family, value } = textStyle(t);
+      return `  - ${code(path.slice(path.indexOf('.') + 1))} (${family}, ${px(value.fontSize)}, ${String(value.fontWeight)}): ${t.description ?? ''}`;
+    }),
+    `- **Colour**, ${code(`${colourStem}…`)}:`,
+    ...colours.map(
+      ([, t]) =>
+        `  - ${code(cssVars(t).join('').slice(colourStem.length))}: ${t.description ?? ''}`,
+    ),
+    `- **Other:** ${[...others.values()].map(braces).join(', ')}.`,
+  ].join('\n')}\n`;
 }
 
 const percent = (n: number) => `${String(Number((n * 100).toFixed(1)))}%`;
