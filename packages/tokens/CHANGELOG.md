@@ -1,5 +1,11 @@
 # @fossil-design/tokens
 
+## 0.5.0
+
+### Minor Changes
+
+- e3b8678: The build also writes `dist/foundations.md`, the same spacing, breakpoint, type and colour tables as the `AGENTS.md` foundations block, and `dist/tokens.md`, every semantic token with its values in light and dark and each deprecated token with its replacement. The foundations gain a breakpoints table.
+
 ## 0.4.1
 
 ### Patch Changes

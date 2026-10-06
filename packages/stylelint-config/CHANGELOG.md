@@ -1,5 +1,12 @@
 # @fossil-design/stylelint-config
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [e3b8678]
+  - @fossil-design/tokens@0.5.0
+
 ## 0.1.2
 
 ### Patch Changes
