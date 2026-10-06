@@ -37,7 +37,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/**
+ * Each tab is an id, a label and its panel's content. Tabs keeps the selection itself unless
+ * the app passes `value`.
+ */
 export const Default: Story = {
+  tags: ['example'],
   play: async ({ canvas, args, userEvent }) => {
     const figma = canvas.getByRole('tab', { name: 'Figma' });
     await userEvent.click(figma);

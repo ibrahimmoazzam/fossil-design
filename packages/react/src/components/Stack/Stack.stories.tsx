@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect } from 'storybook/test';
 import { tokenPx } from '../../../.storybook/token-px.js';
 import { Box } from '../Box/Box.js';
+import { Button } from '../Button/Button.js';
 import { Text } from '../Text/Text.js';
 import { Stack } from './Stack.js';
 
@@ -30,6 +31,28 @@ export const Column: Story = {
     await expect(style.flexDirection).toBe('column');
     await expect(style.rowGap).toBe(tokenPx('--fossil-space-m'));
   },
+};
+
+/**
+ * A heading over its text, then the actions in a row from the tablet breakpoint up: the most
+ * common layout, with no CSS of its own.
+ */
+export const Section: Story = {
+  tags: ['example'],
+  render: () => (
+    <Stack gap="l">
+      <Stack gap="xs">
+        <Text as="h2" variant="heading-m">
+          Release notes
+        </Text>
+        <Text tone="muted">Spacing, colour and type all come from tokens.</Text>
+      </Stack>
+      <Stack direction={{ default: 'column', tablet: 'row' }} gap="s">
+        <Button tone="primary">Read the notes</Button>
+        <Button>Dismiss</Button>
+      </Stack>
+    </Stack>
+  ),
 };
 
 export const Row: Story = {

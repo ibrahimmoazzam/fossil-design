@@ -24,8 +24,34 @@ export interface FigureProps {
 
 /**
  * An image or video in a hairline frame, with an optional caption. The app supplies the media,
- * with its own `alt`: describe what it shows, or use `alt=""` when the caption or the
- * surrounding text already does.
+ * with its own `alt`.
+ *
+ * ## When to use
+ *
+ * - An image, diagram or video that belongs with the text around it, captioned or not.
+ * - Media from `next/image`, `<picture>` or `<video>`, framed the same way as a plain `<img>`.
+ *
+ * ## When not to use
+ *
+ * - A short, silent, looping screen recording: use `Clip`, which adds the pause control.
+ * - An icon: use `Icon`.
+ *
+ * ## States
+ *
+ * None: it isn't interactive.
+ *
+ * ## Accessibility
+ *
+ * ### Built in
+ *
+ * With a caption, a `<figure>` and `<figcaption>`, which browsers use to name the figure.
+ * `captionHidden` keeps the caption for screen readers, off the screen. Without a caption only the
+ * frame renders, since a `<figure>` exists to pair media with its caption.
+ *
+ * ### Up to you
+ *
+ * Write the media's `alt`: describe what it shows, or use `alt=""` when the caption or the
+ * surrounding text already does. Give a video with sound its own captions.
  */
 export function Figure({
   children,

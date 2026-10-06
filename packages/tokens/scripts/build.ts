@@ -107,6 +107,14 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
         'fossil/css-types': () => render.declaration(),
         'fossil/json-types': () => render.declaration('TokensFile'),
         'fossil/lint-types': () => render.declaration('LintLists'),
+        'fossil/foundations-md': ({ dictionary }) =>
+          render.foundationsMarkdown(
+            render.tokensFile(entries(dictionary)),
+            options.prefix,
+            header,
+          ),
+        'fossil/reference': ({ dictionary }) =>
+          render.tokenReference(render.tokensFile(entries(dictionary)), header),
         'fossil/foundations': ({ dictionary }) =>
           render.foundations(
             render.tokensFile(entries(dictionary)),
@@ -129,6 +137,11 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
             format: 'fossil/json-types',
           },
           { destination: 'dist/lint.json', format: 'fossil/lint' },
+          {
+            destination: 'dist/foundations.md',
+            format: 'fossil/foundations-md',
+          },
+          { destination: 'dist/tokens.md', format: 'fossil/reference' },
           { destination: 'dist/lint.json.d.cts', format: 'fossil/lint-types' },
           { destination: 'src/generated/tokens.ts', format: 'fossil/keys' },
           {

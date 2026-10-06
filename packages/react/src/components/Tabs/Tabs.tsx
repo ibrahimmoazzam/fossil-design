@@ -31,6 +31,7 @@ export interface TabItem {
 export interface TabsProps {
   /** Names the tab list for screen readers. */
   label: string;
+  /** The tabs, in order: each one's id, label and panel content. */
   tabs: readonly TabItem[];
   /** The selected tab's id, to control the selection. */
   value?: string;
@@ -45,6 +46,7 @@ export interface TabsProps {
    * such as Motion. Spread `className` onto it.
    */
   renderIndicator?: (props: { className: string }) => ReactNode;
+  /** Classes from the app's own stylesheet, added to Fossil's. */
   className?: string;
 }
 
@@ -55,6 +57,35 @@ const FOCUSABLE =
  * Tabs as a segmented control: the panel, with the pill of tabs beneath it. Follows the ARIA
  * tabs pattern, with one tab stop for the list, arrow keys, Home and End to move between tabs,
  * and selection that follows focus.
+ *
+ * ## When to use
+ *
+ * - A few views of the same thing, one at a time, such as one feature on three platforms.
+ * - Switching views without leaving the page or moving the reader.
+ *
+ * ## When not to use
+ *
+ * - Moving between pages: use `Link`s in a `Box as="nav"`.
+ * - Content to compare side by side: show it all, in a `Stack` or a grid.
+ *
+ * ## States
+ *
+ * Each tab has hover, `:focus-visible` and selected states. The selected tab is marked three ways:
+ * a raised fill, the highlight colour and a heavier weight.
+ *
+ * ## Accessibility
+ *
+ * ### Built in
+ *
+ * The `tablist`, `tab` and `tabpanel` roles, with `aria-selected` and `aria-controls`. The list
+ * is one tab stop, and arrow keys, Home and End move between tabs. A panel with nothing focusable
+ * in it takes a tab stop of its own. Selection never rests on colour alone. Transitions and the
+ * pill's smooth scrolling stop under `prefers-reduced-motion`.
+ *
+ * ### Up to you
+ *
+ * Give the list a `label` naming what the tabs switch between. Keep each tab's `id` stable across
+ * renders, and its label short.
  */
 export function Tabs({
   label,

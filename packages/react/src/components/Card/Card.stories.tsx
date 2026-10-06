@@ -17,7 +17,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** One of a set of parallel items, with a title at the heading level that fits the page. */
 export const Titled: Story = {
+  tags: ['example'],
   play: async ({ canvas }) => {
     await expect(
       canvas.getByRole('heading', { level: 3, name: 'Accessible by default' }),
@@ -28,6 +30,7 @@ export const Titled: Story = {
 
 /** Without a title, a bold lead does the title's job. */
 export const Untitled: Story = {
+  tags: ['example'],
   args: {
     title: undefined,
     titleAs: undefined,

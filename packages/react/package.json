@@ -33,14 +33,16 @@
     "*.css"
   ],
   "files": [
-    "dist"
+    "dist",
+    "docs"
   ],
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
     "generate": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/generate.ts && vite-css-modules",
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && pnpm run generate && vite build && tsc -p tsconfig.build.json",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && pnpm run generate && vite build && tsc -p tsconfig.build.json && pnpm run docs",
+    "docs": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/docs.ts",
     "typecheck": "pnpm run generate && tsc",
     "storybook": "storybook dev --port 6006",
     "build-storybook": "storybook build",
@@ -58,6 +60,7 @@
     "@fossil-design/stylelint-config": "workspace:*",
     "@material-symbols/svg-400": "^0.47.6",
     "@storybook/addon-a11y": "^10.6.1",
+    "@storybook/addon-mcp": "^10.6.1",
     "@storybook/addon-vitest": "^10.6.1",
     "@storybook/react-vite": "^10.6.1",
     "@types/react": "^19.3.0",
@@ -65,6 +68,7 @@
     "@vitest/browser-playwright": "^5.0.3",
     "playwright": "^1.63.0",
     "react": "^19.3.0",
+    "react-docgen-typescript": "^2.4.0",
     "react-dom": "^19.3.0",
     "storybook": "^10.6.1",
     "typescript": "catalog:",

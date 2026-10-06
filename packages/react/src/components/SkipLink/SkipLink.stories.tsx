@@ -24,6 +24,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/**
+ * First in the page, before the navigation. The main content has the id the link names, and
+ * `tabIndex={-1}` so focus lands on it.
+ */
+export const Page: Story = {
+  tags: ['example'],
+  render: () => (
+    <>
+      <SkipLink href="#main">Skip to content</SkipLink>
+      <Box as="nav" aria-label="Site" padding="m">
+        <Text>Navigation</Text>
+      </Box>
+      <Box as="main" id="main" tabIndex={-1} padding="m">
+        <Text>Main content</Text>
+      </Box>
+    </>
+  ),
+};
+
 /** Out of view until focused; Tab from the top of the page brings it in. */
 export const Default: Story = {
   play: async ({ canvas }) => {
