@@ -96,4 +96,5 @@ Each was measured live; `docs/Learnings.md` has the detail.
 - A slot and its `SLOT` property share one name. To keep a layer name from the sheet, such as `frame`, put the slot inside that layer.
 - Don't rename an icon's glyph instance. Left alone, it takes the name of whichever icon it's swapped to, which is how `get_design_context` reports `<CloseIcon />`.
 - Setting `textCase` on a text layer detaches its text style. Case stays in code.
+- A text underline's colour can bind a variable, but its paint opacity comes back as 1. Draw a dim decoration as its own layer with layer opacity, as the sheet says for `Link`.
 - After changing a main component, its instances elsewhere don't show the change until the next `use_figma` call. Edit an override on them, such as a nested icon's colour, in a call of its own.
