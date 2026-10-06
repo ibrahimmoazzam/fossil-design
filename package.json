@@ -25,6 +25,8 @@
     "figma:apply": "pnpm --filter figma-sync apply",
     "figma:read": "pnpm --filter figma-sync read",
     "figma:diff": "pnpm --filter figma-sync diff",
+    "figma:library-spec": "pnpm --filter figma-sync library-spec",
+    "figma:library-check": "pnpm --filter figma-sync library-check",
     "changeset": "changeset"
   },
   "devDependencies": {

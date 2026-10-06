@@ -309,7 +309,7 @@ describe('building the token source', () => {
     expect(agents).toContain('For padding and `gap`. Never margin.');
     expect(agents).toContain('| `space.m` | `--fossil-space-m` | 16px |');
     expect(agents).toContain(
-      '| `text.heading.s` | heading | 22px | 600 | 1.4 | 0 | Card and modal titles. |',
+      '| `text.heading.s` | heading | 22px | 700 | 1.4 | 0 | Card and modal titles. |',
     );
     expect(agents).toContain('| `--fossil-color-text-muted` | Secondary text.');
   });

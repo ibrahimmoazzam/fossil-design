@@ -78,7 +78,7 @@ Additions, deletions, renames, detached aliases and mode changes made in Figma a
   It also found two behaviours the first fake lacked, 32-bit numbers and escaped descriptions, which made a second apply rewrite values that hadn't changed.
 
 - The Plugin API can't reorder variables, so a collection keeps the order its variables were created in. Changing the order of tokens in a file reorders a new Figma file, not an existing one.
-- Reporting the library components still bound to an orphaned variable waits for Phase 5b, which builds the library.
+- Reporting the library components still bound to an orphaned variable waited for Phase 5b, which builds the library. The finish step now reports them as `boundBy` ([0015](./0015-figma-component-library.md)).
 - The scope table follows Fossil's token groups. A fork that renames groups edits it.
 - The diff needs the stamped commit in the local clone, so it asks for a `git fetch` when the commit is missing.
 - `figma-sync` imports the token validator from `packages/tokens/scripts` by relative path. Both live in this repository and `figma-sync` is never published, so they always ship together.
