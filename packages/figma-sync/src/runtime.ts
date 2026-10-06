@@ -2,6 +2,8 @@
 // this file, and each script carries only the functions it calls and hashes them, so everything
 // here is a self-contained top-level function. The types are erased.
 
+import type { PageNode, Paint, SceneNode } from './library/runtime.ts';
+
 /** A value as the sync records it: a colour, a number, a string, or the token path of an alias. */
 export type SyncValue =
   | { hex: string; alpha: number }
@@ -156,6 +158,10 @@ export interface Figma {
       type: string,
     ): FigmaVariable;
   };
+  /** Pages, for finding the component library. Optional, so a variables-only fake can leave them out. */
+  root?: { readonly children: readonly PageNode[] };
+  setCurrentPageAsync?(page: PageNode): Promise<void>;
+  skipInvisibleInstanceChildren?: boolean;
 }
 
 export function stamp(node: Stamped, key = 'path'): string {
@@ -371,11 +377,53 @@ export async function finish(spec: FinishSpec, figma: Figma): Promise<unknown> {
   const unstamped = inFossil.filter((v) => stamp(v) === '').map((v) => v.name);
   if (missing.length === 0)
     for (const c of Object.values(owned)) setStamp(c, spec.commit, 'commit');
+
+  // An orphan stays until no library component binds it; name the components that still do.
+  const boundBy: Record<string, string[]> = {};
+  const orphanIds: Record<string, string> = {};
+  for (const v of inFossil)
+    if (stamp(v) !== '' && !expected[stamp(v)]) orphanIds[v.id] = stamp(v);
+  const page = figma.root?.children.find(
+    (p) => stamp(p, 'page') === 'components',
+  );
+  if (page && figma.setCurrentPageAsync && orphans.length > 0) {
+    await figma.setCurrentPageAsync(page);
+    figma.skipInvisibleInstanceChildren = false;
+    const ids = (value: unknown): string[] =>
+      (Array.isArray(value) ? (value as unknown[]) : [value]).flatMap((a) =>
+        typeof a === 'object' &&
+        a !== null &&
+        typeof (a as { id?: unknown }).id === 'string'
+          ? [(a as { id: string }).id]
+          : [],
+      );
+    const visit = (node: SceneNode, component: string) => {
+      const name =
+        node.type === 'COMPONENT_SET' ||
+        (node.type === 'COMPONENT' && node.parent?.type !== 'COMPONENT_SET')
+          ? node.name
+          : component;
+      const paints = [node.fills, node.strokes].flatMap((list) =>
+        Array.isArray(list) ? (list as readonly Paint[]) : [],
+      );
+      for (const id of [
+        ...Object.values(node.boundVariables ?? {}).flatMap(ids),
+        ...paints.flatMap((p) => ids(p.boundVariables?.color)),
+      ]) {
+        const path = orphanIds[id];
+        if (path !== undefined && name !== '' && !boundBy[path]?.includes(name))
+          boundBy[path] = [...(boundBy[path] ?? []), name];
+      }
+      for (const child of node.children ?? []) visit(child, name);
+    };
+    for (const node of page.children) visit(node, '');
+  }
   return {
     fossil: 'finish',
     commit: missing.length === 0 ? spec.commit : '',
     missing,
     orphans,
+    boundBy,
     unstamped,
   };
 }

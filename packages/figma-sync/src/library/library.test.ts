@@ -10,6 +10,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { TokensFile } from '../../../tokens/src/metadata.ts';
+import { COLLECTIONS } from '../model.ts';
 import { sha256 } from '../runtime.ts';
 import { CHANGED, script } from '../scripts.ts';
 import { checkParts, LibraryError, readResults, reportLines } from './cli.ts';
@@ -1179,6 +1180,34 @@ describe('the library check', () => {
     expect(problems(await check(partial, ['Glyph']))).toContain(
       'The text style for text.body is missing.',
     );
+  });
+
+  it('names the library components that still bind a token deleted in code, when the apply finishes', async () => {
+    const { canvas, variable } = built();
+    const fossil = (
+      await canvas.variables.getLocalVariableCollectionsAsync()
+    )[0];
+    fossil?.setSharedPluginData('fossil', 'collection', 'semantic');
+    const paths = (await canvas.variables.getLocalVariablesAsync())
+      .map((v) => v.getSharedPluginData('fossil', 'path'))
+      .filter((p) => p !== 'space.s' && p !== 'radius.pill');
+    variable('space.s');
+    const result = await run(
+      script(
+        {
+          kind: 'finish',
+          commit: 'c0ffee',
+          collections: Object.values(COLLECTIONS),
+          paths,
+        },
+        'finish',
+      ),
+      canvas,
+    );
+    expect(result).toMatchObject({
+      orphans: ['space.s', 'radius.pill'],
+      boundBy: { 'space.s': ['Chip'], 'radius.pill': ['Chip'] },
+    });
   });
 
   it('refuses to run after a change, like every Fossil script', async () => {
