@@ -1,0 +1,17 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { Eyebrow } from '../Eyebrow.tsx';
+import { Primitives, primitiveCount } from '../Primitives.tsx';
+
+{/* !manifest keeps the page out of what Storybook MCP serves: primitives are for people, not agents. */}
+
+<Meta title="Foundations/Primitives" tags={['!manifest']} />
+
+<Eyebrow>Foundations</Eyebrow>
+
+# Primitives
+
+The raw values every semantic token is built from: {primitiveCount} colours, sizes, faces and timings, each with the semantic tokens that name it.
+
+<Unstyled>
+  <Primitives />
+</Unstyled>

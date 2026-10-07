@@ -1,8 +1,11 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { Eyebrow } from '../Eyebrow.tsx';
 import { RepoDoc } from '../RepoDoc.tsx';
 import tokens from '../../../tokens/dist/tokens.md?raw';
 import { withSwatches } from '../swatches.ts';
 
 <Meta title="Foundations/Tokens" />
+
+<Eyebrow>Foundations</Eyebrow>
 
 <RepoDoc source={withSwatches(tokens)} path="packages/tokens/dist/tokens.md" />
