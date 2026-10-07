@@ -2,7 +2,7 @@
 
 Fossil Design, or Fossil for short, is an open-source design system for agentic coding: tokens in git flow into CSS, typed React components, Figma variables and a generated Figma component library, with lint configs and agent docs that keep generated UI on-system. Teams adopt it by forking it as a template. The published `@fossil-design/*` packages are the reference brand, harvested from the author's portfolio site.
 
-The repo foundation, the token build, the Figma sync, `@fossil-design/react`, both lint configs, the Figma component library and the agent context layer are in place. The docs, the `AGENTS.md` block and the Figma Make guidelines are bundled in `@fossil-design/react`, and the Figma library is two published files, foundations and components. Phase 7, drift measurement, is next. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
+The repo foundation, the token build, the Figma sync, `@fossil-design/react`, both lint configs, the Figma component library and the agent context layer are in place. The docs, the `AGENTS.md` block and the Figma Make guidelines are bundled in `@fossil-design/react`, and the Figma library is two published files, foundations and components. Phase 8, documentation and dogfooding, is next. Phase 7, drift measurement, is deferred to a later release, and `docs/drift-eval.md` holds its design. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
 
 ## Commands
 
@@ -67,6 +67,7 @@ docs/PRD.md            the spec: phases, tasks, exit criteria
 docs/Learnings.md      the research behind each decision
 docs/decisions         ADRs
 docs/gaps.md           logging gaps, and recording a decision for each
+docs/drift-eval.md     the planned drift eval: method, harness, prior art
 .changeset/            pending release notes
 .github/workflows      CI on every pull request; releases from main
 .github/ISSUE_TEMPLATE the gap form

@@ -2,7 +2,7 @@
 
 **Status:** Living document
 **Purpose:** Capture the research and reasoning behind Fossil's architecture, for later use as source material in a written case study.
-**Last updated:** 1 October 2026 (repository layout survey, section 3.11; before that, the Phase 2 and Phase 4 dry run, section 5)
+**Last updated:** 7 October 2026 (agent setups and published evals, section 3.12, and the drift eval deferred; before that, the repository layout survey, section 3.11)
 
 ---
 
@@ -38,7 +38,7 @@ The fix is retrieval. MCP servers, structured JSON metadata, `llms.txt` files, C
 
 The premise is that even a fully informed agent drifts, because its training weights pull harder than your documentation. Polar states this plainly: anything in a doc is a probability, not a guarantee, and across thousands of generations the misses accumulate.
 
-Their fix is not more context but a smaller vocabulary. Orbit's bet is that if a value is not a design decision the team actually made, it should not pass CI. Enforced through token-typed props on a `<Box />` primitive plus an ESLint rule banning raw `<div>`.
+Their fix is not more context but a smaller vocabulary. Orbit's bet is that if a value is not a design decision the team actually made, it should not pass CI. Enforced through token-typed props on a `<Box />` primitive plus an Oxlint rule banning raw `<div>`.
 
 ### Why they are not interchangeable
 
@@ -70,13 +70,13 @@ Nobody frames layer 3 as a pillar, but everyone has it. Storybook shipped it as 
 
 | System | Token source of truth | Build | Enforcement | Agent layer |
 |---|---|---|---|---|
-| **Primer** (GitHub) | JSON5 in `primer/primitives`, DTCG-shaped | Style Dictionary via custom `buildTokens.ts` | `eslint-plugin-primer-react` + token schema validation in CI | Public MCP + instruction files |
-| **ADS** (Atlassian) | `@atlaskit/tokens` in code | Custom | 2 ESLint plugins + Stylelint plugin + codemods | `llms.txt` family + public remote MCP + agent skill |
-| **Spectrum** (Adobe) | `spectrum-design-data`, proprietary JSON schema | Custom | JSON schemas + validation rule catalogue + conformance fixtures | Two MCP servers + agent skills |
-| **Carbon** (IBM) | `@carbon/themes` | Custom | `stylelint-plugin-carbon-tokens` | First-party `carbon-mcp` |
-| **Polaris** (Shopify; React version archived 2026) | `polaris-tokens` package | Custom | `stylelint-polaris` | None found |
-| **Fluent** (Microsoft) | Designer-maintained JSON | "Token pipeline inspired by Style Dictionary" | TypeScript types via Griffel | None official |
-| **Material 3** (Google) | Spec plus algorithmic generation | Theme Builder | None | Community only |
+| **Primer** (GitHub) | JSON5 in `primer/primitives`, DTCG-shaped | Style Dictionary via custom `buildTokens.ts` | `eslint-plugin-primer-react` + token schema validation in CI | Public MCP, with a `lint_css` tool, + instruction files |
+| **ADS** (Atlassian) | `@atlaskit/tokens` in code | Custom | Token-typed primitives and `xcss` + 2 ESLint plugins + Stylelint plugin + codemods | `llms.txt` family + public remote MCP + agent skill |
+| **Spectrum** (Adobe) | `spectrum-design-data`, proprietary JSON schema | Custom | JSON schemas + validation rule catalogue + conformance fixtures; S2's `style` macro takes tokens | Two MCP servers + agent skills, one of them an audit |
+| **Carbon** (IBM) | `@carbon/themes` | Custom | `stylelint-plugin-carbon-tokens` | First-party `carbon-mcp` (public preview) |
+| **Polaris** (Shopify; React version archived 2026) | `polaris-tokens` package | Custom | `stylelint-polaris` | Shopify's Dev MCP, for the web components, with a code validation tool |
+| **Fluent** (Microsoft) | Designer-maintained JSON | "Token pipeline inspired by Style Dictionary" | TypeScript types via Griffel | None official for consumers |
+| **Material 3** (Google) | Spec plus algorithmic generation | Theme Builder | None | Google's Design MCP: colour schemes, fonts and icons |
 
 ### 3.1 Nobody's source of truth is Figma
 
@@ -102,9 +102,15 @@ Implication for Fossil: DTCG remains correct, because interoperability is part o
 
 Every mature system ships a linter. `stylelint-polaris` covers custom property usage and mainline coverage. Carbon ships `stylelint-plugin-carbon-tokens`. Atlassian ships two ESLint plugins plus a Stylelint one, where linters warn for deprecated tokens and error for deleted ones, with auto-fixers so an entire app can be migrated via `eslint --fix`.
 
-This reframes Polar's contribution. Linting off-system values is standard practice. What Polar did differently is **close the API rather than lint an open one**. Everyone else permits any CSS and then complains about it afterwards. Polar makes the wrong thing unrepresentable.
+This reframes Polar's contribution. Linting off-system values is standard practice. What Polar does is **close the API rather than lint an open one**: raw values are type errors on its `Box`, and Oxlint rules in CI keep code going through it. Most systems permit any CSS and then complain about it afterwards. Polar makes the wrong thing unrepresentable.
 
-> Fossil's one-line thesis: the industry lints an open surface; Fossil closes the surface and lints only what remains.
+**Correction (October 2026).** This section first said Polar alone closes the API. A survey of current agent setups (section 3.12) found two more:
+- **Atlassian.** `Box`, `Stack` and `Inline` take token-typed spacing, and `xcss` restricts colour, space, radius, border and shadow to tokens, with ESLint rules steering code onto the primitives.
+- **Spectrum S2.** The `style` macro takes tokens, and the `styles` prop on its components accepts only layout properties.
+
+Both keep explicit escapes: `[...]` values and `UNSAFE_*` props in Spectrum, unrestricted properties in `xcss`. The closed API is therefore established practice in a minority of large systems, not Polar's alone, and Fossil's typed `Box` follows them.
+
+> Fossil's one-line thesis: most systems lint an open surface; Fossil closes the surface and lints only what remains.
 
 ### 3.4 Linters must match the authoring format, not the output format
 
@@ -228,19 +234,57 @@ Fossil sits on the monorepo side for three reasons, and the last is decisive:
 
 The portfolio stays out on purpose (section 6, "Site location"). Atlassian's monorepo includes its products; Fossil's one consumer installs from npm like anyone else's.
 
+### 3.12 Agent setups and published evals (October 2026)
+
+Checked on 7 October 2026 against each system's docs, blog and repositories, before designing the Phase 7 eval.
+
+| System | Context | Closed API | Lint | Checks an agent can call | Published evals |
+|---|---|---|---|---|---|
+| **Polar Orbit** | `CLAUDE.md` and style guides | Yes: `Box` and `Text` props typed to tokens through StyleX | Custom Oxlint rules in CI | CI | None |
+| **Atlassian** | Public MCP, CLI, `llms.txt`, skills (some internal) | Mostly: token-typed primitives and `xcss` | 2 ESLint plugins, Stylelint, codemods | A skill covering the lint rules | Anecdotes only |
+| **Spectrum S2** | MCP, skills, `llms.txt` | Mostly: the `style` macro, with `[...]` and `UNSAFE_*` escapes | None found | An audit skill | None |
+| **Primer** | MCP, Copilot instructions | No: CSS Modules | ESLint plugin, Stylelint config | `lint_css` and `review_alt_text` in the MCP | An accessibility agent's PR resolution rate, not drift |
+| **Carbon** | Carbon MCP (preview) | No | Stylelint plugin | None | None |
+| **Polaris** | Shopify's Dev MCP | Web components | `stylelint-polaris` (legacy) | `validate_component_codeblocks` | None |
+| **SLDS 2** (Salesforce) | DX MCP, skills | No: styling hooks in plain CSS | SLDS Linter | A validation skill with a scorecard | None found |
+| **Fluent** | Instructions and skills for contributors only | No: Griffel is typed but open | ESLint plugin | None | None |
+| **Material 3** | Google's Design MCP | No | None | None | None |
+| **Uber uSpec** | Figma Console MCP writing spec pages | Code side not described | Not described | Not described | Speed only; drift detection is on the roadmap |
+| **Evil Martians skill** | Contracts and a gap ledger | No | None | Scenarios graded by an independent evaluator | None |
+| **Claude Design, Figma Make** | Context inside the design tool | No | None | Claude Design checks its own output | None; a Config 2026 talk claims Make became "measurably on-system", without numbers on its page |
+
+Spotify, New York State and Indeed describe MCP or Code Connect context and no enforcement. Spotify's and Indeed's write-ups are paywalled beyond their summaries.
+
+Three findings follow:
+- **Context plus constraint is not new.** Polar, Atlassian and Spectrum combine an agent context layer with a closed or mostly closed API. Section 3.3 is corrected accordingly.
+- **The newer layer is checks the agent calls itself.** Primer, Shopify, Salesforce, Spectrum and Storybook put validation inside the MCP or a skill, so the agent can check its work before CI does. Fossil's equivalent is the instruction to run the project's checks, which the Phase 7 harness gives every run.
+- **What remains Fossil's own:** a token round trip with Figma on a Professional or Education plan, a Figma library generated from code, adoption by fork, and closing plain CSS Modules through Stylelint rather than a CSS-in-JS API.
+
+Published evals exist, but none measures an on-system rate or separates context from constraint:
+
+| Who | What it measures | Setup | Open |
+|---|---|---|---|
+| **Storybook MCP** | Build success, type, lint and axe errors, story tests, cost and turns. Its blog reports 12.8% better "code usage", 2.76× faster runs and 27% fewer tokens on the Reshaped library, without defining "code usage" | With and without the MCP; Claude Code, Copilot CLI and Codex | Harness in `storybookjs/mcp/eval`; results in a public sheet |
+| **Microsoft `a11y-llm-eval`** | WCAG pass rate of generated UI | A control, instructions and skills; 32 prompts, 5 samples each, 8 models. The control passes 12%; basic instructions add 48.5 points | Yes |
+| **Vercel** | Correct use of Next.js APIs newer than the models | No docs 53%, skill 53%, skill with instructions 79%, `AGENTS.md` 100% | No; case count and runs unstated |
+| **Indeed** | Accuracy of MCP metadata formats | 8 configurations, 1,056 prompts | No |
+| **GitHub** | An accessibility agent on real pull requests | 3,535 reviewed, 68% resolved | Not a controlled eval |
+
+Storybook's harness (a fresh project per trial, variant configs, automatic grading) and Microsoft's design (a control against context, several samples per prompt) are the closest prior art for Phase 7. Neither scores tokens against literals, and neither has a lint-only cell.
+
 ---
 
 ## 4. Where the field falls short
 
 These gaps define Fossil's opportunity.
 
-1. **No published system combines layer 1 and layer 2.** Uber has context without enforcement. Polar has enforcement without a design-tool source of truth. A system where Figma participates, tokens flow into a typed API, and CI proves the output stayed on-system, is genuinely unoccupied ground. AI design tools do not fill this gap. Figma Make and Claude Design add context inside the design surface, and Claude Design adds self-checking, but neither constrains the code an agent writes in a repo.
+1. **No published system combines both layers with Figma.** Polar, Atlassian and Spectrum combine context with a closed or mostly closed API (section 3.12), but Figma takes no part in their agent setups. Uber's uSpec puts Figma at the centre, with context and no code enforcement. A system where Figma participates, tokens flow into a typed API, and CI proves the output stayed on-system is still unoccupied ground, and none of the surveyed systems offers it as a template a small team can fork. AI design tools do not fill this gap. Figma Make and Claude Design add context inside the design surface, and Claude Design adds self-checking, but neither constrains the code an agent writes in a repo.
 
 2. **Nobody has mapped the cost of constraint.** Polar admits their closed token sets are too small for some UI they build, so they add tokens weekly and watch for the point where the constraint costs more than it saves. Where that line sits is unpublished.
 
 3. **The foundational-layer retrieval gap is unsolved** (see section 2). The prescribed workaround is a mitigation.
 
-4. **No published measurement of drift.** Uber lists drift detection as roadmap. Polar reports that reviews feel different. Indeed measured MCP configuration accuracy, not on-system rate of generated output. Claude Design says it checks and corrects its output against an imported system, but publishes no rate either. The bar for a credible eval harness is currently near zero.
+4. **No published measurement of drift.** Uber lists drift detection as roadmap. Polar reports that reviews feel different. Claude Design says it checks and corrects its output against an imported system, but publishes no rate. Evals that do exist measure something else (section 3.12): Storybook grades build, type, lint and test results with and without its MCP, Microsoft grades accessibility, Vercel grades framework API use, and Indeed grades MCP metadata formats. None reports an on-system rate, and none separates what context contributes from what constraint does.
 
 ---
 
@@ -606,7 +650,7 @@ Building the bundled docs settled these, each checked against the installed vers
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Primary problem | Both layers, context and constraint | The unoccupied ground; either alone is a solved and published problem |
+| Primary problem | Both layers, context and constraint | Either alone is a solved and published problem. Polar, Atlassian and Spectrum combine them (section 3.12); doing so with Figma in the loop, on a budget plan, as a forkable template, is the unoccupied ground |
 | Source of truth | Git repo, DTCG JSON | Universal industry practice; git provides review, validation, semver, diffs that Figma cannot |
 | Token spec | DTCG, with `$extensions` where needed | Interoperability is part of the thesis; `$extensions` is the sanctioned escape |
 | Tiers | Primitive and semantic only | Component tokens are in retreat industry-wide (Adobe v12, Fluent ratios) |
@@ -638,6 +682,8 @@ Building the bundled docs settled these, each checked against the installed vers
 | `Box` surfaces | Only fill and text pairs the token build checks for contrast | The generator fails on any other pair, so `surface` can't produce an unchecked combination |
 | Icon pipeline | Components generated at build time from `@material-symbols/svg-400`, named in `icons.json`, with the Apache-2.0 license copied into `dist` | Consumers need no SVGR, the icons stay version-matched, and the license travels with them (ADR 0010) |
 | `asChild` | React's `cloneElement`, with no slot library | One small merge of `className` and children; the child keeps its own element, props and ref |
+| Drift eval design | A 2×2 of context and lint, with typed props and `tsc` in every cell; 15 prompts, three runs each, per-surface scores | Constraint is two mechanisms: typed props and lint. A "context only, lint off" cell still has the typed props, so a three-step design measures what lint adds, not what constraint adds. The types can't be switched off without testing a library nobody ships, so they stay on and the per-surface scores show what they catch. The lint-only cell shows whether lint errors guide an agent that has no docs. Three runs per prompt give intervals, because agent output varies; 15 prompts keep it to 180 runs |
+| Drift eval timing | Deferred to a later release; the design is published in `docs/drift-eval.md` | 180 agent sessions plus grading is more time and compute than the project has now. Nothing in Phase 8 depends on it, and the design holds for any later version of the packages. Until it runs, the workflow's case is the market research and competitive analysis in sections 3 and 3.12, which is what shaped it |
 | `Figure` width | No `displayWidth`; apps size a figure through `className` | None of the portfolio's 8 figures or 5 clips sets one |
 | Motion in Fossil | CSS transitions with `@starting-style` and `data-state`; `usePresence` keeps an element mounted until `getAnimations()` settles | The durations stay in the motion tokens, reduced motion needs no special case, and no animation library reaches forks (ADR 0011) |
 | Extension points | `Modal`'s `renderPanel` and `onShowingChange`, `Tabs`' `renderIndicator`, `Carousel`'s data attributes, `Link`'s `asChild` | Only where a library must own an element's lifecycle, and each library-neutral |
@@ -708,7 +754,7 @@ Building the bundled docs settled these, each checked against the installed vers
 - **The rename correction.** A second reversal, this time in Fossil's favour: what looked like an unsolvable diffing problem turned out to be solved by identity in the Plugin API (stable IDs, and a token path stamped on each variable), and better than the approach a major vendor ships.
 - **The authoring-format argument.** Why "we emit CSS so we need Stylelint" is wrong, with Atlassian as the counter-example that proves the rule.
 - **Constraint versus context as distinct failure modes**, with the on-demand MCP leak as the mechanical explanation for why context alone does not suffice.
-- **Measuring drift.** If the eval harness produces a number, that number is the most publishable artifact in the project, because the field currently has none.
+- **Measuring drift.** If the eval harness produces a number, that number is the most publishable artifact in the project. The eval is designed and deferred (`docs/drift-eval.md`); until it runs, the case rests on the research in this document. Published evals grade build results, accessibility or API use; none reports an on-system rate or splits context from constraint (section 3.12).
 - **The cost of constraint.** Track how often escape hatches are used and what triggered them. Polar noticed the problem; a measured answer would be new.
 - **Harvest, then dogfood.** The portfolio came first, was built in code, and seeded Fossil. Then it was rebuilt on Fossil from npm. The loop shows the system is grounded in a real product rather than guessed, and the migration shows it is consumable.
 - **The agent as courier.** Figma's MCP allowlist means only an agent can reach Figma, while the sync must be exactly right every time. The resulting split has the agent make the one call it's authorised to make, while tested scripts do everything that has to be correct. The component library uses the same split, with the agent also doing the one part that needs judgment. It generalises to most agent tooling built on gated APIs.
@@ -783,6 +829,20 @@ Building the bundled docs settled these, each checked against the installed vers
 - Figma Forum: Allow percentages for line height; Figma MCP: Claude unable to replace slot contents
 - Figma MCP server developer docs, rate limits and access (re-checked 5 October 2026)
 - `figma/mcp-server-guide` skills `figma-use`, `figma-generate-library` and `figma-design-to-code`, with the Plugin API typings they ship
+
+**Agent setups and evals (7 October 2026)**
+- Polar, Building an LLM safe design system; Polar handbook, ADR 0004: Orbit Box design system
+- Atlassian Design System, Develop with AI; Forge UI Kit, `xcss`
+- React Spectrum, Working with AI, Styling, and the S2 skill's guide to creating custom components; Spectrum Design Data agent
+- Primer, MCP server; Carbon, Carbon MCP overview; Shopify, Dev MCP and Polaris web components changelog; Salesforce, SLDS Linter, DX MCP for Lightning Web Components, and the `validating-slds` skill; Google, Design MCP API overview
+- Agent files in `microsoft/fluentui`, `carbon-design-system/carbon`, `primer/react`, `adobe/react-spectrum`, through the GitHub REST API
+- Into Design Systems on Indeed and Spotify (summaries only; paywalled)
+- Uber, How Uber built an agentic system to automate design specs; Southleft, What happens when AI actually understands your design system
+- Anthropic, Claude Design now stays on brand for daily work; Figma Config 2026, Getting real output from Figma Make (session page)
+- Storybook, Storybook MCP for React; `storybookjs/mcp` eval harness README; `storybookjs/storybook` PR #36478
+- Microsoft, A11y LLM eval report and `microsoft/a11y-llm-eval`
+- Vercel, AGENTS.md outperforms skills in our agent evals
+- GitHub Blog, Building a general-purpose accessibility agent
 
 **Dry run and pruning (September–October 2026)**
 - agents.md (format, supported tools, stewardship); GitHub Blog, How to write a great agents.md: lessons from over 2,500 repositories; Primer React `.github/copilot-instructions.md`
