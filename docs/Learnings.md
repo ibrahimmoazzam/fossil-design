@@ -592,6 +592,13 @@ Building the bundled docs settled these, each checked against the installed vers
   - `get_design_context` on a `Button` instance gave `<Button children="View project" icon />` and `var(--fossil-…)` for every library variable; on a standalone `Icon`, it gave the library glyph as `<CloseIcon />`, as in Phase 5b.
   - A third file with only the foundations library on, and no variables of its own, bound a rectangle's fill to `color/background/surface`, stamped, with its code syntax.
   - `Button`'s small text variants are 34px tall in Figma, not code's 32px, in Phase 5b's file and the new one alike: the height of the hidden 18px icon plus padding, though Figma usually leaves hidden layers out of auto layout. The check reads no sizes, so it passes; not yet investigated.
+- **The real Figma library**, built on 7 October 2026 in two new files on the Education team, Fossil Foundations and Fossil Components, both published:
+  - In the foundations file, the apply from `2243211` created both collections and all 136 variables, with nothing missing, orphaned or unstamped. The styles script then created the 12 text styles, 3 effect styles and 6 icons, and the foundations check passed.
+  - In the components file, all 13 components were built from the library's variables, styles and icons, with none of the file's own, and the components check passed for every one.
+  - A new slot has no auto layout. A child set to fill it fails with "node must be an auto-layout frame or a child of an auto-layout frame" until the slot gets a `layoutMode`. The failed script left nothing behind.
+  - `Carousel` made a slot in each variant, each renamed `children`. `combineAsVariants` merged them into one `SLOT` property on the set.
+  - The check skips the inside of a nested instance of a component the spec marks `colored`, but it only knows the components in the same run. Checked alone, `Modal` failed on its close button's muted glyph; checked with `Button`, it passed. A smaller run is only ever stricter, so a component that passes in any group also passes in the full run.
+  - The hash check caught a mistyped path in the styles script, `8.630` for `8.63`, before anything was written. Resent exactly, it ran.
 
 ---
 

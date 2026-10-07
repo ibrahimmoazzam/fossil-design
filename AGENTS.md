@@ -2,7 +2,7 @@
 
 Fossil Design, or Fossil for short, is an open-source design system for agentic coding: tokens in git flow into CSS, typed React components, Figma variables and a generated Figma component library, with lint configs and agent docs that keep generated UI on-system. Teams adopt it by forking it as a template. The published `@fossil-design/*` packages are the reference brand, harvested from the author's portfolio site.
 
-The repo foundation, the token build, the Figma sync, `@fossil-design/react`, both lint configs and the Figma component library are in place. Phase 6, the agent context layer, is under way: the docs, the `AGENTS.md` block and the Figma Make guidelines bundled in `@fossil-design/react` are in place, and the Figma library is split into a foundations file and a components file, verified on scratch files; building the two real files is next. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
+The repo foundation, the token build, the Figma sync, `@fossil-design/react`, both lint configs, the Figma component library and the agent context layer are in place. The docs, the `AGENTS.md` block and the Figma Make guidelines are bundled in `@fossil-design/react`, and the Figma library is two published files, foundations and components. Phase 7, drift measurement, is next. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
 
 ## Commands
 
