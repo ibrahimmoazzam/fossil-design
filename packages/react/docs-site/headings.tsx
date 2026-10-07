@@ -1,4 +1,8 @@
-import { Markdown } from '@storybook/addon-docs/blocks';
+import {
+  AnchorMdx,
+  CodeOrSourceMdx,
+  Markdown,
+} from '@storybook/addon-docs/blocks';
 import type { ComponentProps, ReactNode } from 'react';
 import { autolink } from './autolink.ts';
 import { slug } from './slug.ts';
@@ -63,7 +67,14 @@ function MarkdownWithHeadings({
       {...props}
       options={{
         ...props.options,
-        overrides: { ...elements, ...props.options?.overrides },
+        // Storybook spreads these options over its own, so its link and code components
+        // come back here: AnchorMdx keeps site links within the site, not the preview frame.
+        overrides: {
+          a: AnchorMdx,
+          code: CodeOrSourceMdx,
+          ...elements,
+          ...props.options?.overrides,
+        },
       }}
     >
       {autolink(children, currentPage())}
