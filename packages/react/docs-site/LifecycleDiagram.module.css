@@ -1,0 +1,115 @@
+/* The drawing keeps a readable size, so a narrow screen scrolls it sideways rather than
+   shrinking its text out of reach. The figure takes focus, so the keyboard can scroll it too. */
+.figure {
+  overflow-x: auto;
+  scrollbar-color: var(--fossil-color-border-strong) transparent;
+  scrollbar-width: thin;
+  border: var(--fossil-border-default);
+  border-radius: var(--fossil-radius-surface);
+  background-color: var(--fossil-color-background-page);
+}
+
+/* For browsers without the two properties above, such as older Safari. */
+.figure::-webkit-scrollbar {
+  block-size: var(--fossil-space-2xs);
+  background-color: transparent;
+}
+
+.figure::-webkit-scrollbar-thumb {
+  border-radius: var(--fossil-radius-pill);
+  background-color: var(--fossil-color-border-strong);
+}
+
+.figure:focus-visible {
+  outline: var(--fossil-border-focus);
+  outline-offset: var(--fossil-focus-ring-offset);
+}
+
+.diagram {
+  display: block;
+  inline-size: 100%;
+  min-inline-size: 44rem;
+  block-size: auto;
+}
+
+.rule {
+  stroke: var(--fossil-color-border-default);
+  stroke-width: var(--fossil-border-width-default);
+}
+
+.band {
+  fill: var(--fossil-color-text-muted);
+  font-family: var(--fossil-text-label-font-family);
+  font-size: var(--fossil-text-label-font-size);
+  font-weight: var(--fossil-text-label-font-weight);
+  letter-spacing: var(--fossil-text-label-letter-spacing);
+  text-transform: uppercase;
+}
+
+.group {
+  fill: var(--fossil-color-background-sunken);
+  stroke: var(--fossil-color-border-default);
+  stroke-width: var(--fossil-border-width-default);
+}
+
+.groupTitle {
+  fill: var(--fossil-color-text-muted);
+  font-family: var(--fossil-text-caption-font-family);
+  font-size: var(--fossil-text-caption-font-size);
+  font-weight: var(--fossil-font-weight-strong);
+}
+
+.node {
+  fill: var(--fossil-color-background-surface);
+  stroke: var(--fossil-color-border-strong);
+  stroke-width: var(--fossil-border-width-default);
+}
+
+.logo {
+  color: var(--fossil-color-text-default);
+}
+
+.title {
+  fill: var(--fossil-color-text-default);
+  font-family: var(--fossil-text-heading-xs-font-family);
+  font-size: var(--fossil-text-heading-xs-font-size);
+  font-weight: var(--fossil-text-heading-xs-font-weight);
+  text-anchor: middle;
+}
+
+.detail {
+  fill: var(--fossil-color-text-muted);
+  font-family: var(--fossil-text-caption-font-family);
+  font-size: var(--fossil-text-caption-font-size);
+  font-weight: var(--fossil-text-caption-font-weight);
+  text-anchor: middle;
+}
+
+.label {
+  fill: var(--fossil-color-text-muted);
+  font-family: var(--fossil-text-label-font-family);
+  font-size: var(--fossil-text-label-font-size);
+  font-weight: var(--fossil-text-label-font-weight);
+}
+
+.edge {
+  fill: none;
+  stroke: var(--fossil-color-border-strong);
+  stroke-width: var(--fossil-border-width-default);
+}
+
+/* What comes back is dashed, in the highlight colour, so the loops read apart from the flow. */
+.loop {
+  fill: none;
+  stroke: var(--fossil-color-highlight-default);
+  stroke-dasharray: 6 5;
+  stroke-width: var(--fossil-border-width-default);
+}
+
+.headForward {
+  fill: var(--fossil-color-border-strong);
+}
+
+.headBack {
+  fill: var(--fossil-color-highlight-default);
+}

@@ -13,6 +13,263 @@
   }
 }
 
+/* The diagram's pipelines stack on narrow screens. From 1024px they sit side by side, and each
+   one's header and stages share rows through subgrid, so the stages line up across them. */
+.pipelines {
+  grid-template-columns: 1fr;
+}
+
+.pipeline {
+  gap: var(--fossil-space-s);
+}
+
+/* The row gap leaves room for the arrow that leads into each stage. */
+.steps {
+  row-gap: var(--fossil-space-xl);
+  padding: 0;
+}
+
+/* Stacked, the branch's summary says where it forks from; side by side, the fork draws it and
+   the arrow below it leads into the branch's first stage. */
+.fork,
+.branch .node:first-child > .flow {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .pipelines {
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: var(--fossil-space-m);
+  }
+
+  .pipeline {
+    grid-row: 1 / span 4;
+    grid-template-rows: subgrid;
+  }
+
+  .steps {
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+  }
+
+  /* Between the two pipelines it forks from. With every pipeline on row 1, the others fill the
+     columns either side in source order. */
+  /* Its row gap matches the parent's, so its stages, which start a row later, line up too. */
+  .branch {
+    grid-column: 2;
+    row-gap: var(--fossil-space-xl);
+  }
+
+  .branch .steps {
+    grid-row: span 2;
+  }
+
+  /* In the source row: a bar between the two sources, across the column gaps, and a stem from
+     its middle down to the arrow into the branch's first stage. */
+  .fork {
+    position: relative;
+    display: block;
+  }
+
+  .branch .node:first-child > .flow {
+    display: grid;
+  }
+
+  .fork::before,
+  .fork::after {
+    content: '';
+    position: absolute;
+  }
+
+  .fork::before {
+    inset-block-start: 50%;
+    inset-inline: calc(-1 * var(--fossil-space-m));
+    border-block-start: var(--fossil-border-width-default) solid
+      var(--fossil-color-border-strong);
+  }
+
+  /* Down through the gap below into the arrow's shaft: the arrow is centred in the gap, and its
+     shaft starts a sixth of the way into the glyph. */
+  .fork::after {
+    inset-block: 50%
+      calc(
+        (var(--fossil-icon-size-m) - var(--fossil-space-xl)) / 2 -
+          var(--fossil-icon-size-m) / 6 - var(--fossil-border-width-default)
+      );
+    inset-inline-start: calc(50% - var(--fossil-border-width-default) / 2);
+    border-inline-start: var(--fossil-border-width-default) solid
+      var(--fossil-color-border-strong);
+  }
+}
+
+.node {
+  position: relative;
+  border: var(--fossil-border-default);
+}
+
+.flow,
+.drop {
+  place-items: center;
+  color: var(--fossil-color-border-strong);
+  font-size: var(--fossil-icon-size-m);
+}
+
+.flow svg,
+.drop svg {
+  rotate: 90deg;
+}
+
+/* Sits in the gap above its stage. */
+.flow {
+  position: absolute;
+  inset-block-end: 100%;
+  inset-inline: 0;
+  block-size: var(--fossil-space-xl);
+}
+
+/* Into "Used by". Each line runs from the pipeline above into its arrow's shaft, which starts a
+   sixth of the way into the glyph. Side by side, Figma drops straight to the designers, and a bar
+   joins the other two pipelines, which agents and Figma Make both draw on. The bar hops over
+   Figma's line, because they don't connect. Stacked, one line. */
+.connector {
+  position: relative;
+  block-size: var(--fossil-space-2xl);
+}
+
+.drop {
+  position: relative;
+  align-items: end;
+}
+
+.drop::before {
+  content: '';
+  position: absolute;
+  inset-block: 0
+    calc(var(--fossil-icon-size-m) * 5 / 6 - var(--fossil-border-width-default));
+  inset-inline-start: calc(50% - var(--fossil-border-width-default) / 2);
+  border-inline-start: var(--fossil-border-width-default) solid
+    var(--fossil-color-border-strong);
+}
+
+.drop:not(:first-child),
+.hop {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .connector {
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: var(--fossil-space-m);
+    block-size: var(--fossil-space-3xl);
+  }
+
+  .drop:not(:first-child) {
+    display: grid;
+  }
+
+  /* The bar, from the middle of the first pipeline to the middle of the last, in two halves
+     that end where the hop begins. */
+  .connector::before,
+  .connector::after {
+    content: '';
+    position: absolute;
+    inset-block-start: var(--fossil-space-l);
+    border-block-start: var(--fossil-border-width-default) solid
+      var(--fossil-color-border-strong);
+  }
+
+  .connector::before {
+    inset-inline: calc((100% - 2 * var(--fossil-space-m)) / 6)
+      calc(50% + var(--fossil-space-xs));
+  }
+
+  .connector::after {
+    inset-inline: calc(50% + var(--fossil-space-xs))
+      calc((100% - 2 * var(--fossil-space-m)) / 6);
+  }
+
+  /* A semicircle over Figma's line, its ends on the bar. */
+  .hop {
+    position: absolute;
+    inset-block-start: calc(var(--fossil-space-l) - var(--fossil-space-xs));
+    inset-inline-start: calc(
+      50% - var(--fossil-space-xs) - var(--fossil-border-width-default) / 2
+    );
+    display: block;
+    box-sizing: border-box;
+    inline-size: calc(
+      2 * var(--fossil-space-xs) + var(--fossil-border-width-default)
+    );
+    block-size: calc(
+      var(--fossil-space-xs) + var(--fossil-border-width-default)
+    );
+    border: var(--fossil-border-width-default) solid
+      var(--fossil-color-border-strong);
+    border-block-end: 0;
+    border-start-start-radius: var(--fossil-radius-pill);
+    border-start-end-radius: var(--fossil-radius-pill);
+  }
+}
+
+.actions {
+  flex-wrap: wrap;
+}
+
+.consumers {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .consumers {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.name {
+  color: var(--fossil-color-text-default);
+  font-weight: var(--fossil-font-weight-strong);
+}
+
+/* Inline code: mono on a sunken chip, kept on one line in running text. */
+.code {
+  padding-inline: var(--fossil-space-2xs);
+  border-radius: var(--fossil-radius-compact);
+  background-color: var(--fossil-color-background-sunken);
+  color: var(--fossil-color-text-default);
+  font-family: var(--fossil-font-family-mono);
+  font-size: var(--fossil-text-fine-font-size);
+  white-space: nowrap;
+}
+
+/* A package name that titles a node may wrap anywhere, so a long one fits a narrow column. */
+.name .code {
+  overflow-wrap: anywhere;
+  white-space: normal;
+  box-decoration-break: clone;
+}
+
+.tools {
+  color: var(--fossil-color-text-default);
+}
+
+/* Clears the badge's height, so a one-line way still sits level with its number. */
+.way {
+  align-self: center;
+}
+
+.points {
+  padding-block: 0;
+  padding-inline: var(--fossil-space-m) 0;
+}
+
+/* Two columns of checks under the two layers. */
+@media (min-width: 768px) {
+  .verification .points {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: var(--fossil-space-l);
+  }
+}
+
 .heading {
   display: flex;
   align-items: center;
