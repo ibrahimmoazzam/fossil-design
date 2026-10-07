@@ -103,6 +103,8 @@ export const ProjectDetails: Story = {
 export const WithHeaderContent: Story = {
   args: { headerContent: <Button size="s">Share</Button> },
   render: (args) => <Demo {...args} startOpen />,
+  // Open, the modal would cover its own docs page.
+  tags: ['!autodocs'],
 };
 
 /**
@@ -176,9 +178,12 @@ function AnimatedPanel({
 
 export const Open: Story = {
   render: (args) => <Demo {...args} startOpen />,
+  // Open, the modal would cover its own docs page.
+  tags: ['!autodocs'],
 };
 
 export const OpenDark: Story = {
   render: (args) => <Demo {...args} startOpen />,
   globals: { theme: 'dark' },
+  tags: ['!dev', '!autodocs'],
 };

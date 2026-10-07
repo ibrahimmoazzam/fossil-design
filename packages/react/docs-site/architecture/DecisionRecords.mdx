@@ -1,0 +1,13 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { RepoDoc } from '../RepoDoc.tsx';
+import { decisionRecords } from '../pages.ts';
+import index from '../../../../docs/decisions/README.md?raw';
+
+<Meta title="Architecture/Decision records" />
+
+<RepoDoc source={index} path="docs/decisions/README.md" />
+
+{decisionRecords.map(({ path, source }) => (
+
+  <RepoDoc key={path} source={source} path={path} headingShift={1} />
+))}

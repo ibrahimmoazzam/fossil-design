@@ -51,4 +51,5 @@ export const Uncaptioned: Story = {
 
 export const Dark: Story = {
   globals: { theme: 'dark' },
+  tags: ['!dev', '!autodocs'],
 };

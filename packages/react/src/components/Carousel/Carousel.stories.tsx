@@ -92,4 +92,5 @@ export const Fits: Story = {
 export const DotsDark: Story = {
   args: { indicator: 'dots' },
   globals: { theme: 'dark' },
+  tags: ['!dev', '!autodocs'],
 };
