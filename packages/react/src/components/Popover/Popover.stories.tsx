@@ -46,9 +46,12 @@ export const Default: Story = {
 
 export const WithArrow: Story = {
   args: { arrow: true, open: true },
+  // Open, the popover takes focus and would scroll its docs page to itself.
+  tags: ['!autodocs'],
 };
 
 export const OpenDark: Story = {
   args: { open: true },
   globals: { theme: 'dark' },
+  tags: ['!dev', '!autodocs'],
 };

@@ -87,4 +87,5 @@ export const Tones: Story = {
 export const TonesDark: Story = {
   ...Tones,
   globals: { theme: 'dark' },
+  tags: ['!dev', '!autodocs'],
 };

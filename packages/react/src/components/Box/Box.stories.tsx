@@ -111,4 +111,5 @@ export const Grid: Story = {
 export const SurfacesDark: Story = {
   ...Surfaces,
   globals: { theme: 'dark' },
+  tags: ['!dev', '!autodocs'],
 };

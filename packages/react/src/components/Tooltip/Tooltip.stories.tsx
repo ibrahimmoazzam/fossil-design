@@ -46,4 +46,5 @@ export const Long: Story = {
 export const OpenDark: Story = {
   args: { open: true },
   globals: { theme: 'dark' },
+  tags: ['!dev', '!autodocs'],
 };

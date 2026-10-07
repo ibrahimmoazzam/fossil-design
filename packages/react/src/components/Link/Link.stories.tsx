@@ -93,4 +93,5 @@ export const WithRouter: Story = {
 export const AccentDark: Story = {
   args: { tone: 'accent' },
   globals: { theme: 'dark' },
+  tags: ['!dev', '!autodocs'],
 };

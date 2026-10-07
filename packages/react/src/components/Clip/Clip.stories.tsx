@@ -53,4 +53,5 @@ export const CaptionHidden: Story = {
 
 export const Dark: Story = {
   globals: { theme: 'dark' },
+  tags: ['!dev', '!autodocs'],
 };
