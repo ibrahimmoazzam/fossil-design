@@ -2,7 +2,7 @@
 
 Fossil Design, or Fossil for short, is an open-source design system for agentic coding: tokens in git flow into CSS, typed React components, Figma variables and a generated Figma component library, with lint configs and agent docs that keep generated UI on-system. Teams adopt it by forking it as a template. The published `@fossil-design/*` packages are the reference brand, harvested from the author's portfolio site.
 
-The repo foundation, the token build, the Figma sync, `@fossil-design/react`, both lint configs and the Figma component library are in place. Phase 6, the agent context layer, is under way: the docs, the `AGENTS.md` block and the Figma Make guidelines bundled in `@fossil-design/react` are in place, and splitting the Figma library into foundations and components is next. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
+The repo foundation, the token build, the Figma sync, `@fossil-design/react`, both lint configs and the Figma component library are in place. Phase 6, the agent context layer, is under way: the docs, the `AGENTS.md` block and the Figma Make guidelines bundled in `@fossil-design/react` are in place, and the Figma library is split into a foundations file and a components file, verified on scratch files; building the two real files is next. `docs/PRD.md` is the spec: phases, tasks and exit criteria. `docs/Learnings.md` holds the research and the reason behind each decision.
 
 ## Commands
 
@@ -32,7 +32,7 @@ pnpm changeset                   # record a release note for a package change
 - The token build writes `tokens.css`, `tokens.json`, `lint.json`, `foundations.md` and `tokens.md` to `packages/tokens/dist/`, the TypeScript in `src/generated/`, and the foundations block in this file. Commit the block with the token change; CI fails if the build changes it. ADR 0006 covers each output, and ADR 0016 the two Markdown files.
 - List deprecated tokens and their replacements: `pnpm --filter tokens deprecations`, after a build.
 - Sync tokens with Figma: `pnpm figma:apply`, `pnpm figma:read` and `pnpm figma:diff` write scripts and compare their results. Run a sync through the `fossil-figma-sync` skill in `.claude/skills/`, which needs the Figma MCP server. `packages/figma-sync/AGENTS.md` covers working on the sync itself.
-- Build the Figma component library: `pnpm figma:library-spec` writes the spec, a build sheet and the styles script; `pnpm figma:library-check` writes the check, and `pnpm figma:library-check report` verifies its results. Follow the same skill's library workflow.
+- Build the Figma library, in two files (ADR 0018): `pnpm figma:library-spec` writes the spec, a build sheet and the styles script for the foundations file; `pnpm figma:library-check` writes the components file's check, `pnpm figma:library-check foundations` the foundations file's, and `pnpm figma:library-check report` verifies the results. Follow the same skill's library workflow.
 - Build before linting and type-checking. A package's types resolve through the built declarations of the packages it depends on, and the Stylelint config reads the built token lists.
 - Add a dependency to one package with `pnpm --filter <folder> add <name>`, and to the root with `pnpm add -D -w <name>`. TypeScript comes from the `catalog:` in `pnpm-workspace.yaml`.
 

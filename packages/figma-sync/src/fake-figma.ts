@@ -183,12 +183,18 @@ class Variable extends Data implements FigmaVariable {
 export class FakeFigma implements Figma {
   readonly all: Variable[] = [];
   readonly collections: Collection[] = [];
+  /** Variables imported from a library: found by id, never listed as the file's own. */
+  readonly library: Variable[] = [];
   #next = 1;
 
   readonly variables = {
     getLocalVariableCollectionsAsync: () =>
       Promise.resolve([...this.collections]),
     getLocalVariablesAsync: () => Promise.resolve([...this.all]),
+    getVariableByIdAsync: (id: string): Promise<FigmaVariable | null> =>
+      Promise.resolve(
+        [...this.all, ...this.library].find((v) => v.id === id) ?? null,
+      ),
     createVariableCollection: (name: string) => {
       const collection = new Collection(
         this,
@@ -257,5 +263,11 @@ export class FakeFigma implements Figma {
 
   remove(variable: FigmaVariable): void {
     this.all.splice(this.all.indexOf(variable as Variable), 1);
+  }
+
+  /** Makes this file a components file: its variables now come from the foundations library. */
+  toLibrary(): void {
+    this.library.push(...this.all.splice(0));
+    this.collections.splice(0);
   }
 }

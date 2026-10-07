@@ -591,6 +591,7 @@ Always-on context beat retrieval, which is the same finding behind Fossil's alwa
    - Each is its own file that nobody designs in, published on its own. A designer turns on whichever the file needs, from the libraries panel. Fossil's own design files turn on both.
    - Components in the components file bind to the foundations library's published variables, imported by key (`figma.variables.importVariableByKeyAsync`, which only returns the library's variable from a different file). The library spec and check name variables as they do today; only where a script finds the variable changes.
    - **Verify first, on the scratch files:** that a component bound to an imported variable keeps the binding after publishing and when a foundations update is accepted, that the library check can read imported variables' names, and that `get_design_context` still reports `var(--fossil-*)` for them. Record the result in `docs/Learnings.md`.
+   - **Verified** (October 2026): all three hold, and an imported variable keeps Fossil's stamp, so the check reads stamps as before (ADR 0018).
    - Write an ADR for the split. The skill's workflow, the spec and the check need to say which file each step runs against, and the sync's stamped commit stays on the foundations file.
    - The real Figma files are made as two, once the split is verified, and the Phase 5b scratch file is the test bed. Education plan: confirm each file is in the team's project and that "can edit" members can publish.
 

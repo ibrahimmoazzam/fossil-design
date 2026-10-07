@@ -1,6 +1,6 @@
 # figma-sync
 
-Fossil's own code for syncing tokens with Figma variables, and for generating and checking the Figma component library. To run either, follow the `fossil-figma-sync` skill in `.claude/skills/`. This file covers working on the code. ADR 0007 explains the sync, and ADR 0015 the library.
+Fossil's own code for syncing tokens with Figma variables, and for generating and checking the Figma component library. To run either, follow the `fossil-figma-sync` skill in `.claude/skills/`. This file covers working on the code. ADR 0007 explains the sync, ADR 0015 the library, and ADR 0018 its two files: the foundations, with the variables, styles and icons, and the components, which import them.
 
 ## Commands
 
@@ -10,7 +10,8 @@ pnpm figma:apply                 # write the apply scripts to .figma/
 pnpm figma:read [page]           # write a read script to .figma/
 pnpm figma:diff [--dry-run]      # compare saved read results with git, and write value changes
 pnpm figma:library-spec          # write the library spec, its build sheet and the styles script to .figma/
-pnpm figma:library-check [Name]  # write the library check, for every component or the ones named
+pnpm figma:library-check [Name]  # write the components file's check, for every component or the ones named
+pnpm figma:library-check foundations  # write the foundations file's check: its styles and icons
 pnpm figma:library-check report  # verify saved check results and print what they found
 ```
 
@@ -30,8 +31,8 @@ The CLIs run through Node's type stripping, so there's no build step. `pnpm --fi
   - `components.ts` is the reviewed table of what code can't say: each component's root layer, the layers Figma must have, derived axes and the kind of each Figma property. Every name in it is checked against code;
   - `spec.ts` turns both into the spec, with CSS's cascade, `Box` props through `Box`'s generated classes, and `Text` elements as text layers;
   - `styles.ts` writes the text and effect styles and icons from the token build; `sheet.ts` writes the build sheet;
-  - `runtime.ts` is the library's code that runs in Figma: the styles script and the check. The generator merges it with `src/runtime.ts`;
-  - `fake-canvas.ts` adds pages, nodes, styles and fonts to the fake Figma; `cli.ts` holds the two commands.
+  - `runtime.ts` is the library's code that runs in Figma: the styles script and the check. The generator merges it with `src/runtime.ts`, and a script carries every function whose name it calls, so a local helper mustn't share a runtime function's name;
+  - `fake-canvas.ts` adds pages, nodes, styles and fonts to the fake Figma, and `toLibrary()` turns a fake into a components file whose variables and styles come from a library; `cli.ts` holds the two commands.
 - `src/fixtures/tokens/` is a frozen copy of the reference token source, which the tests run on. A value changed in Figma, or a fork's own brand, therefore can't break them. Refresh the copy only when the token format changes. Tests that check the live source read `packages/tokens/src` directly.
 
 The token source is read with the validator in `packages/tokens/scripts/validate.ts`, so both packages agree on what a valid token is.
@@ -67,3 +68,5 @@ Each one is verified in `docs/Learnings.md`:
 - A component's description, like a variable's, comes back HTML-escaped.
 - A number variable bound to line height is read as pixels, so text styles set line height as a percentage and the check compares the value.
 - Figma's Space Grotesk has no SemiBold. The styles script refuses a text style whose font Figma doesn't have, before it writes anything.
+- The Plugin API can't turn a library on in a file; a person does, from the Assets panel. Then `figma.teamLibrary` lists its variables, but not its styles or components, so the styles script returns their keys.
+- A variable, style or component imported from a library keeps its shared plugin data, so the check reads the stamp of each one a component uses through its id.

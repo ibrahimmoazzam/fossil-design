@@ -46,6 +46,9 @@ class Data {
 export class FakeNode extends Data implements SceneNode {
   readonly id: string;
   readonly type: string;
+  get key(): string | undefined {
+    return this.type === 'COMPONENT' ? `key-${this.id}` : undefined;
+  }
   name: string;
   visible = true;
   x = 0;
@@ -168,6 +171,7 @@ class Page extends Data implements PageNode {
 
 class TextStyle extends Data implements FigmaTextStyle {
   readonly id: string;
+  readonly key: string;
   name = '';
   #description = '';
   #fontName = { family: 'Inter', style: 'Regular' };
@@ -181,6 +185,7 @@ class TextStyle extends Data implements FigmaTextStyle {
     super();
     this.#canvas = canvas;
     this.id = id;
+    this.key = `key-${id}`;
   }
 
   get description(): string {
@@ -233,6 +238,7 @@ class TextStyle extends Data implements FigmaTextStyle {
 
 class EffectStyle extends Data implements FigmaEffectStyle {
   readonly id: string;
+  readonly key: string;
   name = '';
   #description = '';
   effects: readonly Shadow[] = [];
@@ -240,6 +246,7 @@ class EffectStyle extends Data implements FigmaEffectStyle {
   constructor(id: string) {
     super();
     this.id = id;
+    this.key = `key-${id}`;
   }
 
   get description(): string {
@@ -264,6 +271,8 @@ export class FakeCanvas extends FakeFigma implements Canvas {
   currentPage: Page;
   readonly textStyles: TextStyle[] = [];
   readonly effectStyles: EffectStyle[] = [];
+  /** Styles imported from a library: found by id, never listed as the file's own. */
+  readonly libraryStyles: (TextStyle | EffectStyle)[] = [];
   readonly loaded = new Set<string>();
   fonts: { family: string; style: string }[] = [];
   #next = 1;
@@ -318,6 +327,23 @@ export class FakeCanvas extends FakeFigma implements Canvas {
 
   getLocalEffectStylesAsync(): Promise<FigmaEffectStyle[]> {
     return Promise.resolve([...this.effectStyles]);
+  }
+
+  getStyleByIdAsync(id: string): Promise<TextStyle | EffectStyle | null> {
+    return Promise.resolve(
+      [...this.textStyles, ...this.effectStyles, ...this.libraryStyles].find(
+        (s) => s.id === id,
+      ) ?? null,
+    );
+  }
+
+  /** Makes this file a components file: its variables and styles now come from the foundations library. */
+  override toLibrary(): void {
+    super.toLibrary();
+    this.libraryStyles.push(
+      ...this.textStyles.splice(0),
+      ...this.effectStyles.splice(0),
+    );
   }
 
   createTextStyle(): FigmaTextStyle {

@@ -122,6 +122,10 @@ export interface StylesSpec {
 
 export interface CheckSpec {
   kind: 'check';
+  /** The foundations file's styles and icons, or the components file's components. */
+  target: 'foundations' | 'components';
+  /** The components file's page, by name. */
+  page: string;
   commit: string;
   part: number;
   parts: number;
@@ -179,6 +183,8 @@ export interface Spacing {
 
 export interface FigmaTextStyle extends Stamped {
   readonly id: string;
+  /** What another file imports it by, once the file is published. */
+  readonly key: string;
   name: string;
   description: string;
   fontName: { family: string; style: string };
@@ -191,6 +197,7 @@ export interface FigmaTextStyle extends Stamped {
 
 export interface FigmaEffectStyle extends Stamped {
   readonly id: string;
+  readonly key: string;
   name: string;
   description: string;
   effects: readonly Shadow[];
@@ -199,6 +206,8 @@ export interface FigmaEffectStyle extends Stamped {
 /** The parts of a node the library reads and writes. */
 export interface SceneNode extends Stamped {
   readonly id: string;
+  /** A component's, for importing it into another file. */
+  readonly key?: string;
   readonly type: string;
   name: string;
   visible: boolean;
@@ -246,6 +255,8 @@ export interface Canvas extends Figma {
   setCurrentPageAsync(page: PageNode): Promise<void>;
   getLocalTextStylesAsync(): Promise<FigmaTextStyle[]>;
   getLocalEffectStylesAsync(): Promise<FigmaEffectStyle[]>;
+  /** A style by id, the file's own or one imported from a library. */
+  getStyleByIdAsync(id: string): Promise<Stamped | null>;
   createTextStyle(): FigmaTextStyle;
   createEffectStyle(): FigmaEffectStyle;
   listAvailableFontsAsync(): Promise<
@@ -256,6 +267,8 @@ export interface Canvas extends Figma {
   createSection(): SceneNode;
   createNodeFromSvg(svg: string): SceneNode;
   variables: Figma['variables'] & {
+    /** A variable by id, the file's own or one imported from a library. */
+    getVariableByIdAsync(id: string): Promise<FigmaVariable | null>;
     setBoundVariableForPaint(
       paint: Paint,
       field: 'color',
@@ -279,9 +292,9 @@ export function decoded(text: string): string {
     .replace(/&amp;/g, '&');
 }
 
-/** Fossil's Components page, by its stamp. */
-export function componentsPage(figma: Canvas): PageNode | undefined {
-  return figma.root.children.find((p) => stamp(p, 'page') === 'components');
+/** The foundations file's Icons page, by its stamp. */
+export function iconsPage(figma: Canvas): PageNode | undefined {
+  return figma.root.children.find((p) => stamp(p, 'page') === 'icons');
 }
 
 /** The font style Figma names for a weight, from the fonts it has. */
@@ -321,7 +334,10 @@ export function svgOf(icon: IconSpec): string {
   return `${lt}svg xmlns="http://www.w3.org/2000/svg" viewBox="${icon.viewBox}">${paths}${lt}/svg>`;
 }
 
-/** Creates or updates Fossil's text styles, effect styles and icon glyphs. Running it again changes nothing. */
+/**
+ * Creates or updates Fossil's text styles, effect styles and icon glyphs, in the foundations file.
+ * Running it again changes nothing. It returns their keys, which the components file imports them by.
+ */
 export async function styles(
   spec: StylesSpec,
   figma: Canvas,
@@ -475,12 +491,11 @@ export async function styles(
       updated.push(`${e.name}: ${changes.join(', ')}`);
   }
 
-  // Icons live on the Components page, in a section of their own.
-  let page = componentsPage(figma);
+  let page = iconsPage(figma);
   if (!page) {
     page = figma.createPage();
     page.name = spec.page;
-    setStamp(page, 'components', 'page');
+    setStamp(page, 'icons', 'page');
     created.push(`the ${spec.page} page`);
   }
   await figma.setCurrentPageAsync(page);
@@ -496,6 +511,7 @@ export async function styles(
   const color = known(byPath[spec.iconColor], spec.iconColor);
   const glyphs = section.children ?? [];
   const ids: string[] = [];
+  const keys: Record<string, string> = {};
   spec.icons.forEach((icon, i) => {
     let component = glyphs.find((n) => stamp(n, 'icon') === icon.key);
     const changes: string[] = [];
@@ -542,21 +558,82 @@ export async function styles(
       }
     }
     ids.push(component.id);
+    keys[icon.name] = component.key ?? '';
     if (changes.length > 0 && !created.includes(icon.name))
       updated.push(`${icon.name}: ${changes.join(', ')}`);
   });
   section.resize?.(Math.max(400, 64 + spec.icons.length * 56), 136);
 
-  return { fossil: 'styles', created, updated, page: page.id, icons: ids };
+  for (const s of await figma.getLocalTextStylesAsync())
+    if (stamp(s) !== '') keys[s.name] = s.key;
+  for (const s of await figma.getLocalEffectStylesAsync())
+    if (stamp(s) !== '') keys[s.name] = s.key;
+  return {
+    fossil: 'styles',
+    created,
+    updated,
+    page: page.id,
+    icons: ids,
+    keys,
+  };
 }
 
-/** The token path stamped on a variable, by id. */
-export function pathsById(
-  variables: readonly FigmaVariable[],
-): Record<string, string> {
+/**
+ * The stamp on every variable and style the nodes use, by id. In the components file they come
+ * from the foundations library, and an imported variable or style keeps its stamp.
+ */
+export async function stampsUsed(
+  figma: Canvas,
+  nodes: readonly SceneNode[],
+): Promise<{
+  paths: Record<string, string>;
+  textStyles: Record<string, string>;
+  effectStyles: Record<string, string>;
+}> {
+  const variableIds = new Set<string>();
+  const textIds = new Set<string>();
+  const effectIds = new Set<string>();
+  const add = (alias: unknown) => {
+    for (const a of Array.isArray(alias) ? alias : [alias])
+      if (
+        typeof a === 'object' &&
+        a !== null &&
+        typeof (a as Alias).id === 'string'
+      )
+        variableIds.add((a as Alias).id);
+  };
+  const walk = (n: SceneNode) => {
+    for (const alias of Object.values(n.boundVariables ?? {})) add(alias);
+    for (const paints of [n.fills, n.strokes])
+      if (Array.isArray(paints))
+        for (const p of paints as readonly Paint[])
+          add(p.boundVariables?.color);
+    if (typeof n.textStyleId === 'string' && n.textStyleId !== '')
+      textIds.add(n.textStyleId);
+    if (typeof n.effectStyleId === 'string' && n.effectStyleId !== '')
+      effectIds.add(n.effectStyleId);
+    for (const child of n.children ?? []) walk(child);
+  };
+  for (const n of nodes) walk(n);
   const paths: Record<string, string> = {};
-  for (const v of variables) paths[v.id] = stamp(v);
-  return paths;
+  for (const id of variableIds) {
+    const v = await figma.variables.getVariableByIdAsync(id);
+    if (v) paths[id] = stamp(v);
+  }
+  // Not named styles, which would pull the styles script into the check's script.
+  const stampsOf = async (ids: Set<string>) => {
+    const found: Record<string, string> = {};
+    for (const id of ids) {
+      const s = await figma.getStyleByIdAsync(id);
+      if (s) found[id] = stamp(s);
+    }
+    return found;
+  };
+  return {
+    paths,
+    textStyles: await stampsOf(textIds),
+    effectStyles: await stampsOf(effectIds),
+  };
 }
 
 /** A node's children, without entering instances, whose insides belong to their own components. */
@@ -830,7 +907,10 @@ export async function checkVariant(
   return problems;
 }
 
-/** Checks Fossil's component library against the spec, and reports every difference. */
+/**
+ * Checks Fossil's Figma library against the spec, and reports every difference: in the
+ * foundations file, its styles and icons; in the components file, its components.
+ */
 export async function check(
   spec: CheckSpec,
   figma: Canvas,
@@ -838,7 +918,6 @@ export async function check(
   // use_figma starts with this on, which hides what's inside a hidden instance, such as a Button's icon.
   figma.skipInvisibleInstanceChildren = false;
   const foundations: string[] = [];
-  const page = componentsPage(figma);
   const content = {
     part: spec.part,
     parts: spec.parts,
@@ -846,31 +925,11 @@ export async function check(
     components: [] as { name: string; problems: string[] }[],
     foundations,
   };
-  if (!page) {
-    foundations.push(
-      'There is no Components page. Run the styles script from pnpm figma:library-spec first.',
-    );
-    return {
-      fossil: 'check',
-      ...content,
-      hash: sha256(JSON.stringify(content)),
-    };
-  }
-  await figma.setCurrentPageAsync(page);
-  const paths = pathsById(await figma.variables.getLocalVariablesAsync());
-  const textStyles: Record<string, string> = {};
-  for (const s of await figma.getLocalTextStylesAsync())
-    textStyles[s.id] = stamp(s);
-  const effectStyles: Record<string, string> = {};
-  for (const s of await figma.getLocalEffectStylesAsync())
-    effectStyles[s.id] = stamp(s);
-  for (const path of spec.textStyles)
-    if (!Object.values(textStyles).includes(path))
-      foundations.push(`The text style for ${path} is missing.`);
-  for (const path of spec.effectStyles)
-    if (!Object.values(effectStyles).includes(path))
-      foundations.push(`The effect style for ${path} is missing.`);
-
+  const result = (): CheckResult => ({
+    fossil: 'check',
+    ...content,
+    hash: sha256(JSON.stringify(content)),
+  });
   const tops: SceneNode[] = [];
   const walk = (nodes: readonly SceneNode[]) => {
     for (const n of nodes) {
@@ -879,10 +938,43 @@ export async function check(
         walk(n.children ?? []);
     }
   };
+
+  if (spec.target === 'foundations') {
+    const text = (await figma.getLocalTextStylesAsync()).map((s) => stamp(s));
+    const effect = (await figma.getLocalEffectStylesAsync()).map((s) =>
+      stamp(s),
+    );
+    for (const path of spec.textStyles)
+      if (!text.includes(path))
+        foundations.push(`The text style for ${path} is missing.`);
+    for (const path of spec.effectStyles)
+      if (!effect.includes(path))
+        foundations.push(`The effect style for ${path} is missing.`);
+    const icons = iconsPage(figma);
+    if (!icons) {
+      foundations.push(
+        'There is no Icons page. Run the styles script from pnpm figma:library-spec in the foundations file.',
+      );
+      return result();
+    }
+    await figma.setCurrentPageAsync(icons);
+    walk(icons.children);
+    for (const icon of spec.icons)
+      if (!tops.some((n) => n.type === 'COMPONENT' && n.name === icon))
+        foundations.push(`The icon ${icon} is missing.`);
+    return result();
+  }
+
+  const page = figma.root.children.find((p) => p.name === spec.page);
+  if (!page) {
+    foundations.push(
+      `There is no ${spec.page} page. Build the components on a page named ${spec.page}, in the components file.`,
+    );
+    return result();
+  }
+  await figma.setCurrentPageAsync(page);
   walk(page.children);
-  for (const icon of spec.icons)
-    if (!tops.some((n) => n.type === 'COMPONENT' && n.name === icon))
-      foundations.push(`The icon ${icon} is missing.`);
+  const { paths, textStyles, effectStyles } = await stampsUsed(figma, tops);
 
   const colored: Record<string, boolean> = {};
   for (const c of spec.components) colored[c.name] = c.colored;
@@ -983,5 +1075,5 @@ export async function check(
         })),
       );
   }
-  return { fossil: 'check', ...content, hash: sha256(JSON.stringify(content)) };
+  return result();
 }

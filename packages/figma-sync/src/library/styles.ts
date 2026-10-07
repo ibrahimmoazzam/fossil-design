@@ -9,8 +9,10 @@ import type {
   TextStyleSpec,
 } from './runtime.ts';
 
-/** The page that holds the library, in a section per component and one for icons. */
-export const PAGE = 'Components';
+/** The foundations file's page for the icon glyphs. */
+export const ICONS_PAGE = 'Icons';
+/** The components file's page, with a section per component. */
+export const COMPONENTS_PAGE = 'Components';
 /** An icon's colour in its main component. Instances take their parent's text colour. */
 export const ICON_COLOR = 'color.text.default';
 
@@ -130,7 +132,7 @@ export function stylesSpec(
   return {
     spec: {
       kind: 'styles',
-      page: PAGE,
+      page: ICONS_PAGE,
       iconColor: ICON_COLOR,
       textStyles,
       effectStyles,

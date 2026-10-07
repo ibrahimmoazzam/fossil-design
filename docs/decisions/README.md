@@ -18,6 +18,7 @@ Each record states the context, the options considered, the decision and its con
 | [0012](./0012-smoke-test.md)                          | The consumption smoke test                                | Accepted                            |
 | [0013](./0013-base-primitives.md)                     | Primitive tokens live under `base`                        | Accepted                            |
 | [0014](./0014-enforcement.md)                         | The ESLint config, the escape count and the gap log       | Accepted                            |
-| [0015](./0015-figma-component-library.md)             | The Figma component library                               | Accepted                            |
+| [0015](./0015-figma-component-library.md)             | The Figma component library                               | Accepted, partly superseded by 0018 |
 | [0016](./0016-bundled-agent-docs.md)                  | Agent docs bundled in the component package               | Accepted                            |
 | [0017](./0017-agents-md-block-and-make-guidelines.md) | The AGENTS.md block and the Make guidelines               | Accepted                            |
+| [0018](./0018-figma-foundations-and-components.md)    | Two Figma libraries: foundations and components           | Accepted                            |
