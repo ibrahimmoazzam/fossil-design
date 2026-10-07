@@ -14,7 +14,20 @@ const H4 = (props: HeadingProps) => <h4 {...props} />;
 const H5 = (props: HeadingProps) => <h5 {...props} />;
 const H6 = (props: HeadingProps) => <h6 {...props} />;
 
-const headings = { h1: H1, h2: H2, h3: H3, h4: H4, h5: H5, h6: H6 };
+// A wide table scrolls within the text column, so keyboard users need to reach it to scroll.
+const Table = (props: ComponentProps<'table'>) => (
+  <table tabIndex={0} {...props} />
+);
+
+const elements = {
+  h1: H1,
+  h2: H2,
+  h3: H3,
+  h4: H4,
+  h5: H5,
+  h6: H6,
+  table: Table,
+};
 
 function idOf(children: ReactNode): string | undefined {
   return typeof children === 'string' ? slug(children) : undefined;
@@ -38,7 +51,7 @@ function currentPage(): string | undefined {
 }
 
 /**
- * Markdown, from a repo file or a component's JSDoc, with the same headings, and with the
+ * Markdown, from a repo file or a component's JSDoc, with the same headings and tables, and with the
  * first mention of each known name in a section linked.
  */
 function MarkdownWithHeadings({
@@ -50,7 +63,7 @@ function MarkdownWithHeadings({
       {...props}
       options={{
         ...props.options,
-        overrides: { ...headings, ...props.options?.overrides },
+        overrides: { ...elements, ...props.options?.overrides },
       }}
     >
       {autolink(children, currentPage())}
@@ -58,9 +71,9 @@ function MarkdownWithHeadings({
   );
 }
 
-/** Replaces Storybook's docs headings and Markdown, in MDX, in repo files and on component pages. */
+/** Replaces Storybook's docs headings, tables and Markdown, in MDX, in repo files and on component pages. */
 export const docsComponents = {
-  ...headings,
+  ...elements,
   Heading,
   Subheading,
   Markdown: MarkdownWithHeadings,

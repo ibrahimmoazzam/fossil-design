@@ -1,6 +1,6 @@
 import tokensFile from '@fossil-design/tokens/tokens.json';
 import { create, type ThemeVars } from 'storybook/theming';
-import { repo } from '../docs-site/repo.ts';
+import { repo, version } from '../docs-site/repo.ts';
 
 export type Mode = 'light' | 'dark';
 interface ColorValue {
@@ -82,7 +82,9 @@ function brand(mode: Mode): string {
     `--chip-font-family: ${fontStack('font.family.mono')}`,
     `--chip-font-size: ${fontSize('text.fine')}`,
   ].join('; ');
-  return `<span style="display: flex; flex-direction: column; align-items: start; gap: ${String(px('space.xs'))}px"><a href="./" style="${name}">Fossil Design</a><a class="fossil-repo-chip" href="${repo}" aria-label="${repoName} on GitHub" style="${chip}"><svg aria-hidden="true" width="${icon}" height="${icon}" viewBox="0 0 16 16" fill="currentColor"><path d="${githubMark}"/></svg>${repoName}</a></span>`;
+  const versionStyle = `font-family: ${fontStack('font.family.mono')}; font-size: ${fontSize('text.fine')}; color: ${color('color.text.muted', mode)}`;
+  const gap = `${String(px('space.xs'))}px`;
+  return `<span style="display: flex; flex-direction: column; align-items: start; gap: ${gap}"><span style="display: flex; align-items: baseline; gap: ${gap}"><a href="./" style="${name}">Fossil Design</a><span style="${versionStyle}">v${version}</span></span><a class="fossil-repo-chip" href="${repo}" aria-label="${repoName} on GitHub" style="${chip}"><svg aria-hidden="true" width="${icon}" height="${icon}" viewBox="0 0 16 16" fill="currentColor"><path d="${githubMark}"/></svg>${repoName}</a></span>`;
 }
 
 const systemDark = window.matchMedia('(prefers-color-scheme: dark)');

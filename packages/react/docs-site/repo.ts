@@ -5,6 +5,9 @@ export const repo = packageJson.repository.url
   .replace(/^git\+/, '')
   .replace(/\.git$/, '');
 
+/** The version of the components the site documents, as major.minor, such as `0.5`. */
+export const version = packageJson.version.split('.').slice(0, 2).join('.');
+
 /** A file or folder in the repository, on GitHub. */
 export function onGitHub(path: string): string {
   return `${repo}/${path.endsWith('/') ? 'tree' : 'blob'}/main/${path.replace(/\/$/, '')}`;

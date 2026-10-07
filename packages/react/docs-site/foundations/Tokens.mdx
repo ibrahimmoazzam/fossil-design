@@ -1,7 +1,8 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { RepoDoc } from '../RepoDoc.tsx';
 import tokens from '../../../tokens/dist/tokens.md?raw';
+import { withSwatches } from '../swatches.ts';
 
 <Meta title="Foundations/Tokens" />
 
-<RepoDoc source={tokens} path="packages/tokens/dist/tokens.md" />
+<RepoDoc source={withSwatches(tokens)} path="packages/tokens/dist/tokens.md" />

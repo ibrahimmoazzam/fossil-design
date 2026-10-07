@@ -36,7 +36,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Introduction',
-          'Getting started',
+          'Getting Started',
           'Foundations',
           ['Overview', 'Tokens'],
           'Layout',
@@ -46,7 +46,7 @@ const preview: Preview = {
           'Overlays',
           'Architecture',
           'Research',
-          ['Learnings', 'Drift eval'],
+          ['Learnings', 'Drift Eval'],
         ],
       },
     },

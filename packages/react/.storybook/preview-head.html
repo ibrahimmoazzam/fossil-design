@@ -34,6 +34,28 @@
     color: var(--fossil-color-text-default);
   }
 
+  /* The token reference's colour swatches: each sets its colour, painted over a checkerboard
+     so translucent values show. */
+  td:has(> .token-swatch) {
+    white-space: nowrap;
+  }
+
+  .token-swatch {
+    display: inline-block;
+    vertical-align: middle;
+    inline-size: var(--fossil-icon-size-m);
+    block-size: var(--fossil-icon-size-m);
+    border: var(--fossil-border-default);
+    border-radius: var(--fossil-radius-compact);
+    background:
+      linear-gradient(currentcolor, currentcolor),
+      repeating-conic-gradient(
+          var(--fossil-color-background-sunken) 0 25%,
+          var(--fossil-color-background-surface) 0 50%
+        )
+        0 0 / 50% 50%;
+  }
+
   /* Linked code reads as a link, not as plain code. */
   .sbdocs-content a code {
     color: inherit;

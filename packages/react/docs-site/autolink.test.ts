@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { autolink } from './autolink.ts';
 import { codeTarget, codeTerms, components } from './links.ts';
 import { repo } from './repo.ts';
+import { withSwatches } from './swatches.ts';
 
 const root = fileURLToPath(new URL('../../../', import.meta.url));
 
@@ -85,5 +86,27 @@ describe('the links', () => {
       const path = href.replace(new RegExp(`^${repo}/(blob|tree)/main/`), '');
       expect(existsSync(`${root}${path}`), `${term}: ${path}`).toBe(true);
     }
+  });
+});
+
+describe('withSwatches', () => {
+  it('puts a swatch before each colour value, light and dark, and only in the colour table', () => {
+    const reference = [
+      '## color',
+      '| Token | Custom property | Value | Dark | Use |',
+      '| `color.a` | `--a` | #0f0f10 at 8% | #ffffff | A. |',
+      '| `color.b` | `--b` | transparent |  | B. |',
+      '## space',
+      '| `space.m` | `--m` | #ffffff | M. |',
+    ].join('\n');
+    const lines = withSwatches(reference).split('\n');
+    expect(lines[2]).toContain(
+      '<span class="token-swatch" aria-hidden="true" style="color: rgb(15 15 16 / 0.08)"></span> #0f0f10 at 8% |',
+    );
+    expect(lines[2]).toContain(
+      'style="color: rgb(255 255 255 / 1)"></span> #ffffff |',
+    );
+    expect(lines[3]).toBe('| `color.b` | `--b` | transparent |  | B. |');
+    expect(lines[5]).toBe('| `space.m` | `--m` | #ffffff | M. |');
   });
 });

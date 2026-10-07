@@ -1,4 +1,4 @@
-# Drift eval
+# Drift Eval
 
 **Status: planned, not yet run.** Designed in October 2026 as Phase 7 of the [PRD](./PRD.md), then deferred. A full run is 180 agent sessions, each a complete coding task, plus a grading pass for each, which is more time and compute than the project has today. This page records the design so it can be built later, by this project or by anyone running it against their own fork.
 
