@@ -1,6 +1,6 @@
 # Fossil Design
 
-An open-source agentic design system, built for the AI tools that write UI, in code and in Figma. Tokens live in git and flow into CSS, typed React components, Figma variables and a Figma component library generated from code. Shared lint configs, docs bundled into the packages and guidelines for Figma Make keep what coding agents and Make generate on-system.
+An open-source agentic design system: a design system built for AI agents to stay on-system from design to code. Tokens live in git and flow into CSS, typed React components, Figma variables and a Figma component library generated from code. Shared lint configs, docs bundled into the packages and guidelines for Figma Make keep what coding agents and Make generate on-system.
 
 > **Status: pre-release, built in public.** The token build, the Figma sync, the components, both lint configs, the Figma libraries and the agent docs are in place. Documentation and the portfolio migration come next, as set out in the [PRD](./docs/PRD.md). Packages publish as `0.x` until the token taxonomy has survived a real migration.
 

@@ -8,7 +8,7 @@
 
 ## 1. Why this project exists
 
-Fossil Design, or Fossil for short, is a personal, open-source agentic design system, built for the AI tools that write UI, in code and in Figma.
+Fossil Design, or Fossil for short, is a personal, open-source agentic design system: a design system built for AI agents to stay on-system from design to code.
 
 **Origin.** The author designed and built a portfolio website directly in code. Once it was finished, its tokens and components were extracted to start a code-based design system. That system makes the next stage possible: designing in Figma and having agents write the code, with their output constrained to what the system defines. The portfolio is then rebuilt on Fossil, installed from npm. This is also how many design systems begin: harvested from a product that already ships, with code, not a design file, as the source of truth.
 
