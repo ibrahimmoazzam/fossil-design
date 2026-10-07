@@ -8,6 +8,11 @@ compatibility: Needs the Figma MCP server with use_figma and Figma's figma-use s
 
 Fossil's tokens live in git, in `packages/tokens/src`. This skill puts them into Figma as variables, brings back the values designers change in Figma as a pull request, and builds the component library from code. The logic is Fossil's own tested code in `packages/figma-sync`. Your job is to carry its generated scripts to Figma and its results back, unchanged, and to build each component's frames from the spec it writes.
 
+Fossil's Figma library is two files, each published as a library (ADR 0018):
+
+- **The foundations file:** the variables, the text and effect styles, and the icons. The sync, the styles script and the foundations check run here.
+- **The components file:** the components, bound to the foundations library's variables, styles and icons. Components are built and checked here.
+
 ## Rules
 
 - **Never write Plugin API code for variables, text styles, effect styles or icons yourself.** Those `use_figma` calls send a script that `pnpm figma:*` generated, exactly as the file holds it. Don't fix, shorten, reformat or wrap it. Each script hashes itself and refuses to run if anything changed. Only the component frames are yours to write.
@@ -20,9 +25,11 @@ Fossil's tokens live in git, in `packages/tokens/src`. This skill puts them into
 
 1. Start from an up-to-date `main`: `git switch main && git pull`.
 2. `pnpm install --frozen-lockfile && pnpm build`. The sync reads `packages/tokens/dist/tokens.json`.
-3. Get the Figma file's URL from the user. Its key is the part after `/design/`.
+3. Get the URL of the file the step runs on from the user: the foundations file for the sync and the styles script, the components file for building and checking components. Its key is the part after `/design/`.
 
 ## Apply: code to Figma
+
+In the foundations file.
 
 1. Run `pnpm figma:apply`. It refuses if the token source has uncommitted changes, because it stamps the current commit on Figma as the base for the next diff. It writes `packages/figma-sync/.figma/apply-1.js` up to `apply-N.js`.
 2. Send each script to `use_figma`, in order, waiting for each result:
@@ -30,12 +37,14 @@ Fossil's tokens live in git, in `packages/tokens/src`. This skill puts them into
    - the last returns `commit`, `missing`, `orphans` and `unstamped`, and stamps the commit only when nothing is missing.
 3. If `missing` isn't empty, a part didn't finish. Send the parts again in order, then the last script.
 4. Tell the user what changed, then explain anything left over:
-   - **`orphans`** are variables for tokens deleted in code. They stay in Figma until the Figma component library is regenerated without them, so nothing loses its binding. **`boundBy`** names the library components that still bind each one; update those, then the user can delete the variable.
+   - **`orphans`** are variables for tokens deleted in code. They stay in Figma until no component binds them, so nothing loses its binding. The components check, in the components file, reports each binding the spec no longer names. Update those components, publish both files, then the user can delete the variable.
    - **`unstamped`** are variables someone added in Figma. The next diff refuses them.
 
 A second apply right after the first changes nothing. That's the check that the first one worked.
 
 ## Pull: Figma to a pull request
+
+From the foundations file.
 
 1. Run `pnpm figma:read`. Send `.figma/read-1.js` to `use_figma`, and write the result, exactly as returned, to `packages/figma-sync/.figma/snapshot-1.json`.
 2. The result's `pages` says how many pages there are. For each further page `n`, run `pnpm figma:read n`, send `.figma/read-n.js`, and save the result to `.figma/snapshot-n.json`.
@@ -50,6 +59,8 @@ A second apply right after the first changes nothing. That's the check that the 
 6. Tell the user about anything the report refused or marked as a conflict. Those need a change in code, and the report says which.
 
 Once the pull request merges, apply from `main`, so Figma's stamped commit includes the change.
+
+After an apply that changed anything, the user publishes the foundations file, and accepts the update in the components file and in design files.
 
 ## What only code can change
 
@@ -68,22 +79,30 @@ The diff brings back values only: a primitive's value, or which variable a seman
 
 ## The component library
 
-The library lives on the file's **Components** page, one section per component. `pnpm figma:library-spec` reads every component's variant map, JSX and CSS Module and decides everything that must be exact: names, variants, properties, and the variable or style each property uses. You turn that into frames. `pnpm figma:library-check` reads the result back and compares it with the spec.
+`pnpm figma:library-spec` reads every component's variant map, JSX and CSS Module and decides everything that must be exact: names, variants, properties, and the variable or style each property uses. You turn that into frames. `pnpm figma:library-check` reads the result back and compares it with the spec.
 
-Load Figma's `figma-generate-library` skill as well as `figma-use`, and name both in `skillNames`. The file's variables must already be applied from `main` (see Apply above).
+Load Figma's `figma-generate-library` skill as well as `figma-use`, and name both in `skillNames`. Every step after the first runs on one of the two files; the step says which.
 
 1. Run `pnpm figma:library-spec`. It writes three files to `packages/figma-sync/.figma/`:
    - `library.md`, the build sheet: for each component, its variant and component properties, then every variant's layers, with the variable or style each one binds and the raw layout values to follow;
    - `library-spec.json`, the same spec as data;
-   - `styles.js`, the script for the text styles, effect styles, the Components page and the icon glyph components.
-2. Send `styles.js` to `use_figma`, exactly as it is. It checks fonts and variables before it writes anything, and a second run changes nothing.
-3. Build each component the sheet lists, nested components first (`Icon` before `Button`, `Figure` before `Clip`), with your own `use_figma` code:
-   - Put it in a section named after it on the Components page. A component with variants is a component set with the default variant at the top left.
+   - `styles.js`, the script for the text styles, effect styles and the icon glyph components.
+2. **In the foundations file,** applied from `main` (see Apply above), send `styles.js` to `use_figma`, exactly as it is. It checks fonts and variables before it writes anything, puts the icons on the Icons page, and a second run changes nothing. Its result's `keys` gives the key of every text style, effect style and icon, by name; keep them for step 4.
+3. **The user** publishes the foundations file, then turns it on as a library in the components file, from the Assets panel. The Plugin API can't turn a library on.
+4. **In the components file,** build each component the sheet lists, nested components first (`Icon` before `Button`, `Figure` before `Clip`), with your own `use_figma` code:
+   - Put it in a section named after it, on a page named `Components`. A component with variants is a component set with the default variant at the top left.
    - Name every layer the sheet lists exactly as written: it is the CSS class, or the state selector, it stands for, such as `tab[aria-selected='true']`.
    - Bind everything the sheet names, and nothing to a raw value: every fill, stroke, padding, gap and radius is a variable. Text uses the text style named, or each part bound when the sheet lists parts.
+   - Import every variable, style and icon from the foundations library; never create one in the components file. Find a variable's key by its name with `figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync` and `getVariablesInLibraryCollectionAsync`, then `figma.variables.importVariableByKeyAsync`. Import styles with `figma.importStyleByKeyAsync` and icons with `figma.importComponentByKeyAsync`, by the keys from step 2.
    - Nest the library's own components as instances, with the variants the sheet gives, never as copies.
    - Add the component properties the sheet lists, named exactly as written, and set the description it gives.
-4. Run `pnpm figma:library-check`, or `pnpm figma:library-check Button` for one component. Send each `check-<n>.js` exactly as it is, save each result exactly as it comes back to `.figma/check-<n>.json`, then run `pnpm figma:library-check report`. Fix what it lists and check again until it passes.
+5. Check both files:
+   - **In the foundations file:** run `pnpm figma:library-check foundations`, send `check-1.js` exactly as it is, save the result exactly as it comes back to `.figma/check-1.json`, and run `pnpm figma:library-check report`.
+   - **In the components file:** run `pnpm figma:library-check`, or `pnpm figma:library-check Button` for one component. Send each `check-<n>.js`, save each result to `.figma/check-<n>.json`, then run `pnpm figma:library-check report`.
+
+   Each check clears the last one's scripts, so run them one at a time. Fix what the report lists and check again until it passes.
+
+6. **The user** publishes the components file.
 
 After a release that changes a component, run the spec and the check again, and update only what the check reports. Update a component in place: deleting a component that others nest breaks their instances.
 

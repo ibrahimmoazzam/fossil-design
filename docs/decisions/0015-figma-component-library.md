@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-06
+- **Partly superseded by:** [0018](./0018-figma-foundations-and-components.md), which splits the library into a foundations file and a components file
 
 ## Context
 
