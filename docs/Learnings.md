@@ -597,7 +597,7 @@ Building the bundled docs settled these, each checked against the installed vers
   - In the components file, all 13 components were built from the library's variables, styles and icons, with none of the file's own, and the components check passed for every one.
   - A new slot has no auto layout. A child set to fill it fails with "node must be an auto-layout frame or a child of an auto-layout frame" until the slot gets a `layoutMode`. The failed script left nothing behind.
   - `Carousel` made a slot in each variant, each renamed `children`. `combineAsVariants` merged them into one `SLOT` property on the set.
-  - The check skips the inside of a nested instance of a component the spec marks `colored`, but it only knows the components in the same run. Checked alone, `Modal` failed on its close button's muted glyph; checked with `Button`, it passed. A smaller run is only ever stricter, so a component that passes in any group also passes in the full run.
+  - The check skips the inside of a nested instance of a component the spec marks `colored`, but it learned which components those were only from the ones in the same run. Checked alone, `Modal` failed on its close button's muted glyph; checked with `Button`, it passed. A check split into parts could have failed the same way. Each check script now carries every colored component's name, so every group and part stops at the same instances. Checked alone again on the real file, `Modal` passed.
   - The hash check caught a mistyped path in the styles script, `8.630` for `8.63`, before anything was written. Resent exactly, it ran.
 
 ---

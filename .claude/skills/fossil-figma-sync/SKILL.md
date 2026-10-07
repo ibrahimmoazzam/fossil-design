@@ -102,7 +102,7 @@ Load Figma's `figma-generate-library` skill as well as `figma-use`, and name bot
 
    Each check clears the last one's scripts, so run them one at a time. Fix what the report lists and check again until it passes.
 
-   Several names check a group, such as `pnpm figma:library-check Modal Button`. A group keeps each script short, so a mistyped one costs less to resend. A component that nests a colored one, such as `Modal`'s close `Button`, needs it in the same group: the check skips inside a nested colored component only when it knows that component.
+   Several names check a group, such as `pnpm figma:library-check Card Modal Tabs`. A group keeps each script short, so a mistyped one costs less to resend.
 
 6. **The user** publishes the components file.
 
