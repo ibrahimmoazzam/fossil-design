@@ -35,7 +35,7 @@ None of them scores tokens against literal values, and none separates what conte
 
 The corpus runs in a 2×2 of context and lint:
 
-|                                                     | Lint configs off | Lint configs on |
+| Agent context                                       | Lint configs off | Lint configs on |
 | --------------------------------------------------- | ---------------- | --------------- |
 | **No context**                                      | Baseline         | Lint only       |
 | **Context**: the `AGENTS.md` block and bundled docs | Context only     | Both            |

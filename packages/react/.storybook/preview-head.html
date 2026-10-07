@@ -16,6 +16,24 @@
     line-height: var(--fossil-text-body-line-height);
   }
 
+  .sbdocs-content :is(h1, h2, h3, h4) {
+    font-family: var(--fossil-font-family-heading);
+  }
+
+  /* Storybook's own stripe and switch colours fail contrast; these use Fossil's tokens. */
+  .sbdocs.sbdocs-content table tr:nth-of-type(2n) {
+    background-color: var(--fossil-color-background-page);
+  }
+
+  .sbdocs label > input[role='switch'] ~ span {
+    color: var(--fossil-color-text-muted);
+  }
+
+  .sbdocs label > input[role='switch']:checked ~ span:last-of-type,
+  .sbdocs label > input[role='switch']:not(:checked) ~ span:first-of-type {
+    color: var(--fossil-color-text-default);
+  }
+
   /* The docs site's wide reference tables scroll within the text column. */
   .sbdocs-content table {
     display: block;

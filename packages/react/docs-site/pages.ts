@@ -1,19 +1,11 @@
 /// <reference types="vite/client" />
+import { slug } from './slug.ts';
 
 const adrFiles = import.meta.glob<string>('../../../docs/decisions/0*.md', {
   query: '?raw',
   import: 'default',
   eager: true,
 });
-
-/** The id the docs give a heading: GitHub's slug of its text. */
-function slug(heading: string): string {
-  return heading
-    .replace(/[`*_]/g, '')
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N} -]/gu, '')
-    .replace(/ /g, '-');
-}
 
 /** Every ADR, in order, with its path from the repo root and the id of its title on the site. */
 export const decisionRecords = Object.keys(adrFiles)

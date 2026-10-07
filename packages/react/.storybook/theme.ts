@@ -1,7 +1,7 @@
 import tokensFile from '@fossil-design/tokens/tokens.json';
 import { create, type ThemeVars } from 'storybook/theming';
 
-type Mode = 'light' | 'dark';
+export type Mode = 'light' | 'dark';
 interface ColorValue {
   components: number[];
   alpha?: number;
@@ -42,20 +42,43 @@ function fontStack(name: string): string {
     .join(', ');
 }
 
-export function systemMode(): Mode {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light';
+/** Storybook renders a theme's title as HTML when it has no logo image. */
+function brandTitle(): string {
+  const { fontSize } = token('text.heading.s').value as {
+    fontSize: DimensionValue;
+  };
+  const size = fontSize.unit === 'rem' ? fontSize.value * 16 : fontSize.value;
+  return `<span style="font-family: ${fontStack('font.family.heading')}; font-size: ${String(size)}px; font-weight: 700">Fossil Design</span>`;
 }
+
+const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+/** The colour scheme for the toolbar's theme setting: light, dark, or the system's for anything else. */
+export function resolveMode(setting: unknown): Mode {
+  if (setting === 'light' || setting === 'dark') return setting;
+  return systemDark.matches ? 'dark' : 'light';
+}
+
+/** Calls `onChange` when the system's colour scheme changes. */
+export function onSystemModeChange(onChange: () => void): () => void {
+  systemDark.addEventListener('change', onChange);
+  return () => {
+    systemDark.removeEventListener('change', onChange);
+  };
+}
+
+const themes = new Map<Mode, ThemeVars>();
 
 /** Storybook's own frame and docs pages, in Fossil's semantic tokens for one colour scheme. */
 export function fossilTheme(mode: Mode): ThemeVars {
+  const cached = themes.get(mode);
+  if (cached) return cached;
   const c = (name: string) => color(name, mode);
-  return create({
+  const theme = create({
     base: mode,
-    brandTitle: 'Fossil Design',
-    brandUrl: 'https://github.com/ibrahimmoazzam/fossil-design',
-    brandTarget: '_blank',
+    brandTitle: brandTitle(),
+    brandUrl: './',
+    brandTarget: '_self',
 
     colorPrimary: c('color.highlight.default'),
     colorSecondary: c('color.accent.default'),
@@ -88,4 +111,6 @@ export function fossilTheme(mode: Mode): ThemeVars {
     inputTextColor: c('color.text.default'),
     inputBorderRadius: px('radius.control'),
   });
+  themes.set(mode, theme);
+  return theme;
 }

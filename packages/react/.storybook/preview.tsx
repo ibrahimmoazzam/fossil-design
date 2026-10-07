@@ -1,14 +1,37 @@
 import type { Preview } from '@storybook/react-vite';
 import '@fossil-design/tokens/tokens.css';
-import { fossilTheme, systemMode } from './theme.ts';
+import { GLOBALS_UPDATED, SET_GLOBALS } from 'storybook/internal/core-events';
+import { addons } from 'storybook/preview-api';
+import { docsComponents } from '../docs-site/headings.tsx';
+import { FossilDocsContainer } from './DocsContainer.tsx';
 
 const themes = ['system', 'light', 'dark'] as const;
+
+// tokens.css follows the system unless data-theme picks a side.
+function applyTheme(setting: unknown) {
+  const theme = themes.find((value) => value === setting) ?? 'system';
+  if (theme === 'system') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = theme;
+}
+
+// A docs page renders no story, so the decorator below never runs for it.
+if (addons.hasChannel()) {
+  const onGlobals = ({ globals }: { globals: Record<string, unknown> }) => {
+    applyTheme(globals.theme);
+  };
+  addons.getChannel().on(SET_GLOBALS, onGlobals);
+  addons.getChannel().on(GLOBALS_UPDATED, onGlobals);
+}
 
 const preview: Preview = {
   tags: ['autodocs'],
   parameters: {
     a11y: { test: 'error' },
-    docs: { theme: fossilTheme(systemMode()), toc: { headingSelector: 'h2' } },
+    docs: {
+      container: FossilDocsContainer,
+      components: docsComponents,
+      toc: { headingSelector: 'h2' },
+    },
     options: {
       storySort: {
         order: [
@@ -45,10 +68,7 @@ const preview: Preview = {
   initialGlobals: { theme: 'system' },
   decorators: [
     (Story, { globals }) => {
-      const theme = themes.find((value) => value === globals.theme) ?? 'system';
-      // tokens.css follows the system unless data-theme picks a side.
-      if (theme === 'system') delete document.documentElement.dataset.theme;
-      else document.documentElement.dataset.theme = theme;
+      applyTheme(globals.theme);
       return <Story />;
     },
   ],
