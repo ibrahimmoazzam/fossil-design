@@ -693,20 +693,26 @@ export function tokenReference({ tokens }: TokensFile, header: string): string {
     '',
     '# Tokens',
     '',
-    'Every semantic token, by group. Use them as `var(--…)` in CSS, or by key in a component prop that takes tokens. Values are at a 16px root. A dark value is listed only where it differs.',
+    'Every semantic token, by group. Use them as `var(--…)` in CSS, or by key in a component prop that takes tokens. Values are at a 16px root. A dark value is listed only where it differs, and a group with none has no Dark column.',
   ];
   for (const [group, entries] of groups) {
     if (entries.length === 0) continue;
+    // Only a group with a mode-dependent token needs the Dark column.
+    const hasDark = entries.some(([, t]) => t.dark !== undefined);
     lines.push(
       '',
       `## ${group}`,
       '',
-      '| Token | Custom property | Value | Dark | Use |',
-      '| --- | --- | --- | --- | --- |',
-      ...entries.map(
-        ([path, t]) =>
-          `| ${code(path)} | ${cssVars(t).map(code).join(', ')} | ${cell(show(t.type, t.value))} | ${t.dark === undefined ? '' : cell(show(t.type, t.dark.value))} | ${cell(t.description ?? '')} |`,
-      ),
+      hasDark
+        ? '| Token | Custom property | Value | Dark | Use |'
+        : '| Token | Custom property | Value | Use |',
+      hasDark ? '| --- | --- | --- | --- | --- |' : '| --- | --- | --- | --- |',
+      ...entries.map(([path, t]) => {
+        const dark = hasDark
+          ? ` ${t.dark === undefined ? '' : cell(show(t.type, t.dark.value))} |`
+          : '';
+        return `| ${code(path)} | ${cssVars(t).map(code).join(', ')} | ${cell(show(t.type, t.value))} |${dark} ${cell(t.description ?? '')} |`;
+      }),
     );
   }
   if (deprecated.length > 0)
