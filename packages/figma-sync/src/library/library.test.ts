@@ -10,7 +10,6 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { TokensFile } from '../../../tokens/src/metadata.ts';
-import { COLLECTIONS } from '../model.ts';
 import { sha256 } from '../runtime.ts';
 import { CHANGED, script } from '../scripts.ts';
 import { checkParts, LibraryError, readResults, reportLines } from './cli.ts';
@@ -24,6 +23,7 @@ import {
 import { FakeCanvas, type FakeNode } from './fake-canvas.ts';
 import type {
   CheckResult,
+  CheckSpec,
   ComponentSpec,
   IconSpec,
   LayerSpec,
@@ -781,13 +781,21 @@ describe('the styles script', () => {
     const first = (await run(text, canvas)) as {
       created: string[];
       updated: string[];
+      keys: Record<string, string>;
     };
     expect(first.created).toEqual([
       'text/body',
       'shadow/raised',
-      'the Components page',
+      'the Icons page',
       'CloseIcon',
     ]);
+    // The components file imports each of them by key.
+    expect(Object.keys(first.keys)).toEqual([
+      'CloseIcon',
+      'text/body',
+      'shadow/raised',
+    ]);
+    expect(first.keys['text/body']).toBe(canvas.textStyles[0]?.key);
     const style = canvas.textStyles[0];
     const variable = (path: string) => canvas.variable(path).id;
     expect(style?.boundVariables.fontFamily?.id).toBe(
@@ -804,6 +812,7 @@ describe('the styles script', () => {
       variable('base.space.100'),
     );
     const page = canvas.root.children[1];
+    expect(page?.name).toBe('Icons');
     const glyph = page?.children[0]?.children?.[0];
     if (!glyph) throw new Error('No glyph');
     expect(glyph.name).toBe('CloseIcon');
@@ -878,11 +887,14 @@ describe('the library check', () => {
     textStyle.setSharedPluginData('fossil', 'path', 'text.body');
     const effectStyle = canvas.createEffectStyle();
     effectStyle.setSharedPluginData('fossil', 'path', 'shadow.raised');
+    const icons = canvas.createPage();
+    icons.name = 'Icons';
+    icons.setSharedPluginData('fossil', 'page', 'icons');
+    canvas.currentPage = icons;
+    canvas.node('COMPONENT', 'CloseIcon', canvas.node('SECTION', 'Icons'));
     const page = canvas.createPage();
-    page.setSharedPluginData('fossil', 'page', 'components');
+    page.name = 'Components';
     canvas.currentPage = page;
-    const icons = canvas.node('SECTION', 'Icons');
-    canvas.node('COMPONENT', 'CloseIcon', icons);
 
     const paint = (node: FakeNode, layer: LayerSpec) => {
       for (const [field, path] of Object.entries(layer.bound))
@@ -998,11 +1010,14 @@ describe('the library check', () => {
   const check = async (
     canvas: FakeCanvas,
     names = specs.map((s) => s.name),
+    target: CheckSpec['target'] = 'components',
   ) => {
     const parts = checkParts(
       specs.filter((s) => names.includes(s.name)),
       {
         kind: 'check',
+        target,
+        page: 'Components',
         commit: 'abc1234',
         library: specs.map((s) => s.name),
         textStyles: ['text.body'],
@@ -1048,12 +1063,36 @@ describe('the library check', () => {
     ).toBe(true);
   });
 
+  it('passes a components file whose variables and styles come from the foundations library', async () => {
+    const { canvas } = built();
+    canvas.toLibrary();
+    expect(await canvas.variables.getLocalVariablesAsync()).toEqual([]);
+    expect(await canvas.getLocalTextStylesAsync()).toEqual([]);
+    expect(problems(await check(canvas))).toEqual([]);
+  });
+
+  it('checks the foundations file: its styles and its icons, not components', async () => {
+    const { canvas } = built();
+    expect(problems(await check(canvas, [], 'foundations'))).toEqual([]);
+    canvas.textStyles.splice(0);
+    expect(problems(await check(canvas, [], 'foundations'))).toEqual([
+      'The text style for text.body is missing.',
+    ]);
+    expect(problems(await check(new FakeCanvas(), [], 'foundations'))).toEqual([
+      'The text style for text.body is missing.',
+      'The effect style for shadow.raised is missing.',
+      'There is no Icons page. Run the styles script from pnpm figma:library-spec in the foundations file.',
+    ]);
+  });
+
   it('splits into parts that fit use_figma, and a result is checked against its hash', async () => {
     const { canvas } = built();
     const parts = checkParts(
       specs,
       {
         kind: 'check',
+        target: 'components',
+        page: 'Components',
         commit: 'x',
         library: [],
         textStyles: [],
@@ -1186,51 +1225,19 @@ describe('the library check', () => {
     ]);
   });
 
-  it('reports a missing page, style or icon', async () => {
-    const canvas = new FakeCanvas();
-    const [result] = await check(canvas, ['Glyph']);
+  it('reports a components file without its page', async () => {
+    const [result] = await check(new FakeCanvas(), ['Glyph']);
     expect(result?.foundations).toEqual([
-      'There is no Components page. Run the styles script from pnpm figma:library-spec first.',
+      'There is no Components page. Build the components on a page named Components, in the components file.',
     ]);
-    const { canvas: partial } = built();
-    partial.textStyles.splice(0);
-    expect(problems(await check(partial, ['Glyph']))).toContain(
-      'The text style for text.body is missing.',
-    );
-  });
-
-  it('names the library components that still bind a token deleted in code, when the apply finishes', async () => {
-    const { canvas, variable } = built();
-    const fossil = (
-      await canvas.variables.getLocalVariableCollectionsAsync()
-    )[0];
-    fossil?.setSharedPluginData('fossil', 'collection', 'semantic');
-    const paths = (await canvas.variables.getLocalVariablesAsync())
-      .map((v) => v.getSharedPluginData('fossil', 'path'))
-      .filter((p) => p !== 'space.s' && p !== 'radius.pill');
-    variable('space.s');
-    const result = await run(
-      script(
-        {
-          kind: 'finish',
-          commit: 'c0ffee',
-          collections: Object.values(COLLECTIONS),
-          paths,
-        },
-        'finish',
-      ),
-      canvas,
-    );
-    expect(result).toMatchObject({
-      orphans: ['space.s', 'radius.pill'],
-      boundBy: { 'space.s': ['Chip'], 'radius.pill': ['Chip'] },
-    });
   });
 
   it('refuses to run after a change, like every Fossil script', async () => {
     const { canvas } = built();
     const [part] = checkParts(specs, {
       kind: 'check',
+      target: 'components',
+      page: 'Components',
       commit: 'x',
       library: [],
       textStyles: [],
@@ -1240,6 +1247,8 @@ describe('the library check', () => {
     if (!part) throw new Error('No part');
     const text = script(part, 'check').replace('"commit":"x"', '"commit":"y"');
     await expect(run(text, canvas)).rejects.toThrow(CHANGED);
+    // A script carries only what it calls; the check has no use for the styles script.
+    expect(script(part, 'check')).not.toContain('function styles(');
     expect(sha256('')).toHaveLength(64);
   });
 });

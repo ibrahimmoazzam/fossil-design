@@ -14,7 +14,7 @@ import { hash, script } from '../scripts.ts';
 import type { CheckResult, CheckSpec, ComponentSpec } from './runtime.ts';
 import { buildSheet } from './sheet.ts';
 import { buildLibrary, type Library } from './spec.ts';
-import { readIcons, stylesSpec } from './styles.ts';
+import { COMPONENTS_PAGE, readIcons, stylesSpec } from './styles.ts';
 
 const REPO = fileURLToPath(new URL('../../../../', import.meta.url));
 const WORK = fileURLToPath(new URL('../../.figma/', import.meta.url));
@@ -86,7 +86,7 @@ export function librarySpec(): void {
       `Read ${String(library.components.length)} components from ${source()}: ${library.components.map((c) => c.spec.name).join(', ')}.`,
       `Left out: ${Object.keys(library.leftOut).join(', ')}.`,
       `Wrote ${shown(join(WORK, 'library.md'))}, the build sheet, and ${shown(join(WORK, 'library-spec.json'))}.`,
-      `Wrote ${shown(join(WORK, 'styles.js'))} (${String(Math.ceil(text.length / 1024))} KB): ${String(styles.spec.textStyles.length)} text styles, ${String(styles.spec.effectStyles.length)} effect styles and ${String(styles.spec.icons.length)} icons. Pass it to use_figma exactly as it is.`,
+      `Wrote ${shown(join(WORK, 'styles.js'))} (${String(Math.ceil(text.length / 1024))} KB): ${String(styles.spec.textStyles.length)} text styles, ${String(styles.spec.effectStyles.length)} effect styles and ${String(styles.spec.icons.length)} icons. Pass it to use_figma exactly as it is, in the foundations file.`,
     ].join('\n'),
   );
 }
@@ -120,19 +120,37 @@ export function checkParts(
   }));
 }
 
+/**
+ * Writes the check: `foundations` for the foundations file's styles and icons, or the components,
+ * every one or those named, for the components file.
+ */
 export function libraryCheck(names: readonly string[]): void {
   const { library, tokens } = load();
   const styles = stylesSpec(tokens, readIcons(join(REACT, 'package.json')));
   const all = library.components.map((c) => c.spec);
-  const unknown = names.filter((n) => !all.some((c) => c.name === n));
+  const target = names[0] === 'foundations' ? 'foundations' : 'components';
+  if (target === 'foundations' && names.length > 1)
+    throw new LibraryError(
+      'The foundations check takes no component names. Check components on their own.',
+    );
+  const unknown =
+    target === 'foundations'
+      ? []
+      : names.filter((n) => !all.some((c) => c.name === n));
   if (unknown.length > 0)
     throw new LibraryError(
       `${unknown.join(', ')} ${unknown.length === 1 ? "isn't a component" : "aren't components"} in the library. It has ${all.map((c) => c.name).join(', ')}.`,
     );
   const chosen =
-    names.length > 0 ? all.filter((c) => names.includes(c.name)) : all;
+    target === 'foundations'
+      ? []
+      : names.length > 0
+        ? all.filter((c) => names.includes(c.name))
+        : all;
   const parts = checkParts(chosen, {
     kind: 'check',
+    target,
+    page: COMPONENTS_PAGE,
     commit: source(),
     library: all.map((c) => c.name),
     textStyles: styles.spec.textStyles.map((t) => t.path),
@@ -142,16 +160,20 @@ export function libraryCheck(names: readonly string[]): void {
   clear('check-');
   const lines = parts.map((spec) => {
     const name = `check-${String(spec.part)}.js`;
+    const what =
+      target === 'foundations'
+        ? 'the styles and icons'
+        : spec.components.map((c) => c.name).join(', ');
     const text = script(
       spec,
-      `check part ${String(spec.part)} of ${String(spec.parts)}: ${spec.components.map((c) => c.name).join(', ')}`,
+      `check part ${String(spec.part)} of ${String(spec.parts)}: ${what}`,
     );
     writeFileSync(join(WORK, name), text);
-    return `  ${shown(join(WORK, name))}  ${String(Math.ceil(text.length / 1024))} KB  ${spec.components.map((c) => c.name).join(', ')}`;
+    return `  ${shown(join(WORK, name))}  ${String(Math.ceil(text.length / 1024))} KB  ${what}`;
   });
   console.log(
     [
-      `Wrote ${String(parts.length)} check ${parts.length === 1 ? 'script' : 'scripts'}:`,
+      `Wrote ${String(parts.length)} check ${parts.length === 1 ? 'script' : 'scripts'} for the ${target} file:`,
       ...lines,
       '',
       `Pass each one to use_figma exactly as it is, save each result exactly as it comes back to ${shown(join(WORK, 'check-<n>.json'))}, then run pnpm figma:library-check report.`,
