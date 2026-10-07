@@ -77,7 +77,7 @@ It writes Fossil's rules, the token scales, the components and the paths to thei
 
 ## Figma Make
 
-Install `@fossil-design/react` in the Make file, then make the file's `guidelines/Guidelines.md` this one line:
+Install `@fossil-design/react` in the Make file. Before the first prompt, create `Guidelines.md` in the file's `guidelines/` folder, which a new Make file has empty, with this one line:
 
 ```md
 Read node_modules/@fossil-design/react/guidelines/Guidelines.md before writing any code, and follow it.
