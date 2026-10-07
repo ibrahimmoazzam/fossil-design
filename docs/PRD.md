@@ -1,6 +1,6 @@
 # Fossil Design: Product Requirements Document
 
-**Status:** Draft for implementation, revised after the Phase 2 and Phase 4 dry run (1 October 2026), at the start of Phase 4 (4 October 2026) and during Phase 5b (6 October 2026)
+**Status:** Draft for implementation, revised after the Phase 2 and Phase 4 dry run (1 October 2026), at the start of Phase 4 (4 October 2026), during Phase 5b (6 October 2026) and when Phase 7 was deferred (7 October 2026)
 **Audience:** Claude Code, and any human contributor
 **Companion document:** `Learnings.md` contains the competitive research and the rationale behind every decision here. Read it if a decision seems arbitrary; it probably is not.
 
@@ -36,7 +36,7 @@ Fossil addresses both. The industry standard today is to lint an open surface. F
 ### What success looks like
 
 - The portfolio site is built entirely from Fossil, with a measurable and low escape-hatch count.
-- An agent given a UI task in the portfolio repo produces on-system code without hand-holding, and this is demonstrated with a number rather than a claim.
+- An agent given a UI task in the portfolio repo produces on-system code without hand-holding. The deferred Phase 7 eval is designed to show this with a number rather than a claim.
 - A designer can change a token value in Figma, and the change arrives as a reviewable pull request when the sync runs.
 - A fresh fork with new token values builds, lints, syncs to a new Figma file and generates its component library, following only the adoption guide.
 - Another engineer can read the repo and understand why each decision was made.
@@ -169,7 +169,7 @@ Publish through trusted publishing via OIDC from GitHub Actions, never a long-li
 |---|---|
 | Context | A generated `AGENTS.md` block with always-on foundation rules and a component index; Markdown docs bundled in the installed package; Make guidelines bundled the same way; Storybook MCP for Fossil's own development. In Figma: the component library, and variables with code syntax, read through the Figma MCP server |
 | Constraint | `Box` and component props typed to token keys and variant maps; the shared ESLint config (no raw layout elements) and Stylelint config (tokens only, semantic only, no margins). In Figma: variable scopes, and designing only from the component library |
-| Verification | Token build validation; Storybook interaction and a11y tests; real-input browser tests; the consumer smoke test with attw and publint; the Figma library check; gap review; the drift eval harness |
+| Verification | Token build validation; Storybook interaction and a11y tests; real-input browser tests; the consumer smoke test with attw and publint; the Figma library check; gap review; the drift eval harness (planned, Phase 7) |
 
 ### Levels of composition
 
@@ -606,28 +606,42 @@ Always-on context beat retrieval, which is the same finding behind Fossil's alwa
 
 ### Phase 7: Drift measurement
 
-**Goal:** a number, where the field currently has none.
+**Status: deferred (7 October 2026).** The design below is settled, but a full run is 180 agent sessions plus a grading pass for each, more time and compute than the project has now. It moves to a later release. [`drift-eval.md`](./drift-eval.md) publishes the design, including the harness and grading worked out before deferring. Until it runs, Fossil's case rests on the market research and competitive analysis in `Learnings.md`, which shaped the workflow. Phase 8 doesn't depend on it.
+
+**Goal:** an on-system rate, split by what context and constraint each contribute. Published evals measure build results, accessibility or API use, but none reports this (Learnings, section 3.12).
 
 This is the most publishable artifact in the project and the strongest case-study material. Do not skip it.
 
 **Tasks**
-1. Build a prompt corpus of 20 to 30 realistic UI tasks ("add a testimonial card", "build a two-column project layout").
-2. Harness: run each prompt against an agent in a clean checkout, capture the diff. Keep runs independent, and have a separate evaluator, which sees only the criteria and the result, grade anything that needs judgment. Evil Martians' `ai-design-system` scenarios are prior art for this setup. They grade component choices and the resulting UI, not the on-system rate below, so Fossil's number would still be new.
+1. Build a prompt corpus of 15 realistic UI tasks ("add a testimonial card", "build a two-column project layout").
+2. Harness: run each prompt against an agent in a clean checkout, capture the diff. Keep runs independent, and have a separate evaluator, which sees only the criteria and the result, grade anything that needs judgment.
+   - Every run gets the same instruction: run the project's checks before finishing. `tsc` is available in every run, so the only difference between cells is which checks exist.
+   - Grading always runs the full checks, whatever the cell gave the agent.
+
+   Prior art, none of which scores the on-system rate below:
+   - **Storybook's eval harness** (`storybookjs/mcp/eval`): a fresh project per trial, variant configs, and automatic grading of build, types, lint, tests and axe. Reuse its shape where it fits.
+   - **Microsoft's `a11y-llm-eval`**: a control against instructions and skills, with several samples per prompt, close to the 2×2 below.
+   - **Evil Martians' `ai-design-system` scenarios**: they grade component choices and the resulting UI.
 3. Score each result on:
-   - **On-system rate:** proportion of style declarations using tokens versus literals.
+   - **On-system rate:** proportion of style declarations using tokens versus literals, reported per surface: `Box` and component props, CSS Modules, inline `style`, and raw elements.
    - **Escape rate:** lint-disable comments introduced.
    - **Component reuse:** existing components used versus components rebuilt from `Box` or raw elements.
    - **Pass rate:** does it survive lint, typecheck and a11y tests unmodified.
-4. Run the corpus in three configurations to isolate what each layer contributes:
-   - **No context:** no `AGENTS.md` block, lint configs off.
-   - **Context only:** the `AGENTS.md` block and bundled docs, lint configs off.
-   - **Context plus constraint:** everything.
+4. Run the corpus in a 2×2 of context and lint, to isolate what each layer contributes:
 
-   This is the experiment that turns the project's thesis into evidence.
-5. Optional: prototype a subset of the same prompts in Figma Make twice, once with a kit Make extracts from a Figma library and once with the Fossil kit built from the npm package. Hand each to Claude Code through the Figma MCP server and score it with the same metrics. This tests whether a written-down system beats an inferred one.
-6. Publish results in the docs site with methodology.
+   |  | Lint configs off | Lint configs on |
+   |---|---|---|
+   | **No context** | Baseline | Lint only |
+   | **Context**: the `AGENTS.md` block and bundled docs | Context only | Both |
 
-**Exit criterion:** the three configurations produce distinguishable numbers and the methodology is written up clearly enough for someone to reproduce it.
+   The typed API is part of the library, not a switch: `Box` and component props are typed to tokens and variant maps in every cell. Removing the types would test a library nobody ships, so the per-surface scores show what they catch instead.
+
+   This is the experiment that turns the project's thesis into evidence. If "both" beats each single-layer cell, context and constraint answer different failure modes.
+5. Run each prompt three times in each cell, 180 runs in all, and report each rate with an interval. Agent output varies between runs, so a single run per prompt can't show that two cells differ.
+6. Optional: prototype a subset of the same prompts in Figma Make twice, once with a kit Make extracts from a Figma library and once with the Fossil kit built from the npm package. Hand each to Claude Code through the Figma MCP server and score it with the same metrics. This tests whether a written-down system beats an inferred one.
+7. Publish results in the docs site with methodology.
+
+**Exit criterion:** every cell's rates are published with intervals, whatever they show, so a reader can see which cells differ, and the methodology is written up clearly enough for someone to reproduce it.
 
 ---
 
@@ -641,6 +655,7 @@ This is the most publishable artifact in the project and the strongest case-stud
    - a token reference generated from source;
    - the component docs;
    - MDX architecture pages with an index of the ADRs.
+   - the research behind the workflow, and the drift eval's design from `docs/drift-eval.md`, marked as planned until Phase 7 runs.
 2. **"Adopt Fossil" guide** for a team using the repo as a template:
    1. Set the name, prefix and scope in `fossil.config.json`.
    2. Replace the primitive values, and the semantic mapping where the brand needs it.
@@ -688,7 +703,7 @@ Phase 5's Stylelint config is built at the start of Phase 4, because Phase 4's e
 
 Phase 5b needs Phases 3 and 4. Build it straight after Phase 4, before any real design work starts in Figma.
 
-Phase 7 depends on 4, 5 and 6 all being in place, since it measures their combined effect.
+Phase 7 depends on 4, 5 and 6 all being in place, since it measures their combined effect. It is deferred to a later release; nothing in Phase 8 needs it, and it can run on any version of the packages after Phase 6.
 
 If the project has to stop early, the minimum coherent artifact is Phases 0 through 5b: a token pipeline with a typed, enforced component library that exists in both code and Figma. That is a complete and defensible thing. Phases 6 and 7 are what make it distinctive.
 

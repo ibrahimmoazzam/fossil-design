@@ -2,7 +2,7 @@
 
 An open-source design system for agentic coding. Tokens live in git and flow into CSS, typed React components, Figma variables and a Figma component library generated from code. Shared lint configs and docs bundled into the packages keep the UI that coding agents write on-system.
 
-> **Status: pre-release, built in public.** The repository foundation and the token build are in place. Components, the Figma sync and the lint configs arrive phase by phase, as set out in the [PRD](./docs/PRD.md). Packages publish as `0.x` until the token taxonomy has survived a real migration.
+> **Status: pre-release, built in public.** The token build, the Figma sync, the components, both lint configs, the Figma libraries and the agent docs are in place. Documentation and the portfolio migration come next, as set out in the [PRD](./docs/PRD.md). Packages publish as `0.x` until the token taxonomy has survived a real migration.
 
 ## Why
 
@@ -11,7 +11,9 @@ Coding agents produce off-system UI in two different ways, and most design syste
 1. **The agent doesn't know what exists,** so it invents. The fix is context: token and component metadata the agent can read.
 2. **The agent knows and drifts anyway.** Its training pulls harder than your documentation, so it writes `bg-gray-100` with your tokens in plain view. The fix is constraint: make off-system values impossible to express.
 
-Fossil does both. The usual approach is to allow any CSS and lint it afterwards. Fossil closes the surface instead: layout props accept only token keys, styles accept only semantic tokens, and lint covers what remains. Phase 7 then measures how often agents stay on-system with and without each layer, so the claim comes with a number.
+Fossil does both. The usual approach is to allow any CSS and lint it afterwards. Fossil closes the surface instead: layout props accept only token keys, styles accept only semantic tokens, and lint covers what remains.
+
+The workflow came from market research and competitive analysis. We surveyed how production design systems, from Primer and Atlassian to Spectrum and Polar, keep agent output on-system in design and in code, and what each one leaves out ([`Learnings.md`](./docs/Learnings.md)). None of them publishes how often agents actually stay on-system. A [drift eval](./docs/drift-eval.md) that measures this for Fossil, with and without each layer, is designed and will run in a later release.
 
 ## How it works
 
@@ -70,6 +72,7 @@ Every decision has a written reason:
 - [`docs/PRD.md`](./docs/PRD.md): the phases, tasks and exit criteria.
 - [`docs/Learnings.md`](./docs/Learnings.md): the research behind each decision, including a survey of how Primer, Carbon, Atlassian, Spectrum, Polaris, Fluent and Material are built.
 - [`docs/decisions/`](./docs/decisions): architecture decision records.
+- [`docs/drift-eval.md`](./docs/drift-eval.md): the planned eval of how often agents stay on-system, with its method, harness and prior art.
 
 ## License
 
