@@ -1,0 +1,138 @@
+.layers {
+  grid-template-columns: 1fr;
+}
+
+/* The two layers side by side, with verification, which checks both, across the row beneath. */
+@media (min-width: 768px) {
+  .layers {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .verification {
+    grid-column: 1 / -1;
+  }
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--fossil-space-s);
+}
+
+/* An ordinal in mono, like the numbered cards on the reference site. It repeats the reading
+   order, so it's hidden from assistive technology. */
+.number {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: var(--fossil-radius-pill);
+  background-color: var(--fossil-color-background-sunken);
+  color: var(--fossil-color-text-muted);
+  font-family: var(--fossil-font-family-mono);
+  font-size: var(--fossil-text-heading-xs-font-size);
+  font-weight: var(--fossil-font-weight-strong);
+}
+
+.sections {
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+/* The anchor for the link's stretched hit area. */
+.card {
+  position: relative;
+  border: var(--fossil-border-default);
+  transition: scale var(--fossil-motion-duration-fast)
+    var(--fossil-motion-easing-standard);
+}
+
+.card:hover {
+  scale: 1.02;
+}
+
+.card:has(.link:active) {
+  scale: 0.99;
+}
+
+/* The ring belongs to the card, the whole target, not to the run of heading text. */
+.card:has(.link:focus-visible) {
+  outline: var(--fossil-border-focus);
+  outline-offset: var(--fossil-focus-ring-offset);
+}
+
+.mark {
+  color: var(--fossil-color-highlight-default);
+  font-size: var(--fossil-icon-size-l);
+}
+
+/* Takes the leftover height, which keeps every chip on the bottom edge of its row. */
+.text {
+  flex: 1;
+}
+
+.link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+/* Stretched over the whole card, so the card is one target and one tab stop while the
+   heading stays in the outline. */
+.link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--fossil-radius-surface);
+}
+
+.chip {
+  display: grid;
+  align-self: flex-end;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: var(--fossil-radius-pill);
+  background-color: var(--fossil-color-background-sunken);
+  color: var(--fossil-color-text-muted);
+  font-size: var(--fossil-icon-size-l);
+  transition:
+    background-color var(--fossil-motion-duration-default)
+      var(--fossil-motion-easing-standard),
+    color var(--fossil-motion-duration-default)
+      var(--fossil-motion-easing-standard);
+}
+
+.card:hover .chip,
+.card:has(.link:focus-visible) .chip {
+  background-color: var(--fossil-color-highlight-default);
+  color: var(--fossil-color-text-on-highlight);
+}
+
+/* A right arrow tilted up at rest, which straightens to point the way on hover and focus. */
+.arrow {
+  rotate: -45deg;
+  transition: rotate var(--fossil-motion-duration-default)
+    var(--fossil-motion-easing-standard);
+}
+
+.card:hover .arrow,
+.card:has(.link:focus-visible) .arrow {
+  rotate: 0deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .chip,
+  .arrow {
+    transition: none;
+  }
+
+  .card:hover,
+  .card:has(.link:active) {
+    scale: 1;
+  }
+}
