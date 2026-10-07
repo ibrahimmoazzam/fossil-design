@@ -34,6 +34,11 @@
     color: var(--fossil-color-text-default);
   }
 
+  /* Linked code reads as a link, not as plain code. */
+  .sbdocs-content a code {
+    color: inherit;
+  }
+
   /* The docs site's wide reference tables scroll within the text column. */
   .sbdocs-content table {
     display: block;

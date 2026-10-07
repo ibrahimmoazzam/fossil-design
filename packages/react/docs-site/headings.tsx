@@ -1,5 +1,6 @@
 import { Markdown } from '@storybook/addon-docs/blocks';
 import type { ComponentProps, ReactNode } from 'react';
+import { autolink } from './autolink.ts';
 import { slug } from './slug.ts';
 
 // Storybook's headings hold a "Copy heading URL" link, which screen readers then read as
@@ -29,8 +30,21 @@ function Subheading({ children }: { children: ReactNode }) {
   return <h3 id={idOf(children)}>{children}</h3>;
 }
 
-/** Markdown, from a repo file or a component's JSDoc, with the same headings. */
-function MarkdownWithHeadings(props: ComponentProps<typeof Markdown>) {
+/** The docs page showing, such as `actions-button`, from the preview frame's URL. */
+function currentPage(): string | undefined {
+  return new URLSearchParams(window.location.search)
+    .get('id')
+    ?.replace(/--docs$/, '');
+}
+
+/**
+ * Markdown, from a repo file or a component's JSDoc, with the same headings, and with the
+ * first mention of each known name in a section linked.
+ */
+function MarkdownWithHeadings({
+  children,
+  ...props
+}: ComponentProps<typeof Markdown>) {
   return (
     <Markdown
       {...props}
@@ -38,11 +52,13 @@ function MarkdownWithHeadings(props: ComponentProps<typeof Markdown>) {
         ...props.options,
         overrides: { ...headings, ...props.options?.overrides },
       }}
-    />
+    >
+      {autolink(children, currentPage())}
+    </Markdown>
   );
 }
 
-/** Replaces Storybook's docs headings, in MDX, in Markdown and on component pages. */
+/** Replaces Storybook's docs headings and Markdown, in MDX, in repo files and on component pages. */
 export const docsComponents = {
   ...headings,
   Heading,

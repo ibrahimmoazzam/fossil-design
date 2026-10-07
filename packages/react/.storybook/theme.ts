@@ -1,10 +1,6 @@
 import tokensFile from '@fossil-design/tokens/tokens.json';
 import { create, type ThemeVars } from 'storybook/theming';
-import packageJson from '../package.json' with { type: 'json' };
-
-export const repo = packageJson.repository.url
-  .replace(/^git\+/, '')
-  .replace(/\.git$/, '');
+import { repo } from '../docs-site/repo.ts';
 
 export type Mode = 'light' | 'dark';
 interface ColorValue {
