@@ -4,6 +4,8 @@ import { docgenOptions } from '../scripts/docgen.ts';
 const config: StorybookConfig = {
   framework: '@storybook/react-vite',
   stories: ['../docs-site/**/*.mdx', '../src/**/*.stories.tsx'],
+  // The reference brand's icons: Storybook serves favicon.svg from here as the site's favicon.
+  staticDirs: ['../docs-site/public'],
   addons: [
     '@storybook/addon-a11y',
     '@storybook/addon-docs',
