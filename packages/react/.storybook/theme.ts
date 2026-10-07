@@ -1,5 +1,10 @@
 import tokensFile from '@fossil-design/tokens/tokens.json';
 import { create, type ThemeVars } from 'storybook/theming';
+import packageJson from '../package.json' with { type: 'json' };
+
+export const repo = packageJson.repository.url
+  .replace(/^git\+/, '')
+  .replace(/\.git$/, '');
 
 export type Mode = 'light' | 'dark';
 interface ColorValue {
@@ -42,13 +47,20 @@ function fontStack(name: string): string {
     .join(', ');
 }
 
-/** Storybook renders a theme's title as HTML when it has no logo image. */
-function brandTitle(): string {
-  const { fontSize } = token('text.heading.s').value as {
-    fontSize: DimensionValue;
-  };
+function fontSize(name: string): string {
+  const { fontSize } = token(name).value as { fontSize: DimensionValue };
   const size = fontSize.unit === 'rem' ? fontSize.value * 16 : fontSize.value;
-  return `<span style="font-family: ${fontStack('font.family.heading')}; font-size: ${String(size)}px; font-weight: 700">Fossil Design</span>`;
+  return `${String(size)}px`;
+}
+
+/**
+ * The site name, linking home, with a link to the repository under it. Storybook renders a
+ * theme's title as HTML when the theme has neither a logo image nor a URL of its own.
+ */
+function brand(mode: Mode): string {
+  const name = `font-family: ${fontStack('font.family.heading')}; font-size: ${fontSize('text.heading.s')}; font-weight: 700; color: inherit; text-decoration: none`;
+  const source = `font-size: ${fontSize('text.fine')}; color: ${color('color.text.muted', mode)}`;
+  return `<span style="display: flex; flex-direction: column; gap: ${String(px('space.2xs'))}px"><a href="./" style="${name}">Fossil Design</a><a href="${repo}" style="${source}">GitHub</a></span>`;
 }
 
 const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
@@ -76,9 +88,8 @@ export function fossilTheme(mode: Mode): ThemeVars {
   const c = (name: string) => color(name, mode);
   const theme = create({
     base: mode,
-    brandTitle: brandTitle(),
-    brandUrl: './',
-    brandTarget: '_self',
+    brandTitle: brand(mode),
+    brandUrl: '',
 
     colorPrimary: c('color.highlight.default'),
     colorSecondary: c('color.accent.default'),

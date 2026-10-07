@@ -2,12 +2,7 @@ import { createElement } from 'react';
 import { GLOBALS_UPDATED, SET_GLOBALS } from 'storybook/internal/core-events';
 import { Button } from 'storybook/internal/components';
 import { addons, types } from 'storybook/manager-api';
-import packageJson from '../package.json' with { type: 'json' };
-import { fossilTheme, onSystemModeChange, resolveMode } from './theme.ts';
-
-const repo = packageJson.repository.url
-  .replace(/^git\+/, '')
-  .replace(/\.git$/, '');
+import { fossilTheme, onSystemModeChange, repo, resolveMode } from './theme.ts';
 
 addons.setConfig({ theme: fossilTheme(resolveMode('system')) });
 

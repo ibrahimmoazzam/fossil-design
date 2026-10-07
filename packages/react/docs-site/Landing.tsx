@@ -82,7 +82,7 @@ export function Landing() {
       </Stack>
 
       <Stack as="section" gap="m">
-        <Text as="h2" variant="heading-m">
+        <Text as="h2" id="how-it-works" variant="heading-m">
           How it works
         </Text>
         <Text variant="prose">
@@ -101,7 +101,7 @@ export function Landing() {
       </Stack>
 
       <Stack as="section" gap="m">
-        <Text as="h2" variant="heading-m">
+        <Text as="h2" id="explore" variant="heading-m">
           Explore
         </Text>
         <Box as="ul" display="grid" gap="m" style={grid}>

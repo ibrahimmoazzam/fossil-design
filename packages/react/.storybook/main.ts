@@ -13,7 +13,11 @@ const config: StorybookConfig = {
   core: { disableTelemetry: true },
   // The manifest is what Storybook MCP's docs tools serve. The default react-docgen drops
   // Button's variants and every Box layout prop; react-docgen-typescript keeps them.
-  features: { componentsManifest: true },
+  features: {
+    componentsManifest: true,
+    // The theme menu recolours the canvas from the tokens; Backgrounds and its grid would bypass them.
+    backgrounds: false,
+  },
   typescript: {
     reactDocgen: 'react-docgen-typescript',
     reactDocgenTypescriptOptions: docgenOptions,
