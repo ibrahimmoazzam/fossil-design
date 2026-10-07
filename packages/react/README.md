@@ -1,6 +1,6 @@
 # @fossil-design/react
 
-React components for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-design), an open-source design system for agentic coding. Their props take token keys and variant names, never raw values, so code written with them stays on-system.
+React components for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-design), an open-source agentic design system. Their props take token keys and variant names, never raw values, so code written with them stays on-system.
 
 > **Early release.** Versions `0.x` may change component APIs between minor versions while the library is built out. The release notes list each change.
 

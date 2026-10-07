@@ -1,6 +1,6 @@
 # @fossil-design/eslint-config
 
-The shared ESLint config for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-design), an open-source design system for agentic coding. It keeps JSX on-system: layout goes through `Box`, and every disable comment says why. Its partner, [`@fossil-design/stylelint-config`](https://www.npmjs.com/package/@fossil-design/stylelint-config), does the same for stylesheets.
+The shared ESLint config for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-design), an open-source agentic design system. It keeps JSX on-system: layout goes through `Box`, and every disable comment says why. Its partner, [`@fossil-design/stylelint-config`](https://www.npmjs.com/package/@fossil-design/stylelint-config), does the same for stylesheets.
 
 > **Early release.** Versions `0.x` may tighten rules between minor versions. The release notes list each change.
 
