@@ -6,6 +6,12 @@
   href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap"
 />
 <style>
+  /* Scrollbars across the site: the thumb in border.strong on a transparent track. The colour
+     is inherited, so this reaches every scroller on the page. */
+  :root {
+    scrollbar-color: var(--fossil-color-border-strong) transparent;
+  }
+
   body {
     background-color: var(--fossil-color-background-page);
     color: var(--fossil-color-text-default);
@@ -56,6 +62,11 @@
         0 0 / 50% 50%;
   }
 
+  /* The table of contents scrolls on its own when it's taller than the window. */
+  .sbdocs-toc--custom nav {
+    scrollbar-width: thin;
+  }
+
   /* The table of contents marks the current section in the highlight colour, on a token track. */
   .sbdocs.sbdocs-toc--custom .toc-wrapper .toc-list {
     border-left-color: var(--fossil-color-border-strong);
@@ -72,6 +83,16 @@
   /* Linked code reads as a link, not as plain code. */
   .sbdocs-content a code {
     color: inherit;
+  }
+
+  /* A page that marks its figure wide gives it the whole docs column: no table of contents
+     beside it, and room past the reading width, up to a cap. */
+  .sbdocs-wrapper:has([data-fossil-wide]) .sbdocs-toc--custom {
+    display: none;
+  }
+
+  .sbdocs-wrapper:has([data-fossil-wide]) .sbdocs-content {
+    max-width: 1400px;
   }
 
   /* The docs site's wide reference tables scroll within the text column. */
