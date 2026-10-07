@@ -56,6 +56,19 @@
         0 0 / 50% 50%;
   }
 
+  /* The table of contents marks the current section in the highlight colour, on a token track. */
+  .sbdocs.sbdocs-toc--custom .toc-wrapper .toc-list {
+    border-left-color: var(--fossil-color-border-strong);
+  }
+
+  .sbdocs.sbdocs-toc--custom .toc-list-item::before {
+    border-left-color: var(--fossil-color-highlight-default);
+  }
+
+  .sbdocs.sbdocs-toc--custom .toc-list-item.is-active-li > a {
+    color: var(--fossil-color-highlight-default);
+  }
+
   /* Linked code reads as a link, not as plain code. */
   .sbdocs-content a code {
     color: inherit;

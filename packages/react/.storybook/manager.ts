@@ -4,12 +4,13 @@ import { fossilTheme, onSystemModeChange, resolveMode } from './theme.ts';
 
 addons.setConfig({ theme: fossilTheme(resolveMode('system')) });
 
-// Storybook names itself in every tab title, with no option to change it.
+// Storybook names itself in every tab title, with no option to change it. The site follows
+// ibrahimmoazzam.com instead: "Page | Fossil Design", and the front page is just the name.
 function siteTitle(title: string): string {
-  return title
-    .replace(/ - Docs(?= ⋅ Storybook$)/, '')
-    .replace(/⋅ Storybook$/, '⋅ Fossil Design')
-    .replace(/^Storybook$/, 'Fossil Design');
+  if (title === 'Storybook') return 'Fossil Design';
+  const page = /^(.*?)(?: - Docs)? ⋅ Storybook$/.exec(title)?.[1];
+  if (page === undefined) return title;
+  return page === 'Introduction' ? 'Fossil Design' : `${page} | Fossil Design`;
 }
 
 function renameTab() {
