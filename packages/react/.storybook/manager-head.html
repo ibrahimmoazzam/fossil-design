@@ -5,3 +5,29 @@
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap"
 />
+<style>
+  /* The repository chip under the site name. theme.ts sets its token values on the element. */
+  .fossil-repo-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--chip-gap);
+    padding: var(--chip-padding-block) var(--chip-padding-end)
+      var(--chip-padding-block) var(--chip-padding-start);
+    border: var(--chip-border-width) solid var(--chip-border);
+    border-radius: var(--chip-radius);
+    background-color: var(--chip-background);
+    color: var(--chip-text);
+    font-family: var(--chip-font-family);
+    font-size: var(--chip-font-size);
+    text-decoration: none;
+  }
+
+  .fossil-repo-chip:hover {
+    border-color: var(--chip-border-hover);
+  }
+
+  .fossil-repo-chip:focus-visible {
+    outline: var(--chip-focus-width) solid var(--chip-focus);
+    outline-offset: var(--chip-focus-offset);
+  }
+</style>

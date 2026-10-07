@@ -65,8 +65,28 @@ function brand(mode: Mode): string {
   const repoName = repo.slice(repo.lastIndexOf('/') + 1);
   const icon = String(px('icon.size.s'));
   const name = `font-family: ${fontStack('font.family.heading')}; font-size: ${fontSize('text.heading.s')}; font-weight: 700; color: inherit; text-decoration: none`;
-  const source = `display: inline-flex; align-items: center; gap: ${String(px('space.2xs'))}px; font-family: ${fontStack('font.family.mono')}; font-size: ${fontSize('text.fine')}; color: ${color('color.text.muted', mode)}`;
-  return `<span style="display: flex; flex-direction: column; align-items: start; gap: ${String(px('space.2xs'))}px"><a href="./" style="${name}">Fossil Design</a><a href="${repo}" aria-label="${repoName} on GitHub" style="${source}"><svg aria-hidden="true" width="${icon}" height="${icon}" viewBox="0 0 16 16" fill="currentColor"><path d="${githubMark}"/></svg>${repoName}</a></span>`;
+  // manager-head.html lays out the chip from these values; inline styles couldn't take a hover.
+  const sizes: [string, number][] = [
+    ['--chip-gap', px('space.2xs')],
+    ['--chip-padding-block', px('space.2xs')],
+    ['--chip-padding-start', px('space.xs')],
+    ['--chip-padding-end', px('space.s')],
+    ['--chip-border-width', px('border.width.default')],
+    ['--chip-radius', px('radius.pill')],
+    ['--chip-focus-width', px('focus.ring.width')],
+    ['--chip-focus-offset', px('focus.ring.offset')],
+  ];
+  const chip = [
+    ...sizes.map(([name, value]) => `${name}: ${String(value)}px`),
+    `--chip-border: ${color('color.border.default', mode)}`,
+    `--chip-border-hover: ${color('color.border.hover', mode)}`,
+    `--chip-background: ${color('color.background.surface', mode)}`,
+    `--chip-text: ${color('color.text.muted', mode)}`,
+    `--chip-focus: ${color('color.focus.ring', mode)}`,
+    `--chip-font-family: ${fontStack('font.family.mono')}`,
+    `--chip-font-size: ${fontSize('text.fine')}`,
+  ].join('; ');
+  return `<span style="display: flex; flex-direction: column; align-items: start; gap: ${String(px('space.xs'))}px"><a href="./" style="${name}">Fossil Design</a><a class="fossil-repo-chip" href="${repo}" aria-label="${repoName} on GitHub" style="${chip}"><svg aria-hidden="true" width="${icon}" height="${icon}" viewBox="0 0 16 16" fill="currentColor"><path d="${githubMark}"/></svg>${repoName}</a></span>`;
 }
 
 const systemDark = window.matchMedia('(prefers-color-scheme: dark)');

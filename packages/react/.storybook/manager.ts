@@ -1,8 +1,6 @@
-import { createElement } from 'react';
 import { GLOBALS_UPDATED, SET_GLOBALS } from 'storybook/internal/core-events';
-import { Button } from 'storybook/internal/components';
-import { addons, types } from 'storybook/manager-api';
-import { fossilTheme, onSystemModeChange, repo, resolveMode } from './theme.ts';
+import { addons } from 'storybook/manager-api';
+import { fossilTheme, onSystemModeChange, resolveMode } from './theme.ts';
 
 addons.setConfig({ theme: fossilTheme(resolveMode('system')) });
 
@@ -38,18 +36,5 @@ addons.register('fossil-design/site', (api) => {
     childList: true,
     subtree: true,
     characterData: true,
-  });
-
-  addons.add('fossil-design/github', {
-    type: types.TOOL,
-    title: 'GitHub',
-    match: () => true,
-    // Storybook builds this file without the automatic JSX runtime.
-    render: () =>
-      createElement(
-        Button,
-        { asChild: true, variant: 'ghost', padding: 'small', ariaLabel: false },
-        createElement('a', { href: repo }, 'GitHub'),
-      ),
   });
 });
