@@ -1,11 +1,32 @@
 import type { Preview } from '@storybook/react-vite';
 import '@fossil-design/tokens/tokens.css';
+import { fossilTheme, systemMode } from './theme.ts';
 
 const themes = ['system', 'light', 'dark'] as const;
 
 const preview: Preview = {
+  tags: ['autodocs'],
   parameters: {
     a11y: { test: 'error' },
+    docs: { theme: fossilTheme(systemMode()), toc: { headingSelector: 'h2' } },
+    options: {
+      storySort: {
+        order: [
+          'Introduction',
+          'Getting started',
+          'Foundations',
+          ['Overview', 'Tokens'],
+          'Layout',
+          'Content',
+          'Actions',
+          'Navigation',
+          'Overlays',
+          'Architecture',
+          'Research',
+          ['Learnings', 'Drift eval'],
+        ],
+      },
+    },
   },
   globalTypes: {
     theme: {

@@ -3,9 +3,10 @@ import { docgenOptions } from '../scripts/docgen.ts';
 
 const config: StorybookConfig = {
   framework: '@storybook/react-vite',
-  stories: ['../src/**/*.stories.tsx'],
+  stories: ['../docs-site/**/*.mdx', '../src/**/*.stories.tsx'],
   addons: [
     '@storybook/addon-a11y',
+    '@storybook/addon-docs',
     '@storybook/addon-vitest',
     '@storybook/addon-mcp',
   ],
