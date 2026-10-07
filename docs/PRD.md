@@ -594,6 +594,7 @@ Always-on context beat retrieval, which is the same finding behind Fossil's alwa
    - **Verified** (October 2026): all three hold, and an imported variable keeps Fossil's stamp, so the check reads stamps as before (ADR 0018).
    - Write an ADR for the split. The skill's workflow, the spec and the check need to say which file each step runs against, and the sync's stamped commit stays on the foundations file.
    - The real Figma files are made as two, once the split is verified, and the Phase 5b scratch file is the test bed. Education plan: confirm each file is in the team's project and that "can edit" members can publish.
+   - **Built** (October 2026): Fossil Foundations and Fossil Components, both published. The foundations check and the components check pass for all 13 components.
 
 **Exit criterion:**
 - Docs and Make guidelines regenerate from source, and CI fails on an undocumented component.

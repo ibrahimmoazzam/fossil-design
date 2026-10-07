@@ -153,6 +153,7 @@ export function libraryCheck(names: readonly string[]): void {
     page: COMPONENTS_PAGE,
     commit: source(),
     library: all.map((c) => c.name),
+    colored: all.filter((c) => c.colored).map((c) => c.name),
     textStyles: styles.spec.textStyles.map((t) => t.path),
     effectStyles: styles.spec.effectStyles.map((e) => e.path),
     icons: styles.spec.icons.map((i) => i.name),

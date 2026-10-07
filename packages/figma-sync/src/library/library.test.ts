@@ -1020,6 +1020,7 @@ describe('the library check', () => {
         page: 'Components',
         commit: 'abc1234',
         library: specs.map((s) => s.name),
+        colored: specs.filter((s) => s.colored).map((s) => s.name),
         textStyles: ['text.body'],
         effectStyles: ['shadow.raised'],
         icons: ['CloseIcon'],
@@ -1095,6 +1096,7 @@ describe('the library check', () => {
         page: 'Components',
         commit: 'x',
         library: [],
+        colored: [],
         textStyles: [],
         effectStyles: [],
         icons: [],
@@ -1225,6 +1227,30 @@ describe('the library check', () => {
     ]);
   });
 
+  it('leaves a nested colored component its own colour, even when it is checked in another part', async () => {
+    const { canvas, sets, variable } = built();
+    const node = variantNode(
+      sets,
+      'Chip',
+      'tone=neutral, size=m, iconOnly=false',
+    );
+    const slot = canvas.node('SLOT', 'children', node);
+    const instance = canvas.node('INSTANCE', 'Text', slot);
+    instance.main = sets.get('Text')?.children?.[0];
+    const text = canvas.node('TEXT', 'text', instance);
+    text.fills = [
+      {
+        type: 'SOLID',
+        color: { r: 0, g: 0, b: 0 },
+        boundVariables: {
+          color: { id: variable('color.highlight.default').id },
+        },
+      },
+    ];
+    expect(specs.find((s) => s.name === 'Text')?.colored).toBe(true);
+    expect(problems(await check(canvas, ['Chip']), 'Chip')).toEqual([]);
+  });
+
   it('reports a components file without its page', async () => {
     const [result] = await check(new FakeCanvas(), ['Glyph']);
     expect(result?.foundations).toEqual([
@@ -1240,6 +1266,7 @@ describe('the library check', () => {
       page: 'Components',
       commit: 'x',
       library: [],
+      colored: [],
       textStyles: [],
       effectStyles: [],
       icons: [],

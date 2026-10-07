@@ -102,6 +102,8 @@ Load Figma's `figma-generate-library` skill as well as `figma-use`, and name bot
 
    Each check clears the last one's scripts, so run them one at a time. Fix what the report lists and check again until it passes.
 
+   Several names check a group, such as `pnpm figma:library-check Card Modal Tabs`. A group keeps each script short, so a mistyped one costs less to resend.
+
 6. **The user** publishes the components file.
 
 After a release that changes a component, run the spec and the check again, and update only what the check reports. Update a component in place: deleting a component that others nest breaks their instances.
@@ -113,6 +115,8 @@ Each was measured live; `docs/Learnings.md` has the detail.
 - A script whose text contains an `svg` tag is rewritten by `use_figma`, which breaks every Fossil script's hash. Build SVG markup at run time.
 - `figma.skipInvisibleInstanceChildren` starts on, which hides what's inside a hidden instance, such as a Button's hidden icon. Turn it off before reading or changing one.
 - A slot and its `SLOT` property share one name. To keep a layer name from the sheet, such as `frame`, put the slot inside that layer.
+- A new slot has no auto layout. Set its `layoutMode` before a child fills it.
+- For a component set with a slot, make the slot in each variant with the same property name; combining them merges the properties into one.
 - Don't rename an icon's glyph instance. Left alone, it takes the name of whichever icon it's swapped to, which is how `get_design_context` reports `<CloseIcon />`.
 - Setting `textCase` on a text layer detaches its text style. Case stays in code.
 - A text underline's colour can bind a variable, but its paint opacity comes back as 1. Draw a dim decoration as its own layer with layer opacity, as the sheet says for `Link`.

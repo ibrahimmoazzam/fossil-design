@@ -132,6 +132,8 @@ export interface CheckSpec {
   components: ComponentSpec[];
   /** Every library component's name, so an instance of one is recognised in any part. */
   library: string[];
+  /** Every library component whose root sets a colour, so every part and group stops at the same instances. */
+  colored: string[];
   textStyles: string[];
   effectStyles: string[];
   icons: string[];
@@ -977,7 +979,7 @@ export async function check(
   const { paths, textStyles, effectStyles } = await stampsUsed(figma, tops);
 
   const colored: Record<string, boolean> = {};
-  for (const c of spec.components) colored[c.name] = c.colored;
+  for (const name of spec.colored) colored[name] = true;
   for (const c of spec.components) {
     const problems: string[] = [];
     const found = tops.filter((n) => n.name === c.name);
