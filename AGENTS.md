@@ -25,6 +25,7 @@ pnpm changeset                   # record a release note for a package change
 - One test project: `pnpm test --project workspace`. Nested projects take their parent's name: `pnpm test --project 'react*'` runs `react (unit)`, `react (browser)` and `react (storybook)`. Watch mode: `pnpm exec vitest`.
 - The browser tests need Chromium once per machine: `pnpm --filter react exec playwright install chromium`.
 - Storybook: `pnpm --filter react storybook`, at `localhost:6006`. Its MCP server is at `localhost:6006/mcp`, and `.mcp.json` registers it for Claude Code.
+- The docs site is Storybook's static build, `pnpm --filter react build-storybook`, deployed to GitHub Pages from `main` at `fossil.ibrahimmoazzam.com`. Its pages are MDX in `packages/react/docs-site/`, and most show a repo file as it is, through `RepoDoc`; `docs-site/pages.ts` maps each file to its page.
 - `pnpm --filter react docs` writes the docs bundled in `@fossil-design/react` from each component's JSDoc contract and its stories tagged `example`. From the same sources it writes the block the package's `fossil-agents-md` bin puts in an app's `AGENTS.md`, and the Figma Make guidelines in `guidelines/`. The package's build runs it last, and fails on an undocumented component or a block over 8 KB (ADRs 0016 and 0017). `packages/react/AGENTS.md` has the format.
 - `pnpm smoke [next|vite]` copies the apps in `smoke/` to a temporary folder, installs the packed tarballs with npm, then type-checks, lints, builds and checks what they render. Then it runs `fossil-agents-md` in each app and checks every installed file the block and the Make guidelines name. Last, it copies the off-system component in `smoke/off-system/` into each app and expects lint to reject every line of it. It needs the network. Set `FOSSIL_KEEP_SMOKE=1` to keep the folder.
 - `pnpm --filter react generate` writes `Box`'s CSS and the `.module.css.d.ts` types. The react package's `build` and `typecheck` run it first. Neither output is committed.
@@ -69,7 +70,7 @@ docs/decisions         ADRs
 docs/gaps.md           logging gaps, and recording a decision for each
 docs/drift-eval.md     the planned drift eval: method, harness, prior art
 .changeset/            pending release notes
-.github/workflows      CI on every pull request; releases from main
+.github/workflows      CI on every pull request; releases and the docs site from main
 .github/ISSUE_TEMPLATE the gap form
 ```
 
