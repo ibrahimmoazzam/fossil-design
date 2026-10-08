@@ -19,6 +19,7 @@ pnpm check:packages              # pack each published package, then run publint
 pnpm smoke                       # install the tarballs into a Next 16 app and a Vite app on React 18
 pnpm escapes [base]              # count disable comments for Fossil's rules, and those added since base
 pnpm changeset                   # record a release note for a package change
+pnpm rename --name … --scope …   # rename a fork: name, CSS prefix, npm scope, repository
 ```
 
 - One package: `pnpm --filter <folder> <script>`, for example `pnpm --filter tokens build`.
@@ -67,6 +68,7 @@ smoke/off-system       a deliberately off-system component that lint must reject
 docs/PRD.md            the spec: phases, tasks, exit criteria
 docs/Learnings.md      the research behind each decision
 docs/key-decisions.md  the weightiest decisions, what each rejected, and why
+docs/adopting.md       how a team adopts Fossil as its own design system
 docs/decisions         ADRs
 docs/gaps.md           logging gaps, and recording a decision for each
 docs/drift-eval.md     the planned drift eval: method, harness, prior art

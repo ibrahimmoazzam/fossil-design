@@ -6,7 +6,7 @@ For the reasoning behind the decisions that carry the most weight, and what each
 
 | Record                                                | Decision                                                  | Status                              |
 | ----------------------------------------------------- | --------------------------------------------------------- | ----------------------------------- |
-| [0001](./0001-monorepo.md)                            | One monorepo with pnpm workspaces                         | Accepted                            |
+| [0001](./0001-monorepo.md)                            | One monorepo with pnpm workspaces                         | Accepted, partly superseded by 0019 |
 | [0002](./0002-typescript-6.md)                        | Pin TypeScript to 6.0                                     | Accepted                            |
 | [0003](./0003-release-pipeline.md)                    | Release with Changesets and npm trusted publishing        | Accepted, partly superseded by 0004 |
 | [0004](./0004-protect-main.md)                        | Protect main, and approve CI on the version pull request  | Accepted                            |
@@ -24,3 +24,4 @@ For the reasoning behind the decisions that carry the most weight, and what each
 | [0016](./0016-bundled-agent-docs.md)                  | Agent docs bundled in the component package               | Accepted                            |
 | [0017](./0017-agents-md-block-and-make-guidelines.md) | The AGENTS.md block and the Make guidelines               | Accepted                            |
 | [0018](./0018-figma-foundations-and-components.md)    | Two Figma libraries: foundations and components           | Accepted                            |
+| [0019](./0019-renaming-a-fork.md)                     | Renaming a fork                                           | Accepted                            |

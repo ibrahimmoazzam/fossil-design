@@ -1,0 +1,6 @@
+# Here rather than in stylelint.config.js, so it also covers an app in apps/ that has a config of its own.
+**/dist/**
+**/storybook-static/**
+**/coverage/**
+# Deliberately off-system: tests/off-system.test.ts and the smoke test lint it and expect errors.
+smoke/off-system/**

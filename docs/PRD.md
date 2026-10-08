@@ -1,6 +1,6 @@
 # Fossil Design: Product Requirements Document
 
-**Status:** Draft for implementation, revised after the Phase 2 and Phase 4 dry run (1 October 2026), at the start of Phase 4 (4 October 2026), during Phase 5b (6 October 2026) and when Phase 7 was deferred (7 October 2026)
+**Status:** Draft for implementation, revised after the Phase 2 and Phase 4 dry run (1 October 2026), at the start of Phase 4 (4 October 2026), during Phase 5b (6 October 2026), when Phase 7 was deferred (7 October 2026) and for the adoption guide (8 October 2026)
 **Audience:** Claude Code, and any human contributor
 **Companion document:** `Learnings.md` contains the competitive research and the rationale behind every decision here. Read it if a decision seems arbitrary; it probably is not.
 
@@ -657,7 +657,7 @@ This is the most publishable artifact in the project and the strongest case-stud
    - MDX architecture pages with an index of the ADRs.
    - the research behind the workflow, and the drift eval's design from `docs/drift-eval.md`, marked as planned until Phase 7 runs.
 2. **"Adopt Fossil" guide** for a team using the repo as a template:
-   1. Set the name, prefix and scope in `fossil.config.json`.
+   1. Rename the fork with `pnpm rename`, which sets the name, prefix and scope in `fossil.config.json` and rewrites the files that spell them out (ADR 0019).
    2. Replace the primitive values, and the semantic mapping where the brand needs it.
    3. Choose how the app consumes the packages. Either publish under the team's own scope, with the same trusted-publishing bootstrap, or keep the app in the fork's own `apps/` folder and skip publishing.
    4. Create a Figma file, apply the variables, and generate the library.

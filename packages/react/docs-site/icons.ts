@@ -1,9 +1,11 @@
 import accountTree from '@material-symbols/svg-400/rounded/account_tree.svg?raw';
 import arrowForward from '@material-symbols/svg-400/rounded/arrow_forward.svg?raw';
 import experiment from '@material-symbols/svg-400/rounded/experiment.svg?raw';
+import info from '@material-symbols/svg-400/rounded/info.svg?raw';
 import menuBook from '@material-symbols/svg-400/rounded/menu_book.svg?raw';
 import palette from '@material-symbols/svg-400/rounded/palette.svg?raw';
 import rocketLaunch from '@material-symbols/svg-400/rounded/rocket_launch.svg?raw';
+import warning from '@material-symbols/svg-400/rounded/warning.svg?raw';
 import widgets from '@material-symbols/svg-400/rounded/widgets.svg?raw';
 import { createIcon } from '../src/components/Icon/createIcon.tsx';
 
@@ -23,4 +25,6 @@ export const GettingStartedIcon = fromSymbol(
   'GettingStartedIcon',
   rocketLaunch,
 );
+export const InfoIcon = fromSymbol('InfoIcon', info);
 export const ResearchIcon = fromSymbol('ResearchIcon', menuBook);
+export const WarningIcon = fromSymbol('WarningIcon', warning);

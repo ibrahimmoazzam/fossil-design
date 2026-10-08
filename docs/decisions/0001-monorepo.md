@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-10-01
+- **Partly superseded by:** [0019](./0019-renaming-a-fork.md), which renames a fork's packages with a script
 
 ## Context
 
@@ -35,6 +36,6 @@ pnpm, rather than npm or Yarn workspaces, because:
 
 ## Consequences
 
-- Package names in `package.json` can't read `fossil.config.json`. A fork renames them by hand, and `tests/workspace.test.ts` fails with the exact names to change.
+- Package names in `package.json` can't read `fossil.config.json`. A fork renames them by hand, and `tests/workspace.test.ts` fails with the exact names to change. _Superseded by [0019](./0019-renaming-a-fork.md): `pnpm rename` renames them._
 - CI installs once and builds the packages in dependency order.
 - Dependabot can't read the lockfile format that pnpm 11 and later write ([dependabot-core#14919](https://github.com/dependabot/dependabot-core/issues/14919)), which constrains the choice of dependency-update bot.

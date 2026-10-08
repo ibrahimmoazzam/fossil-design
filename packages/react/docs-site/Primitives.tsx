@@ -1,6 +1,7 @@
 import tokensFile from '@fossil-design/tokens/tokens.json';
 import type { ReactNode } from 'react';
 import { Box, Stack, Text } from '../src/index.ts';
+import { Callout } from './Callout.tsx';
 import styles from './Primitives.module.css';
 
 // The primitive tokens, read from the token build's JSON at build time. This page is for
@@ -451,14 +452,12 @@ export function Primitives() {
         </defs>
       </svg>
 
-      <Box padding="m" radius="surface" className={styles.note}>
-        <Text variant="small">
-          <strong>For looking, not for using.</strong> Code and designs take
-          semantic tokens only; Stylelint rejects a{' '}
-          <code className={styles.code}>--fossil-base-…</code> property. This
-          page isn’t in the docs agents read.
-        </Text>
-      </Box>
+      <Callout tone="warning">
+        <strong>For looking, not for using.</strong> Code and designs take
+        semantic tokens only; Stylelint rejects a{' '}
+        <code className={styles.code}>--fossil-base-…</code> property. This page
+        isn’t in the docs agents read.
+      </Callout>
 
       <Stack as="section" gap="l">
         <Stack gap="s">

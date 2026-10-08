@@ -37,8 +37,9 @@ const preview: Preview = {
         order: [
           'Introduction',
           'Getting Started',
+          'Adopt Fossil',
           'Foundations',
-          ['Overview', 'Tokens', 'Primitives'],
+          ['Overview', 'Semantic Tokens', 'Primitive Tokens'],
           'Layout',
           'Content',
           'Actions',

@@ -47,12 +47,12 @@ Everything runs on a Figma Professional or Education plan and free tiers elsewhe
 
 ## Make it your own
 
-Fossil is a template with a reference brand. To use it for your own brand, create a copy with GitHub's **Use this template** button, or fork it. Then set your system's name, CSS prefix and npm scope in [`fossil.config.json`](./fossil.config.json), replace the token values, and run the same pipeline against your own Figma file.
+Fossil is a template with a reference brand. To use it for your own brand, create a copy with GitHub's **Use this template** button, or fork it. Then rename it with `pnpm rename`, which sets your system's name, CSS prefix and npm scope in [`fossil.config.json`](./fossil.config.json) and everywhere else they're spelled out, replace the token values, and run the same pipeline against your own Figma file.
 
 - **Use this template** gives you a fresh history, and the copy can be private.
 - **Fork** keeps the link to this repository, so you can pull later fixes and send changes back. A fork of a public repository stays public.
 
-A step-by-step adoption guide arrives with Phase 8.
+[`docs/adopting.md`](./docs/adopting.md) takes you through it step by step: renaming, your brand's tokens, publishing or keeping apps in the repository, your Figma files, and your first app.
 
 ## Development
 

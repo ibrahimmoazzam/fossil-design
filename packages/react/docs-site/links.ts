@@ -46,7 +46,7 @@ function token(term: string): Target | undefined {
     : term;
   const entry = path === undefined ? undefined : tokensFile.tokens[path];
   if (path === undefined || entry?.tier !== 'semantic') return undefined;
-  return site('foundations-tokens', path.split('.')[0]);
+  return site('foundations-semantic-tokens', path.split('.')[0]);
 }
 
 /** Inline code that names a file, package or repository, and where it links. */
@@ -55,11 +55,13 @@ const code: Record<string, Target> = {
   'Learnings.md': site('research-learnings'),
   'docs/Learnings.md': site('research-learnings'),
   'docs/drift-eval.md': site('research-drift-eval'),
+  'adopting.md': site('adopt-fossil'),
+  'docs/adopting.md': site('adopt-fossil'),
   'key-decisions.md': site('architecture-key-decisions'),
   'docs/key-decisions.md': site('architecture-key-decisions'),
   'docs/decisions/': site('architecture-decision-records'),
   'foundations.md': site('foundations-overview'),
-  'tokens.md': site('foundations-tokens'),
+  'tokens.md': site('foundations-semantic-tokens'),
 
   // Files in this repository.
   'PRD.md': web(onGitHub('docs/PRD.md')),

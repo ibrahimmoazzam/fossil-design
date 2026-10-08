@@ -26,6 +26,12 @@
     font-family: var(--fossil-font-family-heading);
   }
 
+  /* Storybook rules a line under every h2. Headings stand apart by size and space instead, as on
+     the pages the site draws with Fossil's own components. */
+  .sbdocs-content h2 {
+    border-bottom: none;
+  }
+
   /* Storybook's own stripe and switch colours fail contrast; these use Fossil's tokens. */
   .sbdocs.sbdocs-content table tr:nth-of-type(2n) {
     background-color: var(--fossil-color-background-page);

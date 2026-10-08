@@ -2,7 +2,7 @@
 
 **Status:** Living document
 **Purpose:** Capture the research and reasoning behind Fossil's architecture, for later use as source material in a written case study.
-**Last updated:** 7 October 2026 (agent setups and published evals, section 3.12, and the drift eval deferred; before that, the repository layout survey, section 3.11)
+**Last updated:** 8 October 2026 (the adoption dry run, section 5; before that, agent setups and published evals, section 3.12, and the drift eval deferred)
 
 ---
 
@@ -644,6 +644,18 @@ Building the bundled docs settled these, each checked against the installed vers
   - The check skips the inside of a nested instance of a component the spec marks `colored`, but it learned which components those were only from the ones in the same run. Checked alone, `Modal` failed on its close button's muted glyph; checked with `Button`, it passed. A check split into parts could have failed the same way. Each check script now carries every colored component's name, so every group and part stops at the same instances. Checked alone again on the real file, `Modal` passed.
   - The hash check caught a mistyped path in the styles script, `8.630` for `8.63`, before anything was written. Resent exactly, it ran.
 
+### The adoption dry run (October 2026)
+
+Before writing the adoption guide, a copy of the repository was renamed to Acme Design (`acme`, `@acme-design`, `acme/acme-design`) on 8 October 2026 and taken through each step that runs outside Figma and npm ([ADR 0019](decisions/0019-renaming-a-fork.md)):
+
+- **`fossil.config.json` alone renames little.** The token build, the class names and the generated docs read it. Package names, imports, every component stylesheet's `var(--fossil-…)`, the lint configs' imports, the smoke-test apps and the repository URLs spell the values out: 79 files in all.
+- **Three replacements and a reinstall nearly suffice.** Replacing the scope, the custom property prefix and the bin's name, then running `pnpm install` and Prettier, gave a copy that built and linted. 15 tests failed, because they set the prefix `fossil` themselves or expected the `AGENTS.md` markers under Fossil's scope. With those reading the config, the copy renamed by `pnpm rename` passed `pnpm build`, `pnpm lint`, `pnpm typecheck`, all 383 tests, `pnpm check:packages` and `pnpm smoke`, and a build afterwards changed no committed file.
+- **An app on React 18 in `apps/` fails to type-check.** Inside the workspace, the components' declarations take `react`'s types from the package's own `@types/react` 19, through the workspace link, and React 18's `ReactNode` rejects what they return. The same app installing the packed tarballs type-checks, as the smoke test shows. On React 19, an app in `apps/` built, linted and type-checked with the packages, and its `acme-agents-md` wrote the block and passed `--check`.
+- **Stylelint lints each file with the nearest config.** Under an app with its own `stylelint.config.js`, the root config's `ignoreFiles` doesn't apply, so the root `pnpm lint` linted the app's built CSS. A `.stylelintignore` in the working directory applies to every file.
+- **Prettier 3 reads the root `.gitignore`,** so an app's build output is skipped once it is ignored there.
+- **The release workflow runs on every push to `main`,** including a new copy's. Until the copy's scope exists on npm and trusts the repository, it would version Fossil's pending changesets or fail to publish, so the guide turns it off first.
+- **Figma Make installs from public npm,** so a team that keeps its apps in `apps/` and publishes nothing can't prototype in Make with its components.
+
 ---
 
 ## 6. Decisions and rationale
@@ -722,6 +734,8 @@ Building the bundled docs settled these, each checked against the installed vers
 | Distribution | Public npm, `0.x` during development, `1.0.0` at Phase 8. Each package's first version is published by hand, then OIDC | Separate site repo removes `workspace:`; `0.x` keeps renames cheap while the taxonomy churns; `npm trust` needs the package to exist first |
 | React package build | Precompiled via Vite library mode with `preserveModules`, tokens bundled into one `style.css` | Consumers configure nothing; `preserveModules` keeps `'use client'` on the components that need it |
 | Adoption model | A template to fork, with the published packages as the reference brand | The Figma round trip needs a team to own its token source, which only a fork gives it |
+| Renaming a fork | `pnpm rename`, a tested script, rewrites the scope, prefix, bin, markers and repository across tracked files, and leaves `docs/` and the changelogs | The config alone left 79 files naming the old values. Commands in the guide would go stale unnoticed, and a fixed prefix leaves a fork's CSS naming another system (ADR 0019) |
+| Apps in a fork | Published under the fork's scope, or kept in `apps/` on React 19 with `workspace:*` | Publishing keeps apps in other repositories and Figma Make possible; `apps/` needs no npm setup. In the workspace, the packages' own React 19 types reach the app |
 | Behaviour layer | Harvested from the portfolio, native elements first; Fossil owns the accessibility | The portfolio's versions exist and use native `<dialog>` and scroll-snap. A fork can swap a headless library in per component without touching the pipeline |
 | Animation | CSS transitions in Fossil; Motion added by the consumer through extension points | Every portfolio component's core behaviour is native and Motion only polishes it, so it shouldn't be a dependency every fork inherits |
 | Fonts | None shipped; font tokens name stacks, and the reference brand uses open fonts: Space Grotesk, Space Mono and Figtree | Roobert is commercial, `use_figma` can't load custom fonts, and forks shouldn't inherit a licence question. The portfolio keeps Roobert by pointing `font.family.heading` and `font.family.mono` at it |
