@@ -393,3 +393,35 @@
     scale: 1;
   }
 }
+
+/* The repository chip, the same as the sidebar's under the site name. */
+.repoChip {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--fossil-space-2xs);
+  padding-block: var(--fossil-space-2xs);
+  padding-inline: var(--fossil-space-xs) var(--fossil-space-s);
+  border: var(--fossil-border-default);
+  border-radius: var(--fossil-radius-pill);
+  background-color: var(--fossil-color-background-surface);
+  color: var(--fossil-color-text-muted);
+  font-family: var(--fossil-text-fine-font-family);
+  font-size: var(--fossil-text-fine-font-size);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.repoChip:hover {
+  border-color: var(--fossil-color-border-hover);
+}
+
+.repoChip:focus-visible {
+  outline: var(--fossil-border-focus);
+  outline-offset: var(--fossil-focus-ring-offset);
+}
+
+.pop {
+  color: var(--fossil-color-highlight-default);
+  font-weight: var(--fossil-font-weight-strong);
+}

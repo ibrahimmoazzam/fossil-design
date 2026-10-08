@@ -23,7 +23,7 @@ export const decisionRecords = Object.keys(adrFiles)
 const pages: Record<string, string> = {
   'README.md': 'introduction',
   'packages/react/docs-site/getting-started.md': 'getting-started',
-  'docs/adopting.md': 'adopt-fossil',
+  'docs/adopting.md': 'adopt-fossil-for-your-brand',
   'docs/Learnings.md': 'research-learnings',
   'docs/drift-eval.md': 'research-drift-eval',
   'docs/key-decisions.md': 'architecture-key-decisions',
