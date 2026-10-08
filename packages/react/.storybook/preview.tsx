@@ -45,7 +45,7 @@ const preview: Preview = {
           'Navigation',
           'Overlays',
           'Architecture',
-          ['Design-to-Code Lifecycle', 'Decision Records'],
+          ['Design-to-Code Lifecycle', 'Key Decisions', 'Decision Records'],
           'Research',
           ['Learnings', 'Drift Eval'],
         ],

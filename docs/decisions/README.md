@@ -2,6 +2,8 @@
 
 Each record states the context, the options considered, the decision and its consequences. Number new records in sequence. To change an accepted decision, write a new record that supersedes it and mark the old one as superseded, rather than rewriting it.
 
+For the reasoning behind the decisions that carry the most weight, and what each one rejected, read [Key Decisions](../key-decisions.md).
+
 | Record                                                | Decision                                                  | Status                              |
 | ----------------------------------------------------- | --------------------------------------------------------- | ----------------------------------- |
 | [0001](./0001-monorepo.md)                            | One monorepo with pnpm workspaces                         | Accepted                            |
