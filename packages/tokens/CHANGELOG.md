@@ -1,5 +1,12 @@
 # @fossil-design/tokens
 
+## 0.6.1
+
+### Patch Changes
+
+- 84520e6: Title `tokens.md` "Semantic Tokens", since it lists only semantic tokens. The bundled docs in `@fossil-design/react` carry the same file.
+- 052593a: `tokens.md` gives a group a Dark column only when one of its tokens has a dark value, so space, type and the other groups that look the same in both modes no longer carry an empty column. `@fossil-design/react` bundles the same file in its docs.
+
 ## 0.6.0
 
 ### Minor Changes
