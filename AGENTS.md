@@ -66,6 +66,7 @@ smoke/                 consumer apps outside the workspace, built from the packe
 smoke/off-system       a deliberately off-system component that lint must reject
 docs/PRD.md            the spec: phases, tasks, exit criteria
 docs/Learnings.md      the research behind each decision
+docs/key-decisions.md  the weightiest decisions, what each rejected, and why
 docs/decisions         ADRs
 docs/gaps.md           logging gaps, and recording a decision for each
 docs/drift-eval.md     the planned drift eval: method, harness, prior art
@@ -267,7 +268,7 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 - Adding a dependency.
 - Adding, renaming or deleting a token.
 - Running `figma:apply`, or any `use_figma` write, against the real Figma file.
-- Changing a decision recorded in `docs/PRD.md` or `docs/Learnings.md`.
+- Changing a decision recorded in `docs/PRD.md`, `docs/Learnings.md` or `docs/key-decisions.md`.
 - Anything that publishes to npm or changes the release workflow.
 
 **Never**

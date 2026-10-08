@@ -55,6 +55,8 @@ const code: Record<string, Target> = {
   'Learnings.md': site('research-learnings'),
   'docs/Learnings.md': site('research-learnings'),
   'docs/drift-eval.md': site('research-drift-eval'),
+  'key-decisions.md': site('architecture-key-decisions'),
+  'docs/key-decisions.md': site('architecture-key-decisions'),
   'docs/decisions/': site('architecture-decision-records'),
   'foundations.md': site('foundations-overview'),
   'tokens.md': site('foundations-tokens'),

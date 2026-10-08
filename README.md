@@ -71,6 +71,7 @@ Every decision has a written reason:
 
 - [`docs/PRD.md`](./docs/PRD.md): the phases, tasks and exit criteria.
 - [`docs/Learnings.md`](./docs/Learnings.md): the research behind each decision, including a survey of how Primer, Carbon, Atlassian, Spectrum, Polaris, Fluent and Material are built.
+- [`docs/key-decisions.md`](./docs/key-decisions.md): the decisions that carry the most weight, each with the alternative it rejected and why.
 - [`docs/decisions/`](./docs/decisions): architecture decision records.
 - [`docs/drift-eval.md`](./docs/drift-eval.md): the planned eval of how often agents stay on-system, with its method, harness and prior art.
 
