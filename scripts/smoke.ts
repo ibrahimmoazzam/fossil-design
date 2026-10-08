@@ -18,6 +18,7 @@ import {
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import config from '../fossil.config.json' with { type: 'json' };
 import { pnpm, run } from './run.ts';
 
 const root = new URL('../', import.meta.url);
@@ -26,6 +27,9 @@ const apps =
   process.argv.slice(2).length > 0 ? process.argv.slice(2) : ['next', 'vite'];
 const work = mkdtempSync(join(tmpdir(), 'fossil-smoke-'));
 const env = { ...process.env, NEXT_TELEMETRY_DISABLED: '1' };
+// Class names carry the CSS prefix, as vite.config.ts names them.
+const boxClass = `${config.cssPrefix}-box-`;
+const buttonClass = `${config.cssPrefix}-button-`;
 
 function expectIncludes(where: string, text: string, ...needles: string[]) {
   for (const needle of needles) {
@@ -46,7 +50,7 @@ async function check(app: string, dir: string) {
       'The prerendered page',
       html,
       'Fossil smoke test',
-      'fossil-box-',
+      boxClass,
       '<dialog',
     );
     const css = anyFile('.next/static/**/*.css', dir).join('\n');
@@ -54,7 +58,7 @@ async function check(app: string, dir: string) {
       "The page's CSS",
       css,
       '--fossil-color-background-page',
-      'fossil-button-',
+      buttonClass,
     );
   } else {
     const errors: unknown[] = [];
@@ -70,7 +74,7 @@ async function check(app: string, dir: string) {
         'The server render',
         html,
         'Fossil smoke test',
-        'fossil-box-',
+        boxClass,
         '<dialog',
       );
     } finally {
@@ -87,7 +91,7 @@ async function check(app: string, dir: string) {
       "The app's CSS",
       css,
       '--fossil-color-background-page',
-      'fossil-button-',
+      buttonClass,
     );
   }
 }

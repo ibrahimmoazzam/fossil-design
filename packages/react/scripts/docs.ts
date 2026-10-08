@@ -29,6 +29,9 @@ import {
 } from 'react-docgen-typescript';
 import ts from 'typescript';
 import { docgenOptions } from './docgen.ts';
+import { fill, list } from './template.ts';
+
+export { fill };
 
 export const SECTIONS = [
   'When to use',
@@ -83,10 +86,6 @@ export interface Inputs {
   packageName: string;
 }
 
-const list = (items: readonly string[]): string =>
-  items.length < 2
-    ? items.join('')
-    : `${items.slice(0, -1).join(', ')} and ${String(items.at(-1))}`;
 const quoted = (items: readonly string[]) => list(items.map((i) => `"${i}"`));
 
 /** The text before a Markdown document's first heading at `level`, and each heading's text. */
@@ -781,19 +780,6 @@ export function indexMarkdown(
     '',
     `${list(icons.map(code))}. Pass one to a component's \`icon\` prop, or pass any SVG component of your own.`,
   ].join('\n')}\n`;
-}
-
-/** Fills `{{name}}` placeholders, and fails on one it doesn't know. */
-export function fill(
-  text: string,
-  values: Readonly<Record<string, string>>,
-): string {
-  return text.replace(/\{\{(\w+)\}\}/g, (match, key: string) => {
-    const value = values[key];
-    if (value === undefined)
-      throw new Error(`docs-src has an unknown placeholder ${match}`);
-    return value;
-  });
 }
 
 /** Moves every Markdown heading down `by` levels, so a document can sit under another's heading. */

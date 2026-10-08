@@ -10,6 +10,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import config from '../../../fossil.config.json' with { type: 'json' };
 import type { LintLists, TokensFile } from '../src/metadata.ts';
 import {
   build,
@@ -57,8 +58,8 @@ const buildInto = async (from: string, options: Partial<BuildOptions> = {}) => {
   await build({
     source: from,
     root,
-    name: 'Fossil Design',
-    prefix: 'fossil',
+    name: config.name,
+    prefix: config.cssPrefix,
     ...options,
   });
   return (path: string) => readFileSync(join(root, path), 'utf8');
@@ -71,8 +72,8 @@ const failure = async (from: string, options: Partial<BuildOptions> = {}) => {
     await build({
       source: from,
       root,
-      name: 'Fossil Design',
-      prefix: 'fossil',
+      name: config.name,
+      prefix: config.cssPrefix,
       ...options,
     });
   } catch (error) {
