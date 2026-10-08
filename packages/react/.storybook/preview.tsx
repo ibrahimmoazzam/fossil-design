@@ -37,7 +37,7 @@ const preview: Preview = {
         order: [
           'Introduction',
           'Getting Started',
-          'Adopt Fossil',
+          'Adopt Fossil for Your Brand',
           'Foundations',
           ['Overview', 'Semantic Tokens', 'Primitive Tokens'],
           'Layout',

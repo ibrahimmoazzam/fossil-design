@@ -27,6 +27,7 @@ import {
   FigmaIcon,
   FigmaMakeIcon,
   GitHubCopilotIcon,
+  GitHubIcon,
   JsonIcon,
   MCPIcon,
   NpmIcon,
@@ -37,6 +38,7 @@ import {
 } from './logos.tsx';
 import styles from './Landing.module.css';
 import { decisionRecords } from './pages.ts';
+import { repo } from './repo.ts';
 
 // The page sits in Storybook's preview frame, so a link to another page loads the whole site.
 const pageHref = (page: string) => `./?path=/docs/${page}--docs`;
@@ -46,6 +48,23 @@ function PageLink({ page, children }: { page: string; children: ReactNode }) {
     <Link href={pageHref(page)} target="_top" tone="accent">
       {children}
     </Link>
+  );
+}
+
+/** The repository on GitHub, as a chip, the same as under the site name in the sidebar. */
+function RepoChip() {
+  const name = new URL(repo).pathname.slice(1);
+  return (
+    <a
+      href={repo}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${name} on GitHub (opens in a new tab)`}
+      className={styles.repoChip}
+    >
+      <Icon icon={GitHubIcon} />
+      {name}
+    </a>
   );
 }
 
@@ -586,13 +605,15 @@ export function Landing() {
         <Text as="h1" variant="heading-xl">
           Fossil Design
         </Text>
+        <RepoChip />
         <Text variant="prose" tone="muted">
-          Fossil Design is an agentic design system: a design system built for
-          AI agents to stay on-system from design to code. Its tokens live in
-          git and flow into CSS, typed React components, Figma variables and a
-          Figma component library generated from code. Docs bundled into the
-          packages, guidelines for Figma Make and lint configs keep what agents
-          generate on-system.
+          Fossil Design is an{' '}
+          <strong className={styles.pop}>agentic design system</strong>: a
+          design system built for AI agents to stay on-system from design to
+          code. Its tokens live in git and flow into CSS, typed React
+          components, Figma variables and a Figma component library generated
+          from code. Docs bundled into the packages, guidelines for Figma Make
+          and lint configs keep what agents generate on-system.
         </Text>
         <Stack direction="row" gap="l" className={styles.actions}>
           <PageLink page="getting-started">Get started</PageLink>
