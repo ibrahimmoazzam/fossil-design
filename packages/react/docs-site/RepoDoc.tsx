@@ -1,10 +1,6 @@
 import { Markdown } from '@storybook/addon-docs/blocks';
-import packageJson from '../package.json' with { type: 'json' };
 import { sitePath } from './pages.ts';
-
-const repo = packageJson.repository.url
-  .replace(/^git\+/, '')
-  .replace(/\.git$/, '');
+import { onGitHub } from './repo.ts';
 
 /** Points a relative link in a repo file at that file's page on this site, or else on GitHub. */
 function absolute(link: string, from: string): string {
@@ -18,7 +14,7 @@ function absolute(link: string, from: string): string {
   const path = parts.join('/');
   return (
     sitePath(path, hash) ??
-    `${repo}/blob/main/${path}${hash === undefined ? '' : `#${hash}`}`
+    `${onGitHub(path)}${hash === undefined ? '' : `#${hash}`}`
   );
 }
 

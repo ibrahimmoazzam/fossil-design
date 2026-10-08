@@ -1,4 +1,4 @@
-# Architecture decision records
+# Architecture Decision Records
 
 Each record states the context, the options considered, the decision and its consequences. Number new records in sequence. To change an accepted decision, write a new record that supersedes it and mark the old one as superseded, rather than rewriting it.
 

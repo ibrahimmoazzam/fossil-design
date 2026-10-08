@@ -1,3 +1,4 @@
+<link rel="apple-touch-icon" href="./apple-touch-icon.png" sizes="180x180" />
 <!-- The same open fonts as preview-head.html, for Storybook's own frame. -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -5,3 +6,57 @@
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap"
 />
+<style>
+  /* Storybook's frame takes the same scrollbars as the pages: a transparent track. manager.ts
+     sets the colour. */
+  :root {
+    scrollbar-color: var(--fossil-color-border-strong) transparent;
+  }
+
+  /* The repository chip under the site name. theme.ts sets its token values on the element. */
+  .fossil-repo-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--chip-gap);
+    padding: var(--chip-padding-block) var(--chip-padding-end)
+      var(--chip-padding-block) var(--chip-padding-start);
+    border: var(--chip-border-width) solid var(--chip-border);
+    border-radius: var(--chip-radius);
+    background-color: var(--chip-background);
+    color: var(--chip-text);
+    font-family: var(--chip-font-family);
+    font-size: var(--chip-font-size);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .fossil-repo-chip:hover {
+    border-color: var(--chip-border-hover);
+  }
+
+  .fossil-repo-chip:focus-visible {
+    outline: var(--chip-focus-width) solid var(--chip-focus);
+    outline-offset: var(--chip-focus-offset);
+  }
+
+  /* The current page in the sidebar takes the highlight colour, the reference site's mark for
+     the current page, instead of Storybook's white on color.secondary. The id outranks
+     Storybook's own selected, hover and focus rules. manager.ts sets the properties. */
+  #storybook-explorer-tree .sidebar-item[data-selected='true'] {
+    background: var(--fossil-color-highlight-default);
+    color: var(--fossil-color-text-on-highlight);
+  }
+
+  #storybook-explorer-tree .sidebar-item[data-selected='true'] svg {
+    color: var(--fossil-color-text-on-highlight);
+  }
+
+  /* The sidebar's section headings in the label style, mono like the reference site's case
+     study contents. Storybook sets the case. */
+  #storybook-explorer-tree .sidebar-subheading button {
+    font-family: var(--fossil-text-label-font-family);
+    font-size: var(--fossil-text-label-font-size);
+    font-weight: var(--fossil-text-label-font-weight);
+    letter-spacing: var(--fossil-text-label-letter-spacing);
+  }
+</style>

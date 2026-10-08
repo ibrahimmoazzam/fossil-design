@@ -378,8 +378,9 @@ describe('building the token source', () => {
       '| `color.text.muted` | `--fossil-color-text-muted` | #4a5159 | #cdd2d8 | Secondary text. |',
     );
     expect(reference).toContain(
-      '| `space.m` | `--fossil-space-m` | 1rem (16px) |  |',
+      '| `space.m` | `--fossil-space-m` | 1rem (16px) | Padding and gap: 16px. |',
     );
+    expect(reference).toContain('| Token | Custom property | Value | Use |');
     expect(reference).toContain(
       '| `color.background.veil` | `--fossil-color-background-veil` | #000000 at 60% |',
     );

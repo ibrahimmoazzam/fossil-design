@@ -1,0 +1,13 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { Eyebrow } from '../Eyebrow.tsx';
+import { LifecycleDiagram } from '../LifecycleDiagram.tsx';
+
+<Meta title="Architecture/Design-to-Code Lifecycle" />
+
+<Eyebrow>Architecture</Eyebrow>
+
+# Design-to-Code Lifecycle
+
+The whole system in one diagram, from the repo to a merged pull request. Read it top to bottom: the source, what each release publishes, and how a feature is built from it. Solid arrows are delivery, carrying the system forward. Dashed arrows are contribution, bringing what a feature turns up back to the repo for the next release to carry.
+
+<LifecycleDiagram />

@@ -1,0 +1,151 @@
+/* The pattern the colour swatches reference: drawn once, takes no space. */
+.defs {
+  position: absolute;
+  inline-size: 0;
+  block-size: 0;
+}
+
+.checkerBase {
+  fill: var(--fossil-color-background-surface);
+}
+
+.checkerSquare {
+  fill: var(--fossil-color-background-sunken);
+}
+
+.note {
+  background-color: var(--fossil-color-background-sunken);
+}
+
+.code {
+  color: var(--fossil-color-text-default);
+  font-family: var(--fossil-font-family-mono);
+  font-size: var(--fossil-text-fine-font-size);
+}
+
+.name {
+  color: var(--fossil-color-text-default);
+  font-weight: var(--fossil-font-weight-strong);
+}
+
+.value {
+  color: var(--fossil-color-text-default);
+  font-family: var(--fossil-font-family-mono);
+}
+
+.swatches {
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  overflow: hidden;
+  border: var(--fossil-border-default);
+}
+
+.swatch {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  border-block-end: var(--fossil-border-default);
+}
+
+/* Storybook's docs styles mark list items; these lists are role="list", so they keep their
+   semantics without the markers. */
+.uses {
+  flex-direction: column;
+  padding: 0;
+  list-style: none;
+}
+
+/* Wide scales scroll within the column; the wrapper takes focus so the keyboard can scroll too. */
+.scroller {
+  overflow-x: auto;
+  scrollbar-color: var(--fossil-color-border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+.scroller:focus-visible {
+  outline: var(--fossil-border-focus);
+  outline-offset: var(--fossil-focus-ring-offset);
+}
+
+/* Storybook's docs styles make every table a block; the scroller's class outranks them. */
+.scroller .table {
+  display: table;
+  inline-size: 100%;
+  min-inline-size: 44rem;
+  max-inline-size: none;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.colToken {
+  inline-size: 30%;
+}
+
+.colValue {
+  inline-size: 24%;
+}
+
+.colSample {
+  inline-size: 18%;
+}
+
+.table th {
+  padding-block: var(--fossil-space-xs);
+  padding-inline: 0 var(--fossil-space-m);
+  border-block-end: var(--fossil-border-strong);
+  color: var(--fossil-color-text-muted);
+  font-family: var(--fossil-text-label-font-family);
+  font-size: var(--fossil-text-label-font-size);
+  font-weight: var(--fossil-text-label-font-weight);
+  letter-spacing: var(--fossil-text-label-letter-spacing);
+  text-align: start;
+  text-transform: uppercase;
+}
+
+.table td {
+  padding-block: var(--fossil-space-s);
+  padding-inline: 0 var(--fossil-space-m);
+  border-block-end: var(--fossil-border-default);
+  vertical-align: middle;
+}
+
+.bar {
+  fill: var(--fossil-color-accent-default);
+}
+
+.shape {
+  fill: var(--fossil-color-background-sunken);
+  stroke: var(--fossil-color-border-strong);
+  stroke-width: var(--fossil-border-width-default);
+}
+
+.stroke {
+  stroke: var(--fossil-color-text-default);
+}
+
+.glyphs {
+  fill: var(--fossil-color-text-default);
+  font-family: var(--fossil-font-family-body);
+}
+
+.label {
+  fill: var(--fossil-color-text-default);
+  font-family: var(--fossil-text-label-font-family);
+  font-size: var(--fossil-text-label-font-size);
+}
+
+.frame {
+  fill: none;
+  stroke: var(--fossil-color-border-default);
+  stroke-width: var(--fossil-border-width-default);
+}
+
+.curve {
+  fill: none;
+  stroke: var(--fossil-color-accent-default);
+  stroke-width: var(--fossil-border-width-default);
+}

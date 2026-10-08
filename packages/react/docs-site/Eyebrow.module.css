@@ -1,0 +1,4 @@
+/* Level with the top of the page, where Storybook's own docs title would begin. */
+.eyebrow {
+  padding-block-start: var(--fossil-space-xl);
+}

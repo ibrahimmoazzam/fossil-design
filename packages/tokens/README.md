@@ -1,6 +1,6 @@
 # @fossil-design/tokens
 
-Design tokens for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-design), an open-source design system for agentic coding: CSS custom properties for light and dark mode, metadata for tools and agents, and typed keys for component props.
+Design tokens for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-design), an open-source agentic design system: CSS custom properties for light and dark mode, metadata for tools and agents, and typed keys for component props.
 
 > **Early release.** Versions `0.x` may rename tokens between minor versions while the taxonomy settles. Renames keep a deprecated alias first, and the release notes list each one.
 

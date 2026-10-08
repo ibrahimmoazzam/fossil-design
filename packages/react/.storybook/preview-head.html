@@ -6,6 +6,12 @@
   href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap"
 />
 <style>
+  /* Scrollbars across the site: the thumb in border.strong on a transparent track. The colour
+     is inherited, so this reaches every scroller on the page. */
+  :root {
+    scrollbar-color: var(--fossil-color-border-strong) transparent;
+  }
+
   body {
     background-color: var(--fossil-color-background-page);
     color: var(--fossil-color-text-default);
@@ -14,6 +20,79 @@
     font-weight: var(--fossil-text-body-font-weight);
     letter-spacing: var(--fossil-text-body-letter-spacing);
     line-height: var(--fossil-text-body-line-height);
+  }
+
+  .sbdocs-content :is(h1, h2, h3, h4) {
+    font-family: var(--fossil-font-family-heading);
+  }
+
+  /* Storybook's own stripe and switch colours fail contrast; these use Fossil's tokens. */
+  .sbdocs.sbdocs-content table tr:nth-of-type(2n) {
+    background-color: var(--fossil-color-background-page);
+  }
+
+  .sbdocs label > input[role='switch'] ~ span {
+    color: var(--fossil-color-text-muted);
+  }
+
+  .sbdocs label > input[role='switch']:checked ~ span:last-of-type,
+  .sbdocs label > input[role='switch']:not(:checked) ~ span:first-of-type {
+    color: var(--fossil-color-text-default);
+  }
+
+  /* The token reference's colour swatches: each sets its colour, painted over a checkerboard
+     so translucent values show. */
+  td:has(> .token-swatch) {
+    white-space: nowrap;
+  }
+
+  .token-swatch {
+    display: inline-block;
+    vertical-align: middle;
+    inline-size: var(--fossil-icon-size-m);
+    block-size: var(--fossil-icon-size-m);
+    border: var(--fossil-border-default);
+    border-radius: var(--fossil-radius-compact);
+    background:
+      linear-gradient(currentcolor, currentcolor),
+      repeating-conic-gradient(
+          var(--fossil-color-background-sunken) 0 25%,
+          var(--fossil-color-background-surface) 0 50%
+        )
+        0 0 / 50% 50%;
+  }
+
+  /* The table of contents scrolls on its own when it's taller than the window. */
+  .sbdocs-toc--custom nav {
+    scrollbar-width: thin;
+  }
+
+  /* The table of contents marks the current section in the highlight colour, on a token track. */
+  .sbdocs.sbdocs-toc--custom .toc-wrapper .toc-list {
+    border-left-color: var(--fossil-color-border-strong);
+  }
+
+  .sbdocs.sbdocs-toc--custom .toc-list-item::before {
+    border-left-color: var(--fossil-color-highlight-default);
+  }
+
+  .sbdocs.sbdocs-toc--custom .toc-list-item.is-active-li > a {
+    color: var(--fossil-color-highlight-default);
+  }
+
+  /* Linked code reads as a link, not as plain code. */
+  .sbdocs-content a code {
+    color: inherit;
+  }
+
+  /* A page that marks its figure wide gives it the whole docs column: no table of contents
+     beside it, and room past the reading width, up to a cap. */
+  .sbdocs-wrapper:has([data-fossil-wide]) .sbdocs-toc--custom {
+    display: none;
+  }
+
+  .sbdocs-wrapper:has([data-fossil-wide]) .sbdocs-content {
+    max-width: 1400px;
   }
 
   /* The docs site's wide reference tables scroll within the text column. */

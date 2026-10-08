@@ -1,6 +1,6 @@
 # @fossil-design/stylelint-config
 
-The shared Stylelint config for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-design), an open-source design system for agentic coding. It keeps stylesheets on-system: semantic tokens instead of raw values, and padding and `gap` instead of margins.
+The shared Stylelint config for [Fossil Design](https://github.com/ibrahimmoazzam/fossil-design), an open-source agentic design system. It keeps stylesheets on-system: semantic tokens instead of raw values, and padding and `gap` instead of margins.
 
 > **Early release.** Versions `0.x` may tighten rules between minor versions. The release notes list each change.
 

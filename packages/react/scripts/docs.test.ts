@@ -306,6 +306,7 @@ describe('the Make setup', () => {
 });
 
 describe("the package's docs", () => {
+  // It builds a TypeScript program for every component: up to 5s on a CI runner.
   it('cover every component, with nothing missing', () => {
     const inputs: Inputs = {
       root: fileURLToPath(new URL('..', import.meta.url)),
@@ -316,5 +317,5 @@ describe("the package's docs", () => {
     expect(problems).toEqual([]);
     expect(components.map((c) => c.name)).toEqual(componentNames(inputs));
     expect(components).toHaveLength(16);
-  });
+  }, 30_000);
 });

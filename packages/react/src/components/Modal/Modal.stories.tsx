@@ -43,7 +43,7 @@ const meta = {
     title: 'Project details',
     children: (
       <Text>
-        A design system for agentic coding. Read the{' '}
+        An agentic design system. Read the{' '}
         <Link href="#adr">decision records</Link> for the reasoning.
       </Text>
     ),
@@ -93,7 +93,7 @@ export const ProjectDetails: Story = {
           Open details
         </Button>
         <Modal open={open} onOpenChange={setOpen} title="Project details">
-          <Text>A design system for agentic coding.</Text>
+          <Text>An agentic design system.</Text>
         </Modal>
       </>
     );
