@@ -2,7 +2,7 @@
 
 Use {{name}}'s components in a React app, keep the app on-system with the lint configs, and give your coding agent the docs for the version you installed. Each package's page on npm has the details.
 
-To make a design system of your own from this one, with your brand and your own Figma files, follow [Adopt Fossil](?path=/docs/adopt-fossil--docs) instead.
+<Callout tone="info">To make a design system of your own from this one, with your brand and your own Figma files, follow [Adopt Fossil](?path=/docs/adopt-fossil--docs) instead.</Callout>
 
 ## 1. Install the components
 

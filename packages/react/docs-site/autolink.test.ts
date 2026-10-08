@@ -55,7 +55,7 @@ describe('autolink', () => {
 
   it('links a semantic token, by path or custom property, to its group in the reference', () => {
     expect(autolink('`color.text.muted` and `--fossil-space-m`')).toBe(
-      '[`color.text.muted`](?path=/docs/foundations-tokens--docs#color) and [`--fossil-space-m`](?path=/docs/foundations-tokens--docs#space)',
+      '[`color.text.muted`](?path=/docs/foundations-semantic-tokens--docs#color) and [`--fossil-space-m`](?path=/docs/foundations-semantic-tokens--docs#space)',
     );
     expect(autolink('`base.color.gray.600`')).toBe('`base.color.gray.600`');
   });

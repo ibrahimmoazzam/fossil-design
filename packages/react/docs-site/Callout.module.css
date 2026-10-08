@@ -1,0 +1,28 @@
+.callout {
+  border: var(--fossil-border-default);
+}
+
+.tone-warning {
+  background-color: var(--fossil-color-background-wash);
+}
+
+.tone-warning .icon {
+  color: var(--fossil-color-text-default);
+}
+
+.tone-info {
+  border-color: var(--fossil-color-accent-default);
+  background-color: var(--fossil-color-background-surface);
+}
+
+.tone-info .icon {
+  color: var(--fossil-color-accent-default);
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.flow {
+  padding-block-end: var(--fossil-space-m);
+}

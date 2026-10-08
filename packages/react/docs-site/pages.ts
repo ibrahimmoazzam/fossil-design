@@ -29,7 +29,7 @@ const pages: Record<string, string> = {
   'docs/key-decisions.md': 'architecture-key-decisions',
   'docs/decisions/README.md': 'architecture-decision-records',
   'packages/tokens/dist/foundations.md': 'foundations-overview',
-  'packages/tokens/dist/tokens.md': 'foundations-tokens',
+  'packages/tokens/dist/tokens.md': 'foundations-semantic-tokens',
 };
 
 /** Where a repo file is shown on this site, or `undefined` when only GitHub has it. */

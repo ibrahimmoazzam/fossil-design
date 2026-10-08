@@ -13,10 +13,6 @@
   fill: var(--fossil-color-background-sunken);
 }
 
-.note {
-  background-color: var(--fossil-color-background-sunken);
-}
-
 .code {
   color: var(--fossil-color-text-default);
   font-family: var(--fossil-font-family-mono);

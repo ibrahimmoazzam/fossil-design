@@ -691,7 +691,7 @@ export function tokenReference({ tokens }: TokensFile, header: string): string {
   const lines = [
     `<!-- ${header} -->`,
     '',
-    '# Tokens',
+    '# Semantic Tokens',
     '',
     'Every semantic token, by group. Use them as `var(--…)` in CSS, or by key in a component prop that takes tokens. Values are at a 16px root. A dark value is listed only where it differs, and a group with none has no Dark column.',
   ];
