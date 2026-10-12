@@ -49,7 +49,7 @@
     "docs": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/docs.ts",
     "typecheck": "pnpm run generate && tsc",
     "storybook": "storybook dev --port 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "storybook build && node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/site-meta.ts",
     "prepack": "pnpm run build"
   },
   "dependencies": {
