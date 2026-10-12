@@ -608,12 +608,14 @@ export function Landing() {
         <RepoChip />
         <Text variant="prose" tone="muted">
           Fossil Design is an{' '}
-          <strong className={styles.pop}>agentic design system</strong>: a
-          design system built for AI agents to stay on-system from design to
-          code. Its tokens live in git and flow into CSS, typed React
-          components, Figma variables and a Figma component library generated
-          from code. Docs bundled into the packages, guidelines for Figma Make
-          and lint configs keep what agents generate on-system.
+          <strong className={styles.pop}>agentic design system</strong>: built
+          agent-first, so the design agents and coding agents a team builds with
+          stay on-system from design to code. Its tokens live in git and flow
+          into CSS, typed React components, Figma variables and a Figma
+          component library generated from code. Docs bundled into the packages,
+          guidelines for Figma Make and lint configs keep what agents generate
+          on-system: the consistency a design system promises, without the
+          dedicated platform team it usually takes.
         </Text>
         <Stack direction="row" gap="l" className={styles.actions}>
           <PageLink page="getting-started">Get started</PageLink>
