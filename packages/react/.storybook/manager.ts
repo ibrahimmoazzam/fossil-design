@@ -8,6 +8,7 @@ import {
   type Mode,
 } from './theme.ts';
 import fossilConfig from '../../../fossil.config.json' with { type: 'json' };
+import { siteTitle } from '../docs-site/meta.ts';
 
 function setFrameProperties(mode: Mode) {
   for (const [name, value] of Object.entries(frameProperties(mode)))
@@ -19,18 +20,17 @@ setFrameProperties(resolveMode('system'));
 
 // Storybook names itself in every tab title, with no option to change it. The site follows
 // ibrahimmoazzam.com instead: "Page | Fossil Design", and the front page says what Fossil is.
-// A fork's pages take its name from fossil.config.json; the front page's title is its own to write.
-const homeTitle = 'Fossil Design: Open-Source Agentic Design System';
-
-function siteTitle(title: string): string {
-  if (title === 'Storybook') return homeTitle;
+// A fork's pages take its name from fossil.config.json; the front page's title is siteTitle,
+// which scripts/site-meta.ts also writes into the built page, for the scrapers that read it.
+function tabTitle(title: string): string {
+  if (title === 'Storybook') return siteTitle;
   const page = /^(.*?)(?: - Docs)? ⋅ Storybook$/.exec(title)?.[1];
   if (page === undefined) return title;
-  return page === 'Introduction' ? homeTitle : `${page} | ${fossilConfig.name}`;
+  return page === 'Introduction' ? siteTitle : `${page} | ${fossilConfig.name}`;
 }
 
 function renameTab() {
-  const title = siteTitle(document.title);
+  const title = tabTitle(document.title);
   if (title !== document.title) document.title = title;
 }
 

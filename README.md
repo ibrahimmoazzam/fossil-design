@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/ibrahimmoazzam/fossil-design/actions/workflows/ci.yml/badge.svg)](https://github.com/ibrahimmoazzam/fossil-design/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/@fossil-design/react?label=%40fossil-design%2Freact)](https://www.npmjs.com/package/@fossil-design/react) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
-An open-source agentic design system: a design system built for AI agents to stay on-system from design to code. Tokens live in git and flow into CSS, typed React components, Figma variables and a Figma component library generated from code. Shared lint configs, docs bundled into the packages and guidelines for Figma Make keep what coding agents and Make generate on-system.
+An open-source agentic design system: built agent-first, so the design agents and coding agents a team builds with stay on-system from design to code. Tokens live in git and flow into CSS, typed React components, Figma variables and a Figma component library generated from code. Shared lint configs, docs bundled into the packages and guidelines for Figma Make keep what coding agents and Make generate on-system: the consistency a design system promises, without the dedicated platform team it usually takes.
 
 It ships with a reference brand, and it's a template: [fork it, rename it and replace the token values](https://fossil.ibrahimmoazzam.com/?path=/docs/adopt-fossil-for-your-brand--docs), and the same pipeline becomes your brand's design system. Its components can also be [rebuilt on a headless library](#bring-your-own-headless-library) such as [Base UI](https://base-ui.com) or [Headless UI](https://headlessui.com), without changing their props.
 
