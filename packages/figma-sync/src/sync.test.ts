@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import config from '../../../fossil.config.json' with { type: 'json' };
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { format } from 'prettier';
@@ -633,11 +634,11 @@ describe('the three-way diff', () => {
       set(f, 'base.easing.ease', 'Value', { type: 'EASE_IN' });
     });
     expect(report.refused).toEqual([
-      "base.easing.ease (Value) uses Figma's EASE_IN easing. Fossil's easing tokens are cubic Béziers, and Figma doesn't document the curve behind a preset: set a custom curve in Figma instead.",
+      `base.easing.ease (Value) uses Figma's EASE_IN easing. ${config.name}'s easing tokens are cubic Béziers, and Figma doesn't document the curve behind a preset: set a custom curve in Figma instead.`,
     ]);
   });
 
-  it('refuses an alias to a variable that isn’t Fossil’s', async () => {
+  it('refuses an alias to a variable that isn’t the system’s', async () => {
     const report = await roundTrip((f) => {
       const mine = f.variables.createVariableCollection('Mine');
       const brand = f.variables.createVariable('brand', mine, 'COLOR');
@@ -647,7 +648,7 @@ describe('the three-way diff', () => {
       });
     });
     expect(report.refused).toEqual([
-      "color.accent.default (Light) aliases brand, which isn't one of Fossil's variables. Pick a Fossil variable for it in Figma.",
+      `color.accent.default (Light) aliases brand, which isn't one of ${config.name}'s variables. Pick a ${config.name} variable for it in Figma.`,
     ]);
   });
 });

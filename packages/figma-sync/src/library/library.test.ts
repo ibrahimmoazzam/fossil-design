@@ -1201,7 +1201,7 @@ describe('the library check', () => {
     extra.setBoundVariable('paddingRight', variable('space.s'));
     expect(problems(await check(canvas, ['Chip']), 'Chip')).toEqual([
       'tone=neutral, size=m, iconOnly=false: text has an unbound fill, not color.accent.default.',
-      'tone=neutral, size=m, iconOnly=false: the text text has no Fossil text style, not text.body.',
+      'tone=neutral, size=m, iconOnly=false: the text text has no text style from the library, not text.body.',
       'tone=neutral, size=m, iconOnly=false: extra has an unbound fill.',
       "tone=neutral, size=m, iconOnly=false: extra's paddingLeft is 6, not a variable.",
     ]);
@@ -1258,7 +1258,7 @@ describe('the library check', () => {
     ]);
   });
 
-  it('refuses to run after a change, like every Fossil script', async () => {
+  it('refuses to run after a change, like every generated script', async () => {
     const { canvas } = built();
     const [part] = checkParts(specs, {
       kind: 'check',

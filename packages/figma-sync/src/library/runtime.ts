@@ -757,7 +757,7 @@ export async function checkVariant(
           typeof id === 'string' ? context.effectStyles[id] : undefined;
         if (found !== layer.effect)
           problems.push(
-            `${at}${name(layer.name)} has ${found ? `the effect style ${found}` : 'no Fossil effect style'}, not ${layer.effect}.`,
+            `${at}${name(layer.name)} has ${found ? `the effect style ${found}` : 'no effect style from the library'}, not ${layer.effect}.`,
           );
       }
     }
@@ -782,7 +782,7 @@ export async function checkVariant(
       if (t?.style !== undefined) {
         if (style !== t.style)
           problems.push(
-            `${at}the text ${n.name} has ${style ? `the text style ${style}` : 'no Fossil text style'}, not ${t.style}.`,
+            `${at}the text ${n.name} has ${style ? `the text style ${style}` : 'no text style from the library'}, not ${t.style}.`,
           );
       } else if (t !== undefined) {
         for (const field of [
@@ -810,7 +810,9 @@ export async function checkVariant(
             `${at}the text ${n.name}'s line height isn't ${String(t.lineHeight)}%.`,
           );
       } else if (style === undefined)
-        problems.push(`${at}the text ${n.name} has no Fossil text style.`);
+        problems.push(
+          `${at}the text ${n.name} has no text style from the library.`,
+        );
       return;
     }
     if (

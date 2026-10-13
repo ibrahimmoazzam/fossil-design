@@ -1,4 +1,5 @@
 import { COLLECTIONS, nameOf, type FigmaToken } from './model.ts';
+import config from '../../../fossil.config.json' with { type: 'json' };
 import type { CollectionKey, SyncValue } from './runtime.ts';
 import type { Snapshot } from './snapshot.ts';
 
@@ -160,13 +161,13 @@ export function diff(
       }
       if (typeof figma === 'object' && 'preset' in figma) {
         report.refused.push(
-          `${where} uses ${describe(figma)}. Fossil's easing tokens are cubic Béziers, and Figma doesn't document the curve behind a preset: set a custom curve in Figma instead.`,
+          `${where} uses ${describe(figma)}. ${config.name}'s easing tokens are cubic Béziers, and Figma doesn't document the curve behind a preset: set a custom curve in Figma instead.`,
         );
         continue;
       }
       if (isAlias(figma) && figma.alias === '') {
         report.refused.push(
-          `${where} aliases ${describe(figma)}, which isn't one of Fossil's variables. Pick a Fossil variable for it in Figma.`,
+          `${where} aliases ${describe(figma)}, which isn't one of ${config.name}'s variables. Pick a ${config.name} variable for it in Figma.`,
         );
         continue;
       }

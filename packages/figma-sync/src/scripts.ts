@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import config from '../../../fossil.config.json' with { type: 'json' };
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import type { CheckSpec, StylesSpec } from './library/runtime.ts';
@@ -59,7 +60,7 @@ const included = (entry: string): string[] => {
 };
 
 export const CHANGED =
-  'This script was changed after Fossil generated it. Generate it again and pass it to use_figma exactly as it is.';
+  'This script was changed after it was generated. Generate it again and pass it to use_figma exactly as it is.';
 
 /** A script for use_figma that refuses to run if anything in it was changed. */
 export function script(
@@ -76,7 +77,7 @@ export function script(
       'A script for use_figma must not contain an svg tag: build the markup at run time, as svgOf does.',
     );
   return [
-    `// Fossil Design figma-sync: ${title}.`,
+    `// ${config.name} figma-sync: ${title}.`,
     '// Pass this script to use_figma exactly as it is. It checks its own hash before it runs.',
     `const integrity = ${JSON.stringify(hash(code.join('\n') + data))};`,
     `const spec = ${data};`,

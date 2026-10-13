@@ -167,8 +167,7 @@ export function setStamp(node: Stamped, value: string, key = 'path'): void {
 }
 
 export function known<T>(value: T | undefined, what: string): T {
-  if (value === undefined)
-    throw new Error(`Fossil's sync lost track of ${what}.`);
+  if (value === undefined) throw new Error(`The sync lost track of ${what}.`);
   return value;
 }
 
@@ -182,7 +181,7 @@ export function fossilCollections(
     if (key === '') continue;
     if (byKey[key])
       throw new Error(
-        `Two variable collections are stamped as Fossil's ${key} collection. Delete one, then run the sync again.`,
+        `Two variable collections carry the ${key} stamp. Delete one, then run the sync again.`,
       );
     byKey[key] = c;
   }

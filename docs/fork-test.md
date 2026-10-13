@@ -219,12 +219,13 @@ Checking is also harder than it looks. A free package name proves nothing: `@acm
 
 On this branch, with the issue's number and what it took:
 
-| #     | Fix                                                                                         | Commit    |
-| ----- | ------------------------------------------------------------------------------------------- | --------- |
-| 19    | `AGENTS.md`, `packages/react/AGENTS.md` and ADR 0016 call the script with `pnpm run docs`   | `8244a2c` |
-| 1     | `rewrites()` also rewrites `%40<scope>`, with a case for it in `tests/rename.test.ts`       | `0e61106` |
-| 20    | The Stylelint config's tests take a primitive colour from the built `lint.json`             | `a79062a` |
-| 2, 18 | `scripts/fonts.ts` checks each stylesheet against the faces and weights the text styles use | `0ab2c06` |
+| #     | Fix                                                                                                                                                                                    | Commit    |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| 19    | `AGENTS.md`, `packages/react/AGENTS.md` and ADR 0016 call the script with `pnpm run docs`                                                                                              | `8244a2c` |
+| 1     | `rewrites()` also rewrites `%40<scope>`, with a case for it in `tests/rename.test.ts`                                                                                                  | `0e61106` |
+| 20    | The Stylelint config's tests take a primitive colour from the built `lint.json`                                                                                                        | `a79062a` |
+| 2, 18 | `scripts/fonts.ts` checks each stylesheet against the faces and weights the text styles use                                                                                            | `0ab2c06` |
+| 8     | Thirteen strings resolved by kind, under [ADR 0020](./decisions/0020-what-a-fork-renames.md): prose reads `fossil.config.json`, format identifiers stay, Figma-side messages rephrased | `pending` |
 
 Issue 20's fix was proved against what broke it: the new test file, copied into the fork where `base.color.blue.600` no longer exists, passes with no reference to it.
 
@@ -236,6 +237,10 @@ Issue 18's fix found issue 2 by itself, on Fossil's own files, before either hea
 ```
 
 Both now load the same faces the Make guidelines tell an app to load, so the docs site renders what an app will. The check allows a weight no text style names, because `<strong>` in running text asks the browser for bold and the `font.weight` tokens are reachable on their own. None of these four touches a package's public surface, so none takes a changeset.
+
+Issue 8's fix splits the thirteen strings three ways, which [ADR 0020](./decisions/0020-what-a-fork-renames.md) records. The six that name the system, including the Figma descriptions on `Box`, `Stack` and `Icon`, now read `config.name`, and the two tests that cover them assert against the same config, so a fork's suite passes unchanged. The five sent to Figma were rephrased, because `script()` embeds the runtime's source text and hashes it, so no name can be read there: they never meant the brand anyway. "No Fossil text style" meant "no text style from the library", and "stamped as Fossil's Semantic collection" meant "carries the Semantic stamp". Two more name the tool's own format and keep it.
+
+Proved in the fork: with the changed sync copied in, its 84 tests pass and `Box`'s Figma description reads "a frame bound to Acme Design's variables".
 
 The block measured 7985 bytes against its 8192 budget here, against 7917 in the fork, where the shorter prefix saves the difference. That is 207 bytes of headroom in Fossil itself, which sharpens issue 16.
 

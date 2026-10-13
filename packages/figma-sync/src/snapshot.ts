@@ -45,7 +45,7 @@ export function readSnapshot(
       continue;
     }
     if (!isPage(value)) {
-      problems.push(`${name} isn't a Fossil read result.`);
+      problems.push(`${name} isn't a figma-sync read result.`);
       continue;
     }
     const { page, pages: count, whole, commit, collections, variables } = value;

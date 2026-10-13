@@ -1,0 +1,43 @@
+# 0020. What a fork renames, and what keeps Fossil's name
+
+- **Status:** Accepted
+- **Date:** 2026-10-13
+- **Refines:** [0019](./0019-renaming-a-fork.md), which made the rename mechanical
+
+## Context
+
+[0019](./0019-renaming-a-fork.md) gave a fork one command for its name, CSS prefix, npm scope and repository. The fresh-fork test ([`fork-test.md`](../fork-test.md), issues 4, 5, 8 and 11) showed that the mechanics are only half the question. A renamed copy still named Fossil 171 times across 73 files, and the adoption guide's list of seven things to rewrite left 117 of them.
+
+Those mentions are not one kind of thing:
+
+- Some are prose a fork must own. Its README, its docs site, its agent files, and the refusals its designers read during a sync. `library/components.ts` set `Box`'s description in Figma to "a frame bound to Fossil's variables", which every designer using the fork's library would read.
+- Some identify Fossil's own formats. The `fossil` namespace stamped on a Figma variable, the `fossil:` discriminator on a script's result, the vendor key in a token file. A fork that rewrote these would still work on its own, but an upstream fix, a generated script and a Figma file written by either would stop fitting together.
+- Rewriting the first kind without deciding the second broke the suite: `library.test.ts` and `sync.test.ts` assert those messages as literal strings, so a fork following the guide's own `git grep Fossil` got a red suite with no explanation.
+
+A third name arrives when a fork rebuilds a component on a headless library, which [key decision 7](../key-decisions.md) leaves open. Nothing said where that library may be named.
+
+## Options
+
+1. **Rename everything that says Fossil.** Simple to describe, and it breaks the stamp, the script format, the vendor key and the skill, so upstream fixes stop applying and a sync can no longer recognise what it wrote.
+2. **Rename nothing beyond 0019's mechanics.** No code to write, and a fork's designers and agents read another system's name inside their own tools.
+3. **Split by what the name is doing in the sentence.** More to explain, and each string has an owner.
+
+## Decision
+
+Option 3. There are three kinds of name, and each has one rule.
+
+**1. The system's name comes from `fossil.config.json`.** Any prose a person or an agent reads: the docs, page titles, the `AGENTS.md` block, the Make guidelines, the sync's refusals and reports, and the Figma component descriptions. Code reads `config.name` rather than spelling it out, and a test that covers such a message asserts against the same config, so a fork's suite passes unchanged. A test may not assert a system name as a literal.
+
+**2. Fossil's format identifiers stay literal in every fork.** The `fossil.config.json` filename, the `fossil` shared plugin data namespace stamped on Figma variables, the `fossil:` discriminator on a script's result, the `com.ibrahimmoazzam.fossil` vendor key in token files, the `fossil:foundations` markers in `AGENTS.md`, the `fossil()` factory in both lint configs with its `FossilOptions` type, and the `fossil-figma-sync` skill. These name the format and the tooling, not the brand.
+
+**3. An implementation's name appears only where the implementation is the subject.** A headless library a fork rebuilds a component on belongs in that component's JSDoc contract, so an agent knows which behaviour comes from where, and in the package's dependencies. It does not belong in the tokens, the Figma library, the lint configs or the sync, because none of them can tell what a component is built on: props, token usage and the generated Figma component are the same either way.
+
+**Where the code runs decides how it reads the name.** Code that runs locally imports the config. Code that is sent to Figma cannot: `script()` embeds the runtime functions' source text and hashes it, so a name would have to travel inside the spec and be hashed with it. Those messages were rephrased instead, because they never meant the brand. "No Fossil text style" meant "no text style from the library", and "stamped as Fossil's Semantic collection" meant "carries the Semantic stamp".
+
+## Consequences
+
+- A fork's designers read their own system's name in the sync's refusals, the library check's report and the Figma component descriptions, from one commit, with no strings to maintain by hand.
+- The adoption guide's step 1.4 becomes a checklist grouped by these three kinds, rather than a list of seven files and a `git grep`. A grep cannot find positioning prose that never names Fossil, which is what issue 5 records.
+- A fork that swaps in a headless library renames nothing. Its tokens, Figma library, lint configs and agent docs are untouched, which is what makes the swap cheap.
+- Adding a user-visible string to `figma-sync` now carries a question: which kind of name does it hold? A string that runs inside Figma and wants the system's name has to come through the spec, so prefer wording that names the library or the sync.
+- Fossil's own published packages keep saying Fossil, because its config says so. Nothing about this decision is visible until a copy is renamed.
