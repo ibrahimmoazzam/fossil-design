@@ -50,6 +50,11 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 16  | Guide 2                  | The 8 KB `AGENTS.md` block budget is never mentioned                                    | Confirmed     | Guide          |
 | 17  | Guide 1.2                | Its reason for disabling Release doesn't hold when no changeset is pending              | Confirmed     | Guide          |
 
+| 18 | `packages/react/scripts/docs.ts` | The Make guidelines' font check can never fail | Confirmed | Code |
+| 19 | `AGENTS.md` | `pnpm --filter react docs` runs pnpm's own `docs` command, not the script | Confirmed | Docs |
+| 20 | `packages/stylelint-config/test/config.test.ts` | The guide's own worked example in 2.1 turns the suite red | Confirmed | Code and guide |
+| 21 | Guide 2.5 | It calls `public/` the site's icons, and a fork has no artwork of its own | Confirmed | Guide |
+
 ### 1. The rename misses a percent-encoded scope
 
 `README.md` carries the npm badge as `label=%40fossil-design%2Freact`, and `rewrites()` only matches the plain `@fossil-design`. The fork's badge therefore reads `@fossil-design/react` while linking to `@acme-design/react`. One occurrence today, and `tests/rename.test.ts` has no case for an encoded scope.
@@ -161,6 +166,45 @@ The fork's block came to 7917 bytes against the 8 KB cap in ADR 0017: 275 bytes 
 Step 1.2 says Release "would open version pull requests for Fossil's pending changes or try to publish and fail". On the copy's initial commit it ran and succeeded, doing nothing, because no changeset was pending. The advice is still right for later pushes.
 
 **Fix:** correct the reason to what it is: it would publish, or open a version pull request, as soon as a changeset exists.
+
+### 18. The font check can never fail
+
+Guide 2.4 promises that "the build fails if it misses a family a font token uses". It cannot. `docs.ts` builds the guidelines with `source()`, which fills `{{fonts}}` from the token list, and then scans that filled text:
+
+```ts
+'setup.md': source('guidelines/setup.md'),   // already reads "Sora, Inter and IBM Plex Mono"
+...
+for (const font of unloadedFonts(guidelines['setup.md'], fonts))
+```
+
+Every family the check looks for has just been interpolated into the prose it searches, so `unloadedFonts` always returns nothing. Acme's fonts were changed to Sora, Inter and IBM Plex Mono, the `@import` still loaded Figtree, Space Grotesk and Space Mono, and the build passed. A fork's Figma Make prototypes would render in fallback faces, and so would its docs site, which issue 2 covers.
+
+**Fix:** generate the Google Fonts URL from the token families and the weights the text styles use, then use it in `docs-src/guidelines/setup.md` and in both Storybook head files. The check then has nothing left to miss, and issues 2 and 18 close together.
+
+### 19. A documented command no longer runs the script
+
+`AGENTS.md` gives `pnpm --filter react docs`. On the pinned pnpm 12.8.1 that reaches pnpm's own `docs` command, which answers `error: the following required arguments were not provided: <PACKAGE>` and exits. The script needs `pnpm --filter react run docs`.
+
+**Fix:** write `run docs` in `AGENTS.md`, and check the other scripts for names pnpm now takes.
+
+### 20. The guide's example for 2.1 breaks the suite
+
+Step 2.1 says to rename a primitive whose name no longer describes it, "such as `base.color.blue.600` once your accent is green". Doing exactly that failed two tests:
+
+```
+FAIL |stylelint-config| rejects a primitive aliased by a local custom property
+FAIL |stylelint-config| may alias primitives and hold raw values in its own file
+```
+
+`test/config.test.ts` names `--<prefix>-base-color-blue-600` in three places, and the Stylelint config reads the built primitive list, so the sample stops naming a real primitive. Neither failure mentions renaming, and the guide's worked example is what causes them.
+
+**Fix:** have the test take a primitive name from the built `lint.json` instead of spelling one out. Then note in 2.1 that renaming a primitive means updating what names it.
+
+### 21. A fork has no artwork of its own
+
+Step 2.5 says "the docs site's icons are in `packages/react/docs-site/public/`". The folder now also holds `og-image.png`, the preview card. Acme kept Fossil's, because a test fork has no logo to put there, and nothing in the build or the checks notices.
+
+**Fix:** widen 2.5 past icons, and say plainly that the favicon, the touch icon and the preview card are Fossil's artwork until replaced.
 
 ## Resolved before the test reached them
 
