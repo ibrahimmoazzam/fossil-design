@@ -42,7 +42,7 @@ Checked in October 2026:
 
 ## Decision
 
-`pnpm --filter react docs` runs last in the package's build and writes `docs/`, which ships in the tarball and isn't committed:
+`pnpm --filter react run docs` runs last in the package's build and writes `docs/`, which ships in the tarball and isn't committed:
 
 | File                       | Holds                                                                                                                                         |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |

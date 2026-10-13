@@ -7,7 +7,7 @@ Fossil's React components. This file covers working on them; the root `AGENTS.md
 ```sh
 pnpm --filter react generate      # Box's CSS, the icons and every .module.css.d.ts
 pnpm --filter react build         # generate, vite build, tsc for the declarations and the bin, then docs
-pnpm --filter react docs          # docs/, the AGENTS.md block and guidelines/, from JSDoc and stories; needs a build first
+pnpm --filter react run docs      # docs/, the AGENTS.md block and guidelines/, from JSDoc and stories; needs a build first
 pnpm --filter react typecheck     # generate, then tsc
 pnpm --filter react storybook     # Storybook at localhost:6006
 pnpm test --project 'react*'      # unit tests, real-input tests, then every story in Chromium with axe
@@ -44,7 +44,7 @@ Build `@fossil-design/tokens` first; `pnpm build` from the root does it in order
 - **Icons as components.** Take an `IconComponent`, not a name, so an app's own SVGs work beside Fossil's.
 - **Tests.** Every component has stories whose play functions exercise its states. axe runs on every story and must pass in light and dark; add a story with `globals: { theme: 'dark' }` where colour matters. Anything that relies on native handling, such as Escape on a `<dialog>`, light dismiss or `:focus-visible`, needs a real-input browser test.
 - **Document every component in its JSDoc.** A summary, then `## When to use`, `## When not to use`, `## States` and `## Accessibility`, which splits into `### Built in` and `### Up to you`. Every prop has a description. Name the better component in "When not to use".
-- **Tag examples.** Tag one or more stories `example`, each with a JSDoc comment saying why an app would do this. Write them as an app would: a `render` that takes no args, or args alone. They may use only `@fossil-design/react`'s and React's exports, or a module-level constant with a JSDoc comment saying what the app puts there, such as an image URL. `pnpm --filter react docs` fails on anything missing, and so does the build.
+- **Tag examples.** Tag one or more stories `example`, each with a JSDoc comment saying why an app would do this. Write them as an app would: a `render` that takes no args, or args alone. They may use only `@fossil-design/react`'s and React's exports, or a module-level constant with a JSDoc comment saying what the app puts there, such as an image URL. `pnpm --filter react run docs` fails on anything missing, and so does the build.
 - **Keep the AGENTS.md block under 8 KB.** It's always in an app agent's context, so the build fails over budget. Put detail in `foundations.md` or a component's doc, which the block points to.
 - **Write `docs-src/rules.md` for every reader:** it reaches `foundations.md`, every app's `AGENTS.md` and Figma Make.
 - **A changeset** with any change to the public surface.
