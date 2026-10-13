@@ -54,6 +54,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 19 | `AGENTS.md` | `pnpm --filter react docs` runs pnpm's own `docs` command, not the script | Confirmed | Docs |
 | 20 | `packages/stylelint-config/test/config.test.ts` | The guide's own worked example in 2.1 turns the suite red | Confirmed | Code and guide |
 | 21 | Guide 2.5 | It calls `public/` the site's icons, and a fork has no artwork of its own | Confirmed | Guide |
+| 22 | Guide 1.3 and 3A.1 | The scope is baked into 79 files before anything checks that it's available | Confirmed | Guide |
 
 ### 1. The rename misses a percent-encoded scope
 
@@ -205,6 +206,14 @@ FAIL |stylelint-config| may alias primitives and hold raw values in its own file
 Step 2.5 says "the docs site's icons are in `packages/react/docs-site/public/`". The folder now also holds `og-image.png`, the preview card. Acme kept Fossil's, because a test fork has no logo to put there, and nothing in the build or the checks notices.
 
 **Fix:** widen 2.5 past icons, and say plainly that the favicon, the touch icon and the preview card are Fossil's artwork until replaced.
+
+### 22. The scope is committed before anyone checks it is free
+
+Step 1.3 renames the fork, writing the scope into 79 files, and step 3A.1 only then says to create the npm organisation for it. `@acme-design` turned out to be taken, three steps after the fork had been rebranded around it. Nothing earlier asks the adopter to check, and "What you need" mentions only an npm account with two-factor authentication.
+
+Checking is also harder than it looks. A free package name proves nothing: `@acme-design/tokens` and `@acme-design/react` both answered 404 on the registry while the organisation existed, because an organisation can hold no public packages. npmjs.com answers 403 to any automated request, for names that exist and names that don't alike, so only an attempt to create the organisation settles it.
+
+**Fix:** move the check into "What you need", and say how: try to create the organisation at npmjs.com first, because the registry cannot tell you. Then 1.3 renames to a scope already in hand.
 
 ## Fixed so far
 
