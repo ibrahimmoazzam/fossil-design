@@ -46,6 +46,16 @@ describe('rename', () => {
     );
   });
 
+  it('renames the scope where a badge label spells it percent-encoded', () => {
+    expect(
+      toAcme(
+        'https://img.shields.io/npm/v/@fossil-design/react?label=%40fossil-design%2Freact',
+      ),
+    ).toBe(
+      'https://img.shields.io/npm/v/@acme-design/react?label=%40acme-design%2Freact',
+    );
+  });
+
   it('renames the repository in its URLs', () => {
     expect(
       toAcme('git+https://github.com/ibrahimmoazzam/fossil-design.git'),

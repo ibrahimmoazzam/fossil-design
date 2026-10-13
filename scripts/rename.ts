@@ -68,6 +68,15 @@ export function rewrites(from: Identity, to: Identity): Rewrite[] {
         '(?![\\w-])',
       ),
     );
+    // A shields.io badge takes its label percent-encoded, so the scope reads %40fossil-design.
+    list.push(
+      rewrite(
+        `%40${from.npmScope.slice(1)}`,
+        `%40${to.npmScope.slice(1)}`,
+        '(?<![\\w.~-])',
+        '(?![\\w.~-])',
+      ),
+    );
   }
   if (from.cssPrefix !== to.cssPrefix) {
     list.push(
