@@ -8,7 +8,7 @@
  *
  * It writes nothing and lists every problem if a component lacks part of its contract, a prop
  * lacks a description, an example is missing or uses something an app doesn't have, the block
- * outgrows its budget, or the Make setup doesn't load a font the text styles use.
+ * outgrows its budget, or a stylesheet doesn't load a face the text styles use.
  */
 import {
   existsSync,
@@ -28,6 +28,7 @@ import {
   type PropItem,
 } from 'react-docgen-typescript';
 import ts from 'typescript';
+import { missingFonts } from './fonts.ts';
 import { docgenOptions } from './docgen.ts';
 import { fill, list } from './template.ts';
 
@@ -832,13 +833,6 @@ export function componentList(
   ].join('\n');
 }
 
-/** The font families a setup guide never names. */
-export const unloadedFonts = (setup: string, families: readonly string[]) =>
-  families.filter(
-    (family) =>
-      !setup.includes(family) && !setup.includes(family.replaceAll(' ', '+')),
-  );
-
 const stripHeader = (markdown: string) =>
   markdown.replace(/^<!--.*?-->\n+/s, '');
 
@@ -940,10 +934,16 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     'Guidelines.md': source('guidelines/Guidelines.md'),
     'setup.md': source('guidelines/setup.md'),
   };
-  for (const font of unloadedFonts(guidelines['setup.md'], fonts))
-    problems.push(
-      `docs-src/guidelines/setup.md doesn't load ${font}, which the text styles use`,
-    );
+  // Each file is read as written, not as filled: `source()` interpolates the family names, so
+  // checking its output only ever found the list it had just written in.
+  const loadFonts = {
+    'docs-src/guidelines/setup.md': join(root, 'docs-src/guidelines/setup.md'),
+    '.storybook/preview-head.html': join(root, '.storybook/preview-head.html'),
+    '.storybook/manager-head.html': join(root, '.storybook/manager-head.html'),
+  };
+  for (const [name, path] of Object.entries(loadFonts))
+    for (const problem of missingFonts(readFileSync(path, 'utf8'), tokens))
+      problems.push(`${name} ${problem}`);
   if (problems.length > 0) fail('the agent docs');
 
   const out = join(root, 'docs');

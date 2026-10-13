@@ -14,7 +14,6 @@ import {
   readContract,
   readExamples,
   readStories,
-  unloadedFonts,
   type ComponentDocs,
   type Inputs,
   type Prop,
@@ -292,16 +291,6 @@ describe('the AGENTS.md block', () => {
         '- Icons, for any `icon` prop: `CloseIcon`, or any SVG component of your own',
       ].join('\n'),
     );
-  });
-});
-
-describe('the Make setup', () => {
-  it('names the fonts it never loads, as written or in a URL', () => {
-    const setup =
-      'family=Space+Grotesk:wght@700 and Figtree, from Google Fonts';
-    expect(
-      unloadedFonts(setup, ['Space Grotesk', 'Figtree', 'Space Mono']),
-    ).toEqual(['Space Mono']);
   });
 });
 
