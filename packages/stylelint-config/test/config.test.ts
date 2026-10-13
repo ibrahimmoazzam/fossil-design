@@ -1,6 +1,7 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import lintLists from '@fossil-design/tokens/lint.json' with { type: 'json' };
 import stylelint from 'stylelint';
 import { afterAll, describe, expect, it } from 'vitest';
 import config, { fossil } from '../src/index.ts';
@@ -21,6 +22,15 @@ async function lint(
 
 const rules = async (code: string) =>
   (await lint(code)).map(({ rule }) => rule);
+
+/**
+ * A primitive colour, taken from the built list rather than spelled out, so renaming a
+ * primitive, which a fork is told to do, can't fail these tests instead.
+ */
+const primitiveColour = lintLists.primitive.find((name) =>
+  name.includes('-color-'),
+);
+if (!primitiveColour) throw new Error('No primitive colour token to test with');
 
 describe('tokens only', () => {
   it.each([
@@ -96,9 +106,9 @@ describe('semantic tokens only', () => {
   });
 
   it('rejects a primitive aliased by a local custom property', async () => {
-    expect(
-      await rules('a { --tint: var(--fossil-base-color-blue-600); }'),
-    ).toContain('declaration-property-value-disallowed-list');
+    expect(await rules(`a { --tint: var(${primitiveColour}); }`)).toContain(
+      'declaration-property-value-disallowed-list',
+    );
   });
 
   it('rejects a raw colour in a local custom property or a shadow', async () => {
@@ -169,13 +179,12 @@ describe('site tokens', () => {
   const siteTokens = join(dir, 'site-tokens.css');
   writeFileSync(
     siteTokens,
-    ':root {\n  --site-color-heart: var(--fossil-base-color-blue-600);\n  --site-color-coffee: #6f4e37;\n}\n',
+    `:root {\n  --site-color-heart: var(${primitiveColour});\n  --site-color-coffee: #6f4e37;\n}\n`,
   );
   const siteConfig = fossil({ siteTokens: ['site-tokens.css'], root: dir });
 
   it('may alias primitives and hold raw values in its own file', async () => {
-    const code =
-      ':root {\n  --site-color-heart: var(--fossil-base-color-blue-600);\n  --site-color-coffee: #6f4e37;\n}\n';
+    const code = `:root {\n  --site-color-heart: var(${primitiveColour});\n  --site-color-coffee: #6f4e37;\n}\n`;
     expect(await lint(code, { config: siteConfig, file: siteTokens })).toEqual(
       [],
     );
