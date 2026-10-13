@@ -206,6 +206,30 @@ Step 2.5 says "the docs site's icons are in `packages/react/docs-site/public/`".
 
 **Fix:** widen 2.5 past icons, and say plainly that the favicon, the touch icon and the preview card are Fossil's artwork until replaced.
 
+## Fixed so far
+
+On this branch, with the issue's number and what it took:
+
+| #     | Fix                                                                                         | Commit    |
+| ----- | ------------------------------------------------------------------------------------------- | --------- |
+| 19    | `AGENTS.md`, `packages/react/AGENTS.md` and ADR 0016 call the script with `pnpm run docs`   | `8244a2c` |
+| 1     | `rewrites()` also rewrites `%40<scope>`, with a case for it in `tests/rename.test.ts`       | `0e61106` |
+| 20    | The Stylelint config's tests take a primitive colour from the built `lint.json`             | `a79062a` |
+| 2, 18 | `scripts/fonts.ts` checks each stylesheet against the faces and weights the text styles use | `0ab2c06` |
+
+Issue 20's fix was proved against what broke it: the new test file, copied into the fork where `base.color.blue.600` no longer exists, passes with no reference to it.
+
+Issue 18's fix found issue 2 by itself, on Fossil's own files, before either head file was touched:
+
+```
+✗ .storybook/preview-head.html loads Space Grotesk without weight 700, which the text styles set
+✗ .storybook/manager-head.html loads Space Grotesk without weight 700, which the text styles set
+```
+
+Both now load the same faces the Make guidelines tell an app to load, so the docs site renders what an app will. The check allows a weight no text style names, because `<strong>` in running text asks the browser for bold and the `font.weight` tokens are reachable on their own. None of these four touches a package's public surface, so none takes a changeset.
+
+The block measured 7985 bytes against its 8192 budget here, against 7917 in the fork, where the shorter prefix saves the difference. That is 207 bytes of headroom in Fossil itself, which sharpens issue 16.
+
 ## Resolved before the test reached them
 
 - `manager.ts` hard-coded the front page's title beside `fossil.config.json`'s name. [#46](https://github.com/ibrahimmoazzam/fossil-design/pull/46) routes it through `siteTitle` in `meta.ts`. The fork predates that commit, so it still carries the old shape.
