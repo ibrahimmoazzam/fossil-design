@@ -37,7 +37,7 @@ afterAll(() => {
   for (const dir of temporary) rmSync(dir, { recursive: true, force: true });
 });
 const tempDir = () => {
-  const dir = mkdtempSync(join(tmpdir(), 'fossil-build-'));
+  const dir = mkdtempSync(join(tmpdir(), 'tokens-build-'));
   temporary.push(dir);
   return dir;
 };

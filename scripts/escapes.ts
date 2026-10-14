@@ -1,11 +1,11 @@
-// Counts Level 2 escapes: disable comments that turn off one of Fossil's rules, outside tests.
+// Counts Level 2 escapes: disable comments that turn off one of the system's rules, outside tests.
 // With a base ref it also lists the escapes a branch adds. In CI it writes the report to the job
 // summary. It reports and never fails: deviation should be visible, not impossible.
 import { execFileSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
 
-/** Fossil's ESLint and Stylelint rules. A disable naming no rule turns off all of them. */
-const fossilRules = new Set([
+/** The system's ESLint and Stylelint rules. A disable naming no rule turns off all of them. */
+const ownRules = new Set([
   'no-restricted-syntax',
   'scale-unlimited/declaration-strict-value',
   'csstools/value-no-unknown-custom-properties',
@@ -79,7 +79,7 @@ function escapesAt(rev?: string): Escape[] {
         .map((rule) => rule.trim())
         .filter(Boolean);
       return (names.length > 0 ? names : [everyRule])
-        .filter((rule) => rule === everyRule || fossilRules.has(rule))
+        .filter((rule) => rule === everyRule || ownRules.has(rule))
         .map((rule) => ({
           file: rev ? path.slice(rev.length + 1) : path,
           line: Number(line),
@@ -121,7 +121,7 @@ const row = (cells: string[]) => `| ${cells.join(' | ')} |`;
 const lines = [
   '## Lint escapes',
   '',
-  `${String(head.length)} disable comments turn off Fossil's rules${
+  `${String(head.length)} disable comments turn off the system's rules${
     base ? ` (${signed(head.length - base.length)} on this branch)` : ''
   }.`,
   '',

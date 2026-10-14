@@ -1,4 +1,4 @@
-import fossilConfig from '../../../brand.config.json' with { type: 'json' };
+import brand from '../../../brand.config.json' with { type: 'json' };
 import tokensFile from '@fossil-design/tokens/tokens.json';
 import { fill, list } from '../scripts/template.ts';
 
@@ -15,9 +15,9 @@ const fonts = Object.entries(tokensFile.tokens)
 /** Fills a page's `{{name}}`, `{{prefix}}`, `{{scope}}` and `{{fonts}}` from brand.config.json and the tokens, so a fork's site names its own system. */
 export function fromConfig(text: string): string {
   return fill(text, {
-    name: fossilConfig.name,
-    prefix: fossilConfig.cssPrefix,
-    scope: fossilConfig.npmScope,
+    name: brand.name,
+    prefix: brand.cssPrefix,
+    scope: brand.npmScope,
     fonts: list([...new Set(fonts)]),
   });
 }

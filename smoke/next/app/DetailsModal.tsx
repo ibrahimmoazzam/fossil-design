@@ -4,7 +4,7 @@ import { Button, Modal, Text } from '@fossil-design/react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 
-/** Motion runs the panel through renderPanel; Fossil keeps the dialog's lifecycle. */
+/** Motion runs the panel through renderPanel; the component keeps the dialog's lifecycle. */
 export function DetailsModal() {
   const [open, setOpen] = useState(false);
   return (

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { defineConfig, type Plugin } from 'vite';
 import { patchCssModules } from 'vite-css-modules';
-import fossilConfig from '../../brand.config.json' with { type: 'json' };
+import brand from '../../brand.config.json' with { type: 'json' };
 import pkg from './package.json' with { type: 'json' };
 
 // The tokens are bundled into style.css, never imported at runtime; a bare CSS import left in JS
@@ -17,7 +17,7 @@ const external = [
 /** A consumer's `import '@fossil-design/react/style.css'` needs a declaration under TypeScript 6. */
 function styleDeclaration(): Plugin {
   return {
-    name: 'fossil:style-declaration',
+    name: `${brand.cssPrefix}:style-declaration`,
     apply: 'build',
     generateBundle() {
       this.emitFile({
@@ -33,7 +33,7 @@ function styleDeclaration(): Plugin {
 function iconLicense(): Plugin {
   const require = createRequire(import.meta.url);
   return {
-    name: 'fossil:icon-license',
+    name: `${brand.cssPrefix}:icon-license`,
     apply: 'build',
     generateBundle() {
       this.emitFile({
@@ -56,7 +56,7 @@ export default defineConfig({
   ],
   css: {
     modules: {
-      generateScopedName: `${fossilConfig.cssPrefix}-[local]-[hash:base64:5]`,
+      generateScopedName: `${brand.cssPrefix}-[local]-[hash:base64:5]`,
     },
   },
   build: {

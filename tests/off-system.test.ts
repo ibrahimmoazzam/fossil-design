@@ -11,10 +11,10 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const fixture = (name: string) =>
   readFileSync(new URL(`../smoke/off-system/${name}`, import.meta.url), 'utf8');
 
-// Linted as if it were one of Fossil's own components.
+// Linted as if it were one of the system's own components.
 const componentDir = `${root}packages/react/src/components/OffSystem/`;
 
-describe("Fossil's own lint configs", () => {
+describe("the system's own lint configs", () => {
   it('ban exactly the elements Box renders', () => {
     expect([...layoutElements].sort()).toEqual([...boxElements].sort());
   });

@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import StyleDictionary from 'style-dictionary';
+import brand from '../../../brand.config.json' with { type: 'json' };
 import type { Dictionary, Transform } from 'style-dictionary/types';
 import * as render from './formats.ts';
 import { BuildError } from './formats.ts';
@@ -14,8 +15,11 @@ import {
 
 export { BuildError };
 
-export const DURATION = 'fossil/duration/css';
-export const FONT_WEIGHT = 'fossil/fontWeight/css';
+/** The CSS prefix names the hooks this build registers, so a fork's are its own. */
+const PREFIX: string = brand.cssPrefix;
+
+export const DURATION = `${PREFIX}/duration/css`;
+export const FONT_WEIGHT = `${PREFIX}/fontWeight/css`;
 
 // Style Dictionary 5.5.5 leaves both of these as they are, which isn't valid CSS.
 const TRANSFORM_HOOKS: Record<string, Omit<Transform, 'name'>> = {
@@ -94,33 +98,34 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
     hooks: {
       transforms: TRANSFORM_HOOKS,
       formats: {
-        'fossil/css': ({ dictionary }) =>
+        [`${options.prefix}/css`]: ({ dictionary }) =>
           render.css(entries(dictionary), header),
-        'fossil/json': ({ dictionary }) =>
+        [`${options.prefix}/json`]: ({ dictionary }) =>
           `${JSON.stringify(render.tokensFile(entries(dictionary)), null, 2)}\n`,
-        'fossil/lint': ({ dictionary }) =>
+        [`${options.prefix}/lint`]: ({ dictionary }) =>
           `${JSON.stringify(render.lintLists(entries(dictionary)), null, 2)}\n`,
-        'fossil/keys': ({ dictionary }) =>
+        [`${options.prefix}/keys`]: ({ dictionary }) =>
           render.tokenKeys(entries(dictionary), header),
-        'fossil/breakpoints': ({ dictionary }) =>
+        [`${options.prefix}/breakpoints`]: ({ dictionary }) =>
           render.breakpoints(entries(dictionary), header),
-        'fossil/css-types': () => render.declaration(),
-        'fossil/json-types': () => render.declaration('TokensFile'),
-        'fossil/lint-types': () => render.declaration('LintLists'),
-        'fossil/foundations-md': ({ dictionary }) =>
+        [`${options.prefix}/css-types`]: () => render.declaration(),
+        [`${options.prefix}/json-types`]: () =>
+          render.declaration('TokensFile'),
+        [`${options.prefix}/lint-types`]: () => render.declaration('LintLists'),
+        [`${options.prefix}/foundations-md`]: ({ dictionary }) =>
           render.foundationsMarkdown(
             render.tokensFile(entries(dictionary)),
             options.prefix,
             header,
           ),
-        'fossil/foundations-brief': ({ dictionary }) =>
+        [`${options.prefix}/foundations-brief`]: ({ dictionary }) =>
           render.foundationsBrief(
             render.tokensFile(entries(dictionary)),
             header,
           ),
-        'fossil/reference': ({ dictionary }) =>
+        [`${options.prefix}/reference`]: ({ dictionary }) =>
           render.tokenReference(render.tokensFile(entries(dictionary)), header),
-        'fossil/foundations': ({ dictionary }) =>
+        [`${options.prefix}/foundations`]: ({ dictionary }) =>
           render.foundations(
             render.tokensFile(entries(dictionary)),
             options.prefix,
@@ -134,30 +139,42 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
         // Typography becomes one custom property per part. The font shorthand would drop letter-spacing.
         expand: { include: ['typography'] },
         files: [
-          { destination: 'dist/tokens.css', format: 'fossil/css' },
-          { destination: 'dist/tokens.css.d.ts', format: 'fossil/css-types' },
-          { destination: 'dist/tokens.json', format: 'fossil/json' },
+          { destination: 'dist/tokens.css', format: `${options.prefix}/css` },
+          {
+            destination: 'dist/tokens.css.d.ts',
+            format: `${options.prefix}/css-types`,
+          },
+          { destination: 'dist/tokens.json', format: `${options.prefix}/json` },
           {
             destination: 'dist/tokens.json.d.cts',
-            format: 'fossil/json-types',
+            format: `${options.prefix}/json-types`,
           },
-          { destination: 'dist/lint.json', format: 'fossil/lint' },
+          { destination: 'dist/lint.json', format: `${options.prefix}/lint` },
           {
             destination: 'dist/foundations.md',
-            format: 'fossil/foundations-md',
+            format: `${options.prefix}/foundations-md`,
           },
           {
             destination: 'dist/foundations-brief.md',
-            format: 'fossil/foundations-brief',
+            format: `${options.prefix}/foundations-brief`,
           },
-          { destination: 'dist/tokens.md', format: 'fossil/reference' },
-          { destination: 'dist/lint.json.d.cts', format: 'fossil/lint-types' },
-          { destination: 'src/generated/tokens.ts', format: 'fossil/keys' },
+          {
+            destination: 'dist/tokens.md',
+            format: `${options.prefix}/reference`,
+          },
+          {
+            destination: 'dist/lint.json.d.cts',
+            format: `${options.prefix}/lint-types`,
+          },
+          {
+            destination: 'src/generated/tokens.ts',
+            format: `${options.prefix}/keys`,
+          },
           {
             destination: 'src/generated/breakpoints.ts',
-            format: 'fossil/breakpoints',
+            format: `${options.prefix}/breakpoints`,
           },
-          { destination: 'AGENTS.md', format: 'fossil/foundations' },
+          { destination: 'AGENTS.md', format: `${options.prefix}/foundations` },
         ],
       },
     },

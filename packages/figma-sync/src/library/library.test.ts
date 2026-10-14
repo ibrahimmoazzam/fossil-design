@@ -34,7 +34,7 @@ import { buildLibrary, type Library } from './spec.ts';
 import { readIcons, stylesSpec } from './styles.ts';
 
 // A small library, written to a temporary folder, that exercises every rule the spec follows.
-const FIXTURE = mkdtempSync(join(tmpdir(), 'fossil-library-'));
+const FIXTURE = mkdtempSync(join(tmpdir(), 'figma-library-'));
 const write = (path: string, text: string) => {
   mkdirSync(dirname(join(FIXTURE, path)), { recursive: true });
   writeFileSync(join(FIXTURE, path), text);

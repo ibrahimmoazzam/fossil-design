@@ -3,7 +3,7 @@ import {
   type DocsContainerProps,
 } from '@storybook/addon-docs/blocks';
 import { useSyncExternalStore, type PropsWithChildren } from 'react';
-import { fossilTheme, onSystemModeChange, resolveMode } from './theme.ts';
+import { siteTheme, onSystemModeChange, resolveMode } from './theme.ts';
 
 function subscribe(onChange: () => void): () => void {
   const observer = new MutationObserver(onChange);
@@ -21,9 +21,9 @@ function subscribe(onChange: () => void): () => void {
 const pageMode = () => resolveMode(document.documentElement.dataset.theme);
 
 /** Storybook's docs container, themed to match the page: the toolbar's choice, or the system's. */
-export function FossilDocsContainer(
+export function SiteDocsContainer(
   props: PropsWithChildren<DocsContainerProps>,
 ) {
   const mode = useSyncExternalStore(subscribe, pageMode);
-  return <DocsContainer {...props} theme={fossilTheme(mode)} />;
+  return <DocsContainer {...props} theme={siteTheme(mode)} />;
 }

@@ -1,4 +1,5 @@
 import type { TransformedToken } from 'style-dictionary/types';
+import brand from '../../../brand.config.json' with { type: 'json' };
 import type {
   Alias,
   LintLists,
@@ -409,8 +410,8 @@ export const declaration = (type?: string): string =>
     ? 'export {};\n'
     : `import type { ${type} } from './metadata.js';\n\ndeclare const file: ${type};\nexport = file;\n`;
 
-export const BLOCK_START = '<!-- fossil:foundations:start -->';
-export const BLOCK_END = '<!-- fossil:foundations:end -->';
+export const BLOCK_START = `<!-- ${brand.cssPrefix}:foundations:start -->`;
+export const BLOCK_END = `<!-- ${brand.cssPrefix}:foundations:end -->`;
 
 /** A DTCG dimension in px, at a 16px root. */
 const px = (value: unknown): string => {

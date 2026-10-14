@@ -1,4 +1,4 @@
-import fossilConfig from '../../../brand.config.json' with { type: 'json' };
+import brand from '../../../brand.config.json' with { type: 'json' };
 
 /**
  * The site's own origin: the canonical link, and the absolute `og:image` URL a scraper needs.
@@ -13,7 +13,7 @@ export const siteUrl = 'https://fossil.ibrahimmoazzam.com';
  * title and in the built page's, with no option to change either, so manager.ts renames the tab
  * and scripts/site-meta.ts rewrites the built page. A fork writes its own.
  */
-export const siteTitle = `${fossilConfig.name}: Open-Source Agentic Design System`;
+export const siteTitle = `${brand.name}: Open-Source Agentic Design System`;
 
 /**
  * One sentence, inside the ~160 characters a search result and a preview card show. It doesn't

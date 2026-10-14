@@ -1,7 +1,7 @@
 {
-  "name": "fossil-smoke-next",
+  "name": "smoke-next",
   "private": true,
-  "description": "Builds a Next 16 app from Fossil's packed tarballs: a Server Component page, and Motion driving Modal through renderPanel.",
+  "description": "Builds a Next 16 app from the packed tarballs: a Server Component page, and Motion driving Modal through renderPanel.",
   "type": "module",
   "scripts": {
     "build": "next build",

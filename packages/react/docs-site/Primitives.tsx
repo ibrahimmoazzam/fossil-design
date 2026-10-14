@@ -1,4 +1,5 @@
 import tokensFile from '@fossil-design/tokens/tokens.json';
+import config from '../../../brand.config.json' with { type: 'json' };
 import type { ReactNode } from 'react';
 import { Box, Stack, Text } from '../src/index.ts';
 import { Callout } from './Callout.tsx';
@@ -179,7 +180,7 @@ function Sample({ name, token }: { name: string; token: Token }): ReactNode {
           fontFamily={formatValue(token)}
           fontSize="20"
         >
-          Fossil Aa 123
+          {`${config.name} Aa 123`}
         </text>
       </svg>
     );

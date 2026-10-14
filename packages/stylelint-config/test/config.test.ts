@@ -172,7 +172,7 @@ describe('disable comments', () => {
 });
 
 describe('site tokens', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'fossil-stylelint-'));
+  const dir = mkdtempSync(join(tmpdir(), 'stylelint-config-'));
   afterAll(() => {
     rmSync(dir, { recursive: true, force: true });
   });
