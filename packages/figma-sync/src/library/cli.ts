@@ -15,6 +15,7 @@ import type { CheckResult, CheckSpec, ComponentSpec } from './runtime.ts';
 import { buildSheet } from './sheet.ts';
 import { buildLibrary, type Library } from './spec.ts';
 import { COMPONENTS_PAGE, readIcons, stylesSpec } from './styles.ts';
+import { NS } from '../brand.ts';
 
 const REPO = fileURLToPath(new URL('../../../../', import.meta.url));
 const WORK = fileURLToPath(new URL('../../.figma/', import.meta.url));
@@ -149,6 +150,7 @@ export function libraryCheck(names: readonly string[]): void {
         : all;
   const parts = checkParts(chosen, {
     kind: 'check',
+    ns: NS,
     target,
     page: COMPONENTS_PAGE,
     commit: source(),
@@ -201,7 +203,7 @@ export function readResults(
     }
     const { part, parts, commit, components, foundations } = result;
     if (
-      (result as { fossil?: unknown }).fossil !== 'check' ||
+      (result as unknown as Record<string, unknown>)[NS] !== 'check' ||
       hash(JSON.stringify({ part, parts, commit, components, foundations })) !==
         result.hash
     )

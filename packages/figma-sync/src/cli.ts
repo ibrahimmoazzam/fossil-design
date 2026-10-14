@@ -27,6 +27,7 @@ import { script } from './scripts.ts';
 import { readSnapshot, SnapshotError } from './snapshot.ts';
 import { applySpecs, variableSpecs } from './spec.ts';
 import { applyEdits } from './write.ts';
+import { NS } from './brand.ts';
 
 const REPO = fileURLToPath(new URL('../../../', import.meta.url));
 const SOURCE = 'packages/tokens/src';
@@ -117,7 +118,7 @@ function read(arg: string | undefined): void {
   writeFileSync(
     name,
     script(
-      { kind: 'read', page, pageSize: PART_SIZE },
+      { kind: 'read', ns: NS, page, pageSize: PART_SIZE },
       `read page ${String(page)}`,
     ),
   );

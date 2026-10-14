@@ -1,4 +1,5 @@
 import type { Figma, FigmaCollection, FigmaVariable } from './runtime.ts';
+import { NS } from './brand.ts';
 
 type Value = FigmaVariable['valuesByMode'][string];
 
@@ -245,7 +246,7 @@ export class FakeFigma implements Figma {
   /** The variable stamped with a token path. */
   variable(path: string): Variable {
     const found = this.all.find(
-      (v) => v.getSharedPluginData('fossil', 'path') === path,
+      (v) => v.getSharedPluginData(NS, 'path') === path,
     );
     if (!found) throw new Error(`No variable stamped ${path}`);
     return found;

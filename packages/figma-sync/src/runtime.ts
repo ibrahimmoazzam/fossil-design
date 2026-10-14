@@ -36,7 +36,17 @@ export interface VariableSpec {
   renamedFrom: string[];
 }
 
-export interface ApplySpec {
+/**
+ * The brand's namespace: the shared plugin data stamped on every variable, style, page and
+ * component, and the key a script tags its result with. It travels in the spec rather than
+ * being read from `brand.config.json`, because `script()` emits only the functions its entry
+ * point reaches, so a module constant would never reach Figma. [ADR 0020](../../../docs/decisions/0020-what-a-fork-renames.md).
+ */
+export interface Branded {
+  ns: string;
+}
+
+export interface ApplySpec extends Branded {
   kind: 'apply';
   part: number;
   parts: number;
@@ -44,14 +54,14 @@ export interface ApplySpec {
   variables: VariableSpec[];
 }
 
-export interface FinishSpec {
+export interface FinishSpec extends Branded {
   kind: 'finish';
   commit: string;
   collections: CollectionSpec[];
   paths: string[];
 }
 
-export interface ReadSpec {
+export interface ReadSpec extends Branded {
   kind: 'read';
   page: number;
   pageSize: number;
@@ -71,7 +81,6 @@ export interface ReadVariable {
 }
 
 export interface ReadPage {
-  fossil: 'read';
   page: number;
   pages: number;
   /** The hash of every page's variables, joined, so pages from different reads can't mix. */
@@ -158,12 +167,26 @@ export interface Figma {
   };
 }
 
-export function stamp(node: Stamped, key = 'path'): string {
-  return node.getSharedPluginData('fossil', key);
+export function stamp(ns: string, node: Stamped, key = 'path'): string {
+  return node.getSharedPluginData(ns, key);
 }
 
-export function setStamp(node: Stamped, value: string, key = 'path'): void {
-  node.setSharedPluginData('fossil', key, value);
+export function setStamp(
+  ns: string,
+  node: Stamped,
+  value: string,
+  key = 'path',
+): void {
+  node.setSharedPluginData(ns, key, value);
+}
+
+/** A script's result, under the key the local side recognises it by. */
+export function tagged<T extends object>(
+  ns: string,
+  kind: string,
+  content: T,
+): T & Record<string, unknown> {
+  return { [ns]: kind, ...content };
 }
 
 export function known<T>(value: T | undefined, what: string): T {
@@ -173,11 +196,12 @@ export function known<T>(value: T | undefined, what: string): T {
 
 /** The sync's own collections, by the key stamped on each. */
 export function stampedCollections(
+  ns: string,
   collections: readonly FigmaCollection[],
 ): Record<string, FigmaCollection> {
   const byKey: Record<string, FigmaCollection> = {};
   for (const c of collections) {
-    const key = stamp(c, 'collection');
+    const key = stamp(ns, c, 'collection');
     if (key === '') continue;
     if (byKey[key])
       throw new Error(
@@ -190,12 +214,13 @@ export function stampedCollections(
 
 /** Variables by the token path stamped on each. Two with one path is an error. */
 export function stampedVariables(
+  ns: string,
   variables: readonly FigmaVariable[],
 ): Record<string, FigmaVariable> {
   const index: Record<string, FigmaVariable> = {};
   const duplicates: string[] = [];
   for (const v of variables) {
-    const path = stamp(v);
+    const path = stamp(ns, v);
     if (path === '') continue;
     if (index[path]) duplicates.push(path);
     index[path] = v;
@@ -229,6 +254,7 @@ export function toFigma(value: SyncValue): FigmaValue {
 export function fromFigma(
   value: FigmaValue,
   variables: readonly FigmaVariable[],
+  ns: string,
 ): SyncValue {
   const round = (n: number) => Math.round(n * 10000) / 10000;
   const channel = (n: number) =>
@@ -239,7 +265,7 @@ export function fromFigma(
   if (typeof value !== 'object') return value;
   if ('type' in value && value.type === 'VARIABLE_ALIAS') {
     const target = variables.find((v) => v.id === value.id);
-    const path = target ? stamp(target) : '';
+    const path = target ? stamp(ns, target) : '';
     return path === ''
       ? { alias: '', target: target ? target.name : value.id }
       : { alias: path };
@@ -266,13 +292,14 @@ export function fromFigma(
 /** Creates Fossil's collections and modes where they're missing, and returns each mode's id. */
 export function ensureCollections(
   figma: Figma,
+  ns: string,
   collections: FigmaCollection[],
   specs: readonly CollectionSpec[],
 ): {
   owned: Record<string, FigmaCollection>;
   modeIds: Record<string, Record<string, string>>;
 } {
-  const owned = stampedCollections(collections);
+  const owned = stampedCollections(ns, collections);
   const modeIds: Record<string, Record<string, string>> = {};
   for (const c of specs) {
     let collection = owned[c.key];
@@ -282,7 +309,7 @@ export function ensureCollections(
         known(collection.modes[0], 'the first mode').modeId,
         known(c.modes[0], 'the mode names'),
       );
-      setStamp(collection, c.key, 'collection');
+      setStamp(ns, collection, c.key, 'collection');
       owned[c.key] = collection;
       collections.push(collection);
     }
@@ -300,7 +327,7 @@ export function ensureCollections(
 export async function read(spec: ReadSpec, figma: Figma): Promise<ReadPage> {
   const collections = await figma.variables.getLocalVariableCollectionsAsync();
   const variables = await figma.variables.getLocalVariablesAsync();
-  const owned = stampedCollections(collections);
+  const owned = stampedCollections(spec.ns, collections);
   const keyOf: Record<string, string> = {};
   for (const [key, c] of Object.entries(owned)) keyOf[c.id] = key;
   const records = variables
@@ -314,13 +341,13 @@ export async function read(spec: ReadSpec, figma: Figma): Promise<ReadPage> {
       for (const mode of collection.modes) {
         const value = v.valuesByMode[mode.modeId];
         if (value !== undefined)
-          values[mode.name] = fromFigma(value, variables);
+          values[mode.name] = fromFigma(value, variables, spec.ns);
       }
       return [
         {
           id: v.id,
           name: v.name,
-          path: stamp(v),
+          path: stamp(spec.ns, v),
           collection: key,
           type: v.resolvedType,
           values,
@@ -337,7 +364,7 @@ export async function read(spec: ReadSpec, figma: Figma): Promise<ReadPage> {
     page: spec.page,
     pages: Math.max(1, Math.ceil(records.length / spec.pageSize)),
     whole: sha256(JSON.stringify(records)),
-    commit: owned.semantic ? stamp(owned.semantic, 'commit') : '',
+    commit: owned.semantic ? stamp(spec.ns, owned.semantic, 'commit') : '',
     collections: Object.entries(owned).map(([key, c]) => ({
       key,
       name: c.name,
@@ -348,15 +375,23 @@ export async function read(spec: ReadSpec, figma: Figma): Promise<ReadPage> {
       spec.page * spec.pageSize,
     ),
   };
-  return { fossil: 'read', ...content, hash: sha256(JSON.stringify(content)) };
+  return tagged(spec.ns, 'read', {
+    ...content,
+    hash: sha256(JSON.stringify(content)),
+  });
 }
 
 /** Checks that every variable is in Figma, reports any Fossil doesn't know, and only then stamps the commit. */
 export async function finish(spec: FinishSpec, figma: Figma): Promise<unknown> {
   const collections = await figma.variables.getLocalVariableCollectionsAsync();
   const variables = await figma.variables.getLocalVariablesAsync();
-  const { owned } = ensureCollections(figma, collections, spec.collections);
-  const index = stampedVariables(variables);
+  const { owned } = ensureCollections(
+    figma,
+    spec.ns,
+    collections,
+    spec.collections,
+  );
+  const index = stampedVariables(spec.ns, variables);
   const expected: Record<string, boolean> = {};
   for (const path of spec.paths) expected[path] = true;
   const missing = spec.paths.filter((path) => !index[path]);
@@ -365,21 +400,21 @@ export async function finish(spec: FinishSpec, figma: Figma): Promise<unknown> {
     ownedIds.includes(v.variableCollectionId),
   );
   const orphans = ownedVariables
-    .filter((v) => stamp(v) !== '' && !expected[stamp(v)])
-    .map((v) => stamp(v));
+    .filter((v) => stamp(spec.ns, v) !== '' && !expected[stamp(spec.ns, v)])
+    .map((v) => stamp(spec.ns, v));
   const unstamped = ownedVariables
-    .filter((v) => stamp(v) === '')
+    .filter((v) => stamp(spec.ns, v) === '')
     .map((v) => v.name);
   if (missing.length === 0)
-    for (const c of Object.values(owned)) setStamp(c, spec.commit, 'commit');
+    for (const c of Object.values(owned))
+      setStamp(spec.ns, c, spec.commit, 'commit');
 
-  return {
-    fossil: 'finish',
+  return tagged(spec.ns, 'finish', {
     commit: missing.length === 0 ? spec.commit : '',
     missing,
     orphans,
     unstamped,
-  };
+  });
 }
 
 /** Creates or updates one part of Fossil's variables. Running it again changes nothing. */
@@ -388,12 +423,13 @@ export async function apply(spec: ApplySpec, figma: Figma): Promise<unknown> {
   const variables = await figma.variables.getLocalVariablesAsync();
   const { owned, modeIds } = ensureCollections(
     figma,
+    spec.ns,
     collections,
     spec.collections,
   );
 
   // Check everything before writing anything, because a failed script may keep its partial writes.
-  const index = stampedVariables(variables);
+  const index = stampedVariables(spec.ns, variables);
   const problems: string[] = [];
   const plan = spec.variables.map((v) => {
     const renamed = v.renamedFrom.find((old) => index[old]);
@@ -412,7 +448,7 @@ export async function apply(spec: ApplySpec, figma: Figma): Promise<unknown> {
     );
     if (clash)
       problems.push(
-        `${v.path}: another variable is already named ${v.name}${stamp(clash) ? ` (stamped ${stamp(clash)})` : ''}. Rename or delete it in Figma, then apply again.`,
+        `${v.path}: another variable is already named ${v.name}${stamp(spec.ns, clash) ? ` (stamped ${stamp(spec.ns, clash)})` : ''}. Rename or delete it in Figma, then apply again.`,
       );
     return { spec: v, existing, renamed: existing && renamed ? renamed : '' };
   });
@@ -485,8 +521,8 @@ export async function apply(spec: ApplySpec, figma: Figma): Promise<unknown> {
       variable.name = v.name;
       changes.push('name');
     }
-    if (stamp(variable) !== v.path) {
-      setStamp(variable, v.path);
+    if (stamp(spec.ns, variable) !== v.path) {
+      setStamp(spec.ns, variable, v.path);
       index[v.path] = variable;
       changes.push('stamp');
     }
@@ -527,14 +563,13 @@ export async function apply(spec: ApplySpec, figma: Figma): Promise<unknown> {
     if (changes.length > 0) updated.push(`${v.path}: ${changes.join(', ')}`);
     else unchanged += 1;
   }
-  return {
-    fossil: 'apply',
+  return tagged(spec.ns, 'apply', {
     part: `${String(spec.part)} of ${String(spec.parts)}`,
     created,
     renamed,
     updated,
     unchanged,
-  };
+  });
 }
 
 /** SHA-256 of a string's UTF-8 bytes, as hex. Figma's plugin sandbox has no Web Crypto. */

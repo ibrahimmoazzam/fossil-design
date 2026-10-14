@@ -10,6 +10,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { TokensFile } from '../../../tokens/src/metadata.ts';
+import { NS } from '../brand.ts';
 import { sha256 } from '../runtime.ts';
 import { CHANGED, script } from '../scripts.ts';
 import { checkParts, LibraryError, readResults, reportLines } from './cli.ts';
@@ -731,7 +732,7 @@ describe('the styles script', () => {
           : 'FLOAT';
       canvas.variables
         .createVariable(path.replaceAll('.', '/'), collection, type)
-        .setSharedPluginData('fossil', 'path', path);
+        .setSharedPluginData(NS, 'path', path);
     }
     canvas.fonts = fonts;
     return canvas;
@@ -873,7 +874,7 @@ describe('the library check', () => {
           collection,
           path.startsWith('color') ? 'COLOR' : 'FLOAT',
         );
-        v.setSharedPluginData('fossil', 'path', path);
+        v.setSharedPluginData(NS, 'path', path);
         variables.set(path, v);
       }
       return v;
@@ -884,12 +885,12 @@ describe('the library check', () => {
       boundVariables: { color: { id: variable(path).id } },
     });
     const textStyle = canvas.createTextStyle();
-    textStyle.setSharedPluginData('fossil', 'path', 'text.body');
+    textStyle.setSharedPluginData(NS, 'path', 'text.body');
     const effectStyle = canvas.createEffectStyle();
-    effectStyle.setSharedPluginData('fossil', 'path', 'shadow.raised');
+    effectStyle.setSharedPluginData(NS, 'path', 'shadow.raised');
     const icons = canvas.createPage();
     icons.name = 'Icons';
-    icons.setSharedPluginData('fossil', 'page', 'icons');
+    icons.setSharedPluginData(NS, 'page', 'icons');
     canvas.currentPage = icons;
     canvas.node('COMPONENT', 'CloseIcon', canvas.node('SECTION', 'Icons'));
     const page = canvas.createPage();
@@ -1016,6 +1017,7 @@ describe('the library check', () => {
       specs.filter((s) => names.includes(s.name)),
       {
         kind: 'check',
+        ns: NS,
         target,
         page: 'Components',
         commit: 'abc1234',
@@ -1092,6 +1094,7 @@ describe('the library check', () => {
       specs,
       {
         kind: 'check',
+        ns: NS,
         target: 'components',
         page: 'Components',
         commit: 'x',
@@ -1262,6 +1265,7 @@ describe('the library check', () => {
     const { canvas } = built();
     const [part] = checkParts(specs, {
       kind: 'check',
+      ns: NS,
       target: 'components',
       page: 'Components',
       commit: 'x',

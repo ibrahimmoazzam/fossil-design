@@ -1,6 +1,7 @@
 import type { TokensFile } from '../../tokens/src/metadata.ts';
 import { COLLECTIONS, nameOf, type FigmaToken } from './model.ts';
 import type { Spec, VariableSpec } from './runtime.ts';
+import { NS } from './brand.ts';
 
 /**
  * Where each semantic variable appears in Figma's pickers, by token path prefix. The first match
@@ -99,6 +100,7 @@ export function applySpecs(
   for (let part = 1; part <= parts; part++)
     specs.push({
       kind: 'apply',
+      ns: NS,
       part,
       parts,
       collections,
@@ -106,6 +108,7 @@ export function applySpecs(
     });
   specs.push({
     kind: 'finish',
+    ns: NS,
     commit,
     collections,
     paths: variables.map((v) => v.path),

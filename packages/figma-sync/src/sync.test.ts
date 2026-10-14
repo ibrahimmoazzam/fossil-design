@@ -19,6 +19,7 @@ import { CHANGED, script } from './scripts.ts';
 import { readSnapshot } from './snapshot.ts';
 import { applySpecs, scopesOf, variableSpecs } from './spec.ts';
 import { applyEdits } from './write.ts';
+import { NS } from './brand.ts';
 
 // A frozen copy of the reference token source, so a value changed in Figma or by a fork doesn't
 // break these tests. The live source has its own tests below.
@@ -79,7 +80,7 @@ const readAll = async (figma: FakeFigma) => {
   const pages: { name: string; text: string }[] = [];
   for (let page = 1, count = 1; page <= count; page++) {
     const result = (await run(
-      script({ kind: 'read', page, pageSize: 40 }, 'test'),
+      script({ kind: 'read', ns: NS, page, pageSize: 40 }, 'test'),
       figma,
     )) as ReadPage;
     count = result.pages;
@@ -253,7 +254,7 @@ describe('applying to a fresh file', () => {
       ['Semantic', ['Light', 'Dark']],
     ]);
     for (const c of figma.collections)
-      expect(c.getSharedPluginData('fossil', 'commit')).toBe(COMMIT);
+      expect(c.getSharedPluginData(NS, 'commit')).toBe(COMMIT);
     expect(first.at(-1)).toMatchObject({
       commit: COMMIT,
       missing: [],
@@ -436,7 +437,7 @@ describe('applying safely', () => {
   it('refuses two variables stamped with the same path', async () => {
     const figma = new FakeFigma();
     await applyAll(figma);
-    figma.variable('space.l').setSharedPluginData('fossil', 'path', 'space.m');
+    figma.variable('space.l').setSharedPluginData(NS, 'path', 'space.m');
     await expect(applyAll(figma)).rejects.toThrow(
       'More than one variable is stamped with space.m',
     );
