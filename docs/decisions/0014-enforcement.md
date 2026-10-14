@@ -33,7 +33,7 @@ Checked in October 2026:
 
 ## Decision
 
-`@fossil-design/eslint-config` exports `fossil(options)` and, as its default, `fossil()`:
+`@fossil-design/eslint-config` exports `brand(options)` and, as its default, `brand()`:
 
 | Setting                                                 | What it enforces                                                                                |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
@@ -42,7 +42,7 @@ Checked in October 2026:
 | `reportUnusedDisableDirectives: 'error'`                | A disable that disables nothing fails                                                           |
 | `@typescript-eslint/no-deprecated`, with `deprecations` | Deprecated components and props are flagged. Opt-in: it needs typescript-eslint's typed linting |
 
-It sets no parser; a TypeScript app already has typescript-eslint's. It exports `layoutElementRestrictions` for a config that sets `no-restricted-syntax` itself. Fossil's root `eslint.config.js` adds `fossil()` after its own configs.
+It sets no parser; a TypeScript app already has typescript-eslint's. It exports `layoutElementRestrictions` for a config that sets `no-restricted-syntax` itself. Fossil's root `eslint.config.js` adds `brand()` after its own configs.
 
 The escape levels:
 

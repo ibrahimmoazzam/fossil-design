@@ -30,17 +30,17 @@ Probing the two plugins against Stylelint 17.16 in October 2026 settled what the
    - **Refuse them.** Arithmetic on two tokens needs a token of its own or a disable comment with a reason.
 4. **How a consumer adds its own tokens.**
    - A second config the consumer writes and merges.
-   - **An option on a factory:** `fossil({ siteTokens })` makes those files' properties known everywhere, and lets those files alone alias primitives and hold raw values.
+   - **An option on a factory:** `brand({ siteTokens })` makes those files' properties known everywhere, and lets those files alone alias primitives and hold raw values.
 
 ## Decision
 
-The package exports `fossil(options)` and, as its default, `fossil()`:
+The package exports `brand(options)` and, as its default, `brand()`:
 
 ```js
 // stylelint.config.js in an app
-import { fossil } from '@fossil-design/stylelint-config';
+import { brand } from '@fossil-design/stylelint-config';
 
-export default fossil({ siteTokens: ['src/styles/site-tokens.css'] });
+export default brand({ siteTokens: ['src/styles/site-tokens.css'] });
 ```
 
 | Rule                                                                                    | What it enforces                                                                                                                                                                                                                                                                                                       |
@@ -53,7 +53,7 @@ export default fossil({ siteTokens: ['src/styles/site-tokens.css'] });
 
 The site-tokens override turns off the strict-value rule and keeps only the deprecated-name check. `siteTokens` paths resolve from `root`, which defaults to the working directory, because the unknown-property plugin needs absolute paths in a monorepo.
 
-Fossil's root `stylelint.config.js` is `fossil()` plus ignores for build output, so Fossil's own stylesheets go through exactly what a consumer gets. Box's generated CSS is linted too.
+Fossil's root `stylelint.config.js` is `brand()` plus ignores for build output, so Fossil's own stylesheets go through exactly what a consumer gets. Box's generated CSS is linted too.
 
 ## Consequences
 

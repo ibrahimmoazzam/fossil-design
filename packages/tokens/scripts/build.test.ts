@@ -10,7 +10,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import config from '../../../fossil.config.json' with { type: 'json' };
+import config from '../../../brand.config.json' with { type: 'json' };
 import type { LintLists, TokensFile } from '../src/metadata.ts';
 import {
   build,

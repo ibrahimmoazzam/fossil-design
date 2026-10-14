@@ -60,7 +60,7 @@ export interface BuildOptions {
   source: string;
   /** The package folder. Outputs go to dist/ and src/generated/ inside it. */
   root: string;
-  /** The system name and CSS prefix from fossil.config.json. */
+  /** The system name and CSS prefix from brand.config.json. */
   name: string;
   prefix: string;
   /** The AGENTS.md whose foundations block the build replaces. */
@@ -194,7 +194,7 @@ export async function build(options: BuildOptions): Promise<BuildResult> {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const repo = new URL('../../../', import.meta.url);
   const config = JSON.parse(
-    readFileSync(new URL('fossil.config.json', repo), 'utf8'),
+    readFileSync(new URL('brand.config.json', repo), 'utf8'),
   ) as { name: string; cssPrefix: string };
   try {
     const { tokens, files } = await build({

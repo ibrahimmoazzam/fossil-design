@@ -1,5 +1,5 @@
 // Renames a fork: the system name, CSS prefix, npm scope and GitHub repository. Changing
-// fossil.config.json alone isn't enough, because package names, imports, stylesheets and
+// brand.config.json alone isn't enough, because package names, imports, stylesheets and
 // repository URLs spell the old values out. Fossil's history (docs/ and changelogs) stays as written.
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -26,7 +26,7 @@ export const keep = [
   ':!docs/**',
   ':!**/CHANGELOG.md',
   ':!pnpm-lock.yaml',
-  ':!fossil.config.json',
+  ':!brand.config.json',
 ];
 
 const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -124,7 +124,7 @@ function main() {
     },
   });
 
-  const configFile = new URL('fossil.config.json', root);
+  const configFile = new URL('brand.config.json', root);
   const config = JSON.parse(readFileSync(configFile, 'utf8')) as Omit<
     Identity,
     'repo'
@@ -200,7 +200,7 @@ function main() {
   writeFileSync(configFile, `${JSON.stringify(nextConfig, null, 2)}\n`);
 
   console.log(
-    `fossil.config.json: ${to.name}, --${to.cssPrefix}-*, ${to.npmScope}`,
+    `brand.config.json: ${to.name}, --${to.cssPrefix}-*, ${to.npmScope}`,
   );
   for (const [key, label] of [
     ['npmScope', 'npm scope'],
@@ -221,7 +221,7 @@ function main() {
       '--ignore-unknown',
       '--log-level',
       'warn',
-      'fossil.config.json',
+      'brand.config.json',
       ...changed,
     ],
     root,

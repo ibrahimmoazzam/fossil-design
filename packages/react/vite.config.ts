@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { defineConfig, type Plugin } from 'vite';
 import { patchCssModules } from 'vite-css-modules';
-import fossilConfig from '../../fossil.config.json' with { type: 'json' };
+import fossilConfig from '../../brand.config.json' with { type: 'json' };
 import pkg from './package.json' with { type: 'json' };
 
 // The tokens are bundled into style.css, never imported at runtime; a bare CSS import left in JS

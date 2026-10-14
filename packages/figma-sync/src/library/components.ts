@@ -1,4 +1,4 @@
-import config from '../../../../fossil.config.json' with { type: 'json' };
+import config from '../../../../brand.config.json' with { type: 'json' };
 import type { Element } from './code.ts';
 
 export type PropertyType = 'TEXT' | 'BOOLEAN' | 'INSTANCE_SWAP' | 'SLOT';

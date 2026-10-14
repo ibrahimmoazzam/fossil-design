@@ -7,7 +7,7 @@ import {
   resolveMode,
   type Mode,
 } from './theme.ts';
-import fossilConfig from '../../../fossil.config.json' with { type: 'json' };
+import fossilConfig from '../../../brand.config.json' with { type: 'json' };
 import { siteTitle } from '../docs-site/meta.ts';
 
 function setFrameProperties(mode: Mode) {
@@ -20,7 +20,7 @@ setFrameProperties(resolveMode('system'));
 
 // Storybook names itself in every tab title, with no option to change it. The site follows
 // ibrahimmoazzam.com instead: "Page | Fossil Design", and the front page says what Fossil is.
-// A fork's pages take its name from fossil.config.json; the front page's title is siteTitle,
+// A fork's pages take its name from brand.config.json; the front page's title is siteTitle,
 // which scripts/site-meta.ts also writes into the built page, for the scrapers that read it.
 function tabTitle(title: string): string {
   if (title === 'Storybook') return siteTitle;

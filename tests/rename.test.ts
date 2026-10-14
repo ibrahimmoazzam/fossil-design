@@ -67,10 +67,14 @@ describe('rename', () => {
 
   it('leaves what only looks like the old names', () => {
     for (const text of [
-      // Names Fossil keeps: the config file, the vendor key, the lint configs' factory.
-      'fossil.config.json',
+      // What Fossil writes into a shared artifact, and so keeps: the stamp it puts on a
+      // Figma variable, the vendor key in a token file, and the markers in AGENTS.md.
+      "getSharedPluginData('fossil', key)",
       'com.ibrahimmoazzam.fossil',
-      "import { fossil } from '@acme-design/stylelint-config';",
+      '<!-- fossil:foundations -->',
+      // Local names, generic already, so there is nothing to rename.
+      'brand.config.json',
+      '.claude/skills/fossil-figma-sync/SKILL.md',
       // Longer names that start with the old ones.
       '@fossil-designer/react',
       'my-fossil-agents-md',
@@ -114,7 +118,7 @@ describe('repoOf', () => {
 });
 
 describe('patterns', () => {
-  it('accept what fossil.config.json accepts', () => {
+  it('accept what brand.config.json accepts', () => {
     expect(patterns.cssPrefix.test('acme')).toBe(true);
     expect(patterns.cssPrefix.test('Acme')).toBe(false);
     expect(patterns.npmScope.test('@acme-design')).toBe(true);

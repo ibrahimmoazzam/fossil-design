@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import fossilConfig from '../../../fossil.config.json' with { type: 'json' };
+import fossilConfig from '../../../brand.config.json' with { type: 'json' };
 import tokensFile from '@fossil-design/tokens/tokens.json';
 import { onGitHub, sitePage } from './repo.ts';
 
@@ -68,7 +68,7 @@ const code: Record<string, Target> = {
   'docs/PRD.md': web(onGitHub('docs/PRD.md')),
   'gaps.md': web(onGitHub('docs/gaps.md')),
   'docs/gaps.md': web(onGitHub('docs/gaps.md')),
-  'fossil.config.json': web(onGitHub('fossil.config.json')),
+  'brand.config.json': web(onGitHub('brand.config.json')),
   'pnpm-workspace.yaml': web(onGitHub('pnpm-workspace.yaml')),
   'tsconfig.base.json': web(onGitHub('tsconfig.base.json')),
   'stylelint.config.js': web(onGitHub('stylelint.config.js')),

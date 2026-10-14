@@ -1,7 +1,7 @@
 import comments from '@eslint-community/eslint-plugin-eslint-comments';
 import type { Linter } from 'eslint';
 
-export interface FossilOptions {
+export interface BrandOptions {
   /**
    * How a raw layout element such as `<div>` is reported. Defaults to `'error'`; `'warn'`
    * suits an app still moving onto Fossil.
@@ -52,11 +52,11 @@ export const layoutElementRestrictions = layoutElements.map((element) => ({
  * Fossil Design's ESLint config: layout goes through `Box`, and every disable comment says
  * why. Spread it after your own configs.
  */
-export function fossil({
+export function brand({
   layoutElements: severity = 'error',
   deprecations = false,
   files = ['**/*.jsx', '**/*.tsx'],
-}: FossilOptions = {}): Linter.Config[] {
+}: BrandOptions = {}): Linter.Config[] {
   const configs: Linter.Config[] = [
     {
       name: 'fossil/disables',
@@ -98,6 +98,6 @@ export function fossil({
   return configs;
 }
 
-const config: Linter.Config[] = fossil();
+const config: Linter.Config[] = brand();
 
 export default config;

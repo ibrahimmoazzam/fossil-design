@@ -1,4 +1,4 @@
-import fossilConfig from '../../../fossil.config.json' with { type: 'json' };
+import fossilConfig from '../../../brand.config.json' with { type: 'json' };
 
 /**
  * The site's own origin: the canonical link, and the absolute `og:image` URL a scraper needs.

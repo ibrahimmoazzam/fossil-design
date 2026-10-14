@@ -42,7 +42,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 8   | Guide 1.4                | Rewriting the sync's messages fails a test that asserts one                             | Proven        | Guide and code |
 | 9   | Guide 1.4                | It must end with `pnpm format`                                                          | Confirmed     | Guide          |
 | 10  | Guide 1.4                | It doesn't name `docs-site/meta.ts` or `og-image.png`                                   | By inspection | Guide          |
-| 11  | Guide 1.4                | It doesn't say whether the exported `FossilOptions` type is a name that stays           | By inspection | Guide          |
+| 11  | Guide 1.4                | It doesn't say whether the exported `BrandOptions` type is a name that stays            | By inspection | Guide          |
 | 12  | Guide "What you need"    | `playwright install chromium` appears only in `AGENTS.md`                               | By inspection | Guide          |
 | 13  | Guide 4.3                | It omits `pnpm build`, and that apply refuses an uncommitted token tree                 | By inspection | Guide          |
 | 14  | Guide 4.4                | The font requirement is explained in 2.4 and fails here                                 | By inspection | Guide          |
@@ -86,7 +86,7 @@ Before: 171 mentions in 73 files. After following its seven categories exactly: 
 - `AGENTS.md` outside its opening, including the gap fields and the definition of done, in the file the fork's own agents read every session;
 - the Storybook chrome: `theme.ts`, `DocsContainer.tsx`, `preview.tsx`;
 - `links.ts`, which autolinks the name;
-- both lint configs' exported `FossilOptions` type, and the sync's error messages.
+- both lint configs' exported `BrandOptions` type, and the sync's error messages.
 
 **Fix:** replace the list of seven with a checklist of every file, grouped by what it reaches: the npm pages, the docs site, the agent files, the error messages. Say which to leave, and why.
 
@@ -112,7 +112,7 @@ Swapping `Fossil` for `Acme Foundry` produced "a Acme Foundry token" three times
 
 The sync's own reports name Fossil, in strings its designers and agent read: `Fossil's sync lost track of …`, `Two variable collections are stamped as Fossil's … collection`, `no Fossil text style`. An adopter who keeps going past 1.4's list rewrites them and `pnpm test` fails, on `library.test.ts` asserting the literal string. Proven by probe, then reverted. So the adopter chooses between Fossil's name in their own designers' errors and a red suite, and the guide resolves neither.
 
-**Fix:** decide it. Either the messages name the system from `fossil.config.json` and the tests assert against that, or the guide says plainly that they stay and why.
+**Fix:** decide it. Either the messages name the system from `brand.config.json` and the tests assert against that, or the guide says plainly that they stay and why.
 
 ### 9. Step 1.4 must end with `pnpm format`
 
@@ -126,9 +126,9 @@ Rewriting a Markdown table reflowed it, and `pnpm lint` failed on Prettier befor
 
 **Fix:** add `meta.ts` to the checklist, and widen 2.5 past icons.
 
-### 11. Is `FossilOptions` a name that stays?
+### 11. Is `BrandOptions` a name that stays?
 
-Guide 1.4 lists the names that stay on purpose, including "the `fossil()` factory in both lint configs". Both configs also export an interface named `FossilOptions`, which is public API in the fork's own packages. The list neither includes nor excludes it.
+Guide 1.4 lists the names that stay on purpose, including "the `brand()` factory in both lint configs". Both configs also export an interface named `BrandOptions`, which is public API in the fork's own packages. The list neither includes nor excludes it.
 
 **Fix:** say which, in the same sentence as the factory.
 
@@ -217,13 +217,13 @@ Step 1.3 writes the scope into 79 files; step 3A.1 only then says to create the 
 
 On this branch, with the issue's number and what it took:
 
-| #     | Fix                                                                                                                                                                                    | Commit    |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| 19    | `AGENTS.md`, `packages/react/AGENTS.md` and ADR 0016 call the script with `pnpm run docs`                                                                                              | `8244a2c` |
-| 1     | `rewrites()` also rewrites `%40<scope>`, with a case for it in `tests/rename.test.ts`                                                                                                  | `0e61106` |
-| 20    | The Stylelint config's tests take a primitive colour from the built `lint.json`                                                                                                        | `a79062a` |
-| 2, 18 | `scripts/fonts.ts` checks each stylesheet against the faces and weights the text styles use                                                                                            | `0ab2c06` |
-| 8     | Thirteen strings resolved by kind, under [ADR 0020](./decisions/0020-what-a-fork-renames.md): prose reads `fossil.config.json`, format identifiers stay, Figma-side messages rephrased | `pending` |
+| #     | Fix                                                                                                                                                                                   | Commit    |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| 19    | `AGENTS.md`, `packages/react/AGENTS.md` and ADR 0016 call the script with `pnpm run docs`                                                                                             | `8244a2c` |
+| 1     | `rewrites()` also rewrites `%40<scope>`, with a case for it in `tests/rename.test.ts`                                                                                                 | `0e61106` |
+| 20    | The Stylelint config's tests take a primitive colour from the built `lint.json`                                                                                                       | `a79062a` |
+| 2, 18 | `scripts/fonts.ts` checks each stylesheet against the faces and weights the text styles use                                                                                           | `0ab2c06` |
+| 8     | Thirteen strings resolved by kind, under [ADR 0020](./decisions/0020-what-a-fork-renames.md): prose reads `brand.config.json`, format identifiers stay, Figma-side messages rephrased | `pending` |
 
 Issue 20's fix was proved against what broke it: the new test file, copied into the fork where `base.color.blue.600` no longer exists, passes with no reference to it.
 
@@ -244,4 +244,4 @@ The block measured 7985 bytes against its 8192 budget here, against 7917 in the 
 
 ## Resolved before the test reached them
 
-- `manager.ts` hard-coded the front page's title beside `fossil.config.json`'s name. [#46](https://github.com/ibrahimmoazzam/fossil-design/pull/46) routes it through `siteTitle` in `meta.ts`. The fork predates that commit, so it still carries the old shape.
+- `manager.ts` hard-coded the front page's title beside `brand.config.json`'s name. [#46](https://github.com/ibrahimmoazzam/fossil-design/pull/46) routes it through `siteTitle` in `meta.ts`. The fork predates that commit, so it still carries the old shape.

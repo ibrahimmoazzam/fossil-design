@@ -1,5 +1,5 @@
 import { COLLECTIONS, nameOf, type FigmaToken } from './model.ts';
-import config from '../../../fossil.config.json' with { type: 'json' };
+import config from '../../../brand.config.json' with { type: 'json' };
 import type { CollectionKey, SyncValue } from './runtime.ts';
 import type { Snapshot } from './snapshot.ts';
 

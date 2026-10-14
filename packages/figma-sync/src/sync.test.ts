@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import config from '../../../fossil.config.json' with { type: 'json' };
+import config from '../../../brand.config.json' with { type: 'json' };
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { format } from 'prettier';

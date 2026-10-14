@@ -1,4 +1,4 @@
-import config from '../../../../fossil.config.json' with { type: 'json' };
+import config from '../../../../brand.config.json' with { type: 'json' };
 import { nameOf } from '../model.ts';
 import type { ComponentFacts, Library, LayerFacts } from './spec.ts';
 import type { LayerSpec, StylesSpec } from './runtime.ts';

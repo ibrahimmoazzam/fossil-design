@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import config from '../../../fossil.config.json' with { type: 'json' };
+import config from '../../../brand.config.json' with { type: 'json' };
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import type { CheckSpec, StylesSpec } from './library/runtime.ts';

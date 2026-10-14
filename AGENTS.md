@@ -55,13 +55,13 @@ Phase 0 pinned the tooling below; later phases pin the rest when they add it.
 ## Layout
 
 ```
-fossil.config.json     system name, CSS prefix, npm scope
+brand.config.json     system name, CSS prefix, npm scope
 packages/tokens        DTCG source and the Style Dictionary build
 packages/react         components (CSS Modules), stories, bundled agent docs, Make guidelines, the AGENTS.md bin
 packages/eslint-config, packages/stylelint-config
 packages/figma-sync    Figma sync and component library: core, scripts and checks (private)
 .claude/skills         the fossil-figma-sync skill
-tests/                 workspace-wide tests, such as package names against fossil.config.json
+tests/                 workspace-wide tests, such as package names against brand.config.json
 scripts/               workspace-wide scripts: the packed-tarball check and the smoke test
 smoke/                 consumer apps outside the workspace, built from the packed tarballs
 smoke/off-system       a deliberately off-system component that lint must reject

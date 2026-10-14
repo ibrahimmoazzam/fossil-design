@@ -846,7 +846,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     bin: Record<string, string>;
   };
   const config = JSON.parse(
-    readFileSync(join(root, '../../fossil.config.json'), 'utf8'),
+    readFileSync(join(root, '../../brand.config.json'), 'utf8'),
   ) as { name: string; cssPrefix: string; npmScope: string };
   const exports = (await import(
     pathToFileURL(join(root, 'dist/index.js')).href

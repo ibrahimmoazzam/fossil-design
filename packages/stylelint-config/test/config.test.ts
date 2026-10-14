@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import lintLists from '@fossil-design/tokens/lint.json' with { type: 'json' };
 import stylelint from 'stylelint';
 import { afterAll, describe, expect, it } from 'vitest';
-import config, { fossil } from '../src/index.ts';
+import config, { brand } from '../src/index.ts';
 
 async function lint(
   code: string,
@@ -181,7 +181,7 @@ describe('site tokens', () => {
     siteTokens,
     `:root {\n  --site-color-heart: var(${primitiveColour});\n  --site-color-coffee: #6f4e37;\n}\n`,
   );
-  const siteConfig = fossil({ siteTokens: ['site-tokens.css'], root: dir });
+  const siteConfig = brand({ siteTokens: ['site-tokens.css'], root: dir });
 
   it('may alias primitives and hold raw values in its own file', async () => {
     const code = `:root {\n  --site-color-heart: var(${primitiveColour});\n  --site-color-coffee: #6f4e37;\n}\n`;

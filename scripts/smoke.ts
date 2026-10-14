@@ -18,7 +18,7 @@ import {
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import config from '../fossil.config.json' with { type: 'json' };
+import config from '../brand.config.json' with { type: 'json' };
 import { pnpm, run } from './run.ts';
 
 const root = new URL('../', import.meta.url);

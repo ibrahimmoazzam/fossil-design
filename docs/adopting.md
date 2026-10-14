@@ -36,7 +36,7 @@ git switch -c rename
 pnpm rename --name "Acme Design" --prefix acme --scope @acme-design --repo acme/acme-design
 ```
 
-`fossil.config.json` holds the name, prefix and scope, and the token build, the class names and the agent docs read them from there. But package names, imports, stylesheets and repository URLs spell the old values out, so `pnpm rename` rewrites them too:
+`brand.config.json` holds the name, prefix and scope, and the token build, the class names and the agent docs read them from there. But package names, imports, stylesheets and repository URLs spell the old values out, so `pnpm rename` rewrites them too:
 
 - `@fossil-design` becomes your scope, in package names, dependencies, imports and pending changesets;
 - `--fossil-` becomes your prefix in every custom property, and `fossil-agents-md` becomes `acme-agents-md`;
@@ -56,9 +56,9 @@ This lists what still says Fossil in prose:
 git grep -n Fossil -- . ':!docs' ':!**/CHANGELOG.md'
 ```
 
-Rewrite what describes your system: the README, the opening of `AGENTS.md`, each package's README and `description`, the docs site's front page (`packages/react/docs-site/Landing.tsx`) and its title (`homeTitle` in `.storybook/manager.ts`), the gap form, and the few component prop descriptions that say "Fossil's". The docs site's name, tab titles and Getting Started page already read `fossil.config.json`.
+Rewrite what describes your system: the README, the opening of `AGENTS.md`, each package's README and `description`, the docs site's front page (`packages/react/docs-site/Landing.tsx`) and its title (`homeTitle` in `.storybook/manager.ts`), the gap form, and the few component prop descriptions that say "Fossil's". The docs site's name, tab titles and Getting Started page already read `brand.config.json`.
 
-Some names stay, on purpose: the `fossil.config.json` file, the `fossil()` factory in both lint configs, the `fossil-figma-sync` skill, the `fossil` namespace the Figma sync stamps on variables, the token build's `fossil:foundations` markers in `AGENTS.md`, and the `com.ibrahimmoazzam.fossil` key in the token files. They name Fossil's tooling and formats, not your brand.
+Some names stay, on purpose: the `fossil` namespace the Figma sync stamps on variables, the `com.ibrahimmoazzam.fossil` key in the token files, the token build's `fossil:foundations` markers in `AGENTS.md`, and the `fossil-figma-sync` skill. The first two are written into your Figma file and your token files, so renaming them would be a migration rather than a rename, and a vendor key is meant to name the format's author. What isn't named after Fossil in the first place needs no thought: the brand lives in `brand.config.json`, and both lint configs export `brand()` ([ADR 0020](./decisions/0020-what-a-fork-renames.md)).
 
 ### 1.5 Make the rest yours
 

@@ -109,7 +109,7 @@ Monorepo, pnpm workspaces.
 
 ```
 fossil-design/
-  fossil.config.json     system name, CSS prefix and npm scope: what a fork changes first
+  brand.config.json     system name, CSS prefix and npm scope: what a fork changes first
   packages/
     tokens/              DTCG source, Style Dictionary build, generated outputs
     react/               components (CSS Modules), stories, bundled agent docs
@@ -225,7 +225,7 @@ Phases are ordered by dependency. Each has an explicit exit criterion. Do not st
 6. GitHub Actions workflow: install, lint, typecheck, test and build on every PR.
 7. Create the `@fossil-design` npm org and set each workspace's `package.json` name per the table in section 2.
 8. **Trusted publishing.** Publish `0.0.1` of each published package by hand with 2FA. Run `npm trust github` for each, then publish `0.0.2` through the release workflow.
-9. `fossil.config.json` at the root holds the system name, CSS prefix and npm scope. Every build script reads it, so a fork renames the system in one place.
+9. `brand.config.json` at the root holds the system name, CSS prefix and npm scope. Every build script reads it, so a fork renames the system in one place.
 10. Root `README.md` stating what Fossil is and why it exists.
 11. **Agent instructions.** `AGENTS.md` is the cross-tool standard: read by 25+ agents and maintained by the Agentic AI Foundation under the Linux Foundation. It holds the repo rules. `CLAUDE.md` contains only `@AGENTS.md`.
     - Claude Code (v2.1.277 and later) reads `AGENTS.md` by itself only when no `CLAUDE.md` or `CLAUDE.local.md` exists. The import works whatever files a contributor adds.
@@ -657,7 +657,7 @@ This is the most publishable artifact in the project and the strongest case-stud
    - MDX architecture pages with an index of the ADRs.
    - the research behind the workflow, and the drift eval's design from `docs/drift-eval.md`, marked as planned until Phase 7 runs.
 2. **"Adopt Fossil" guide** for a team using the repo as a template:
-   1. Rename the fork with `pnpm rename`, which sets the name, prefix and scope in `fossil.config.json` and rewrites the files that spell them out (ADR 0019).
+   1. Rename the fork with `pnpm rename`, which sets the name, prefix and scope in `brand.config.json` and rewrites the files that spell them out (ADR 0019).
    2. Replace the primitive values, and the semantic mapping where the brand needs it.
    3. Choose how the app consumes the packages. Either publish under the team's own scope, with the same trusted-publishing bootstrap, or keep the app in the fork's own `apps/` folder and skip publishing.
    4. Create a Figma file, apply the variables, and generate the library.
