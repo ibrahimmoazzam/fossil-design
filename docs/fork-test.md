@@ -234,6 +234,8 @@ On this run three of the four packages published and `tokens` did not, leaving `
 
 **Fix:** end 3A.3 with a check: `npm view <scope>/<name> version` for each published package, and an install of the component package into an empty folder. State that a partial publish is the likely failure, since the registry's permission list will not show it.
 
+The run's own set is complete now: all four packages answer `npm view`, and `npm i @acme-foundry/react` in an empty folder resolves and installs `tokens` with it. The finding stands on the window where it did not, which read as success.
+
 ### 25. The workspace root keeps Fossil's name
 
 `pnpm rename` rewrites package names across the workspace, but the root `package.json` keeps `"name": "fossil-design"`. The root is private and unpublished, so nothing breaks, and it is the name an adopter sees at the top of their own manifest.
