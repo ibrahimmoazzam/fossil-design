@@ -63,6 +63,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 28 | `packages/tokens/src/semantic/typography.tokens.json` | Two token descriptions name Fossil's own typefaces, and travel into the fork's Figma file | Confirmed | Code and guide |
 | 29 | Guide 4.5 | It sends you to the Assets panel to turn the library on, where there is nothing to turn on | Confirmed | Guide, fixed |
 | 30 | `.figma/library.md` | The check demands a library text style on a text layer the sheet gives no typography for | Confirmed | Code |
+| 31 | `packages/figma-sync/src/runtime.ts` | Templating the stamp namespace silently duplicates a fork's existing library | Proven | Code and docs |
 
 ### 1. The rename misses a percent-encoded scope
 
@@ -334,6 +335,28 @@ The rule is in `checkVariant`: for a text node, when the spec gives no `typograp
 It was resolved by giving both `Link` labels `text/body`, which is right for an inline link in running text, but that was a guess the sheet did not sanction. Nothing says which style an unspecified text layer should take.
 
 **Fix:** have `sheet.ts` say it. Either emit the inherited text style for a layer that has none of its own, so the sheet always names one, or state the rule in the sheet's preamble: a text layer with no typography of its own takes a library text style, and name which. The first is better, because the spec already knows the answer — `Link`'s CSS inherits the surrounding text style, and the sheet could say so.
+
+### 31. Templating the stamp silently duplicates a library that already exists
+
+[ADR 0020](./decisions/0020-what-a-fork-renames.md) says of the Figma stamp: "Fossil's own value is `fossil` either way, so nothing migrates when it lands." That is true of Fossil and false of any fork that has already built its library — which, as of this run, Acme has.
+
+Probed against `FakeFigma`: apply the tokens with `ns` of `fossil`, as the fork's live library is stamped, then apply the same tokens again with `ns` of `acme`, as the fork would after taking the change.
+
+```
+beforeCollections: 2   afterCollections: 4
+beforeVariables: 134   afterVariables: 268
+collectionNames: Primitives, Semantic, Primitives, Semantic
+stampedFossil: 134     stampedAcme: 134
+lastResult: { acme: 'finish', commit: 'c0ffee', missing: [], orphans: [], unstamped: [] }
+```
+
+It does not refuse. It reports a clean bill of health: nothing missing, no orphans, nothing unstamped. The reason is that `ensureCollections` finds no collection stamped `acme`, so it creates a second `Primitives` and `Semantic`; `stampedVariables` then finds nothing, and the clash check looks only inside the new collection, which is empty. So every variable is created again, the old 134 keep the `fossil` stamp, and the components stay bound to the old ones while the sync now believes the new ones are the library.
+
+A first draft of this finding said the apply would refuse with 136 name clashes. It does not, and the difference matters: a refusal is a message, and this is a published library quietly growing a second copy of itself.
+
+**Fix:** the change needs a migration, which is the test ADR 0020 itself sets — "whether changing it would be a migration rather than a rename". A one-off `pnpm figma:restamp <old>` that generates a script re-stamping every variable, collection, style, page and icon from the old namespace to the brand's, run once before the first apply, keeps the fork's library and leaves no permanent reference to Fossil's name in anyone's runtime. Carrying the old namespace in the apply spec as a fallback would work too and is worse, because it makes every future apply carry a migration.
+
+Until then, the templating is safe for Fossil and for a fork that has not yet built its library, and unsafe for a fork that has. Acme's own re-verification is therefore held: the apply was not run against its published files.
 
 ## Fixed so far
 
