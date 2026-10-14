@@ -55,6 +55,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 20 | `packages/stylelint-config/test/config.test.ts` | The guide's own worked example in 2.1 turns the suite red | Confirmed | Code and guide |
 | 21 | Guide 2.5 | It calls `public/` the site's icons, and a fork has no artwork of its own | Confirmed | Guide |
 | 22 | Guide "What you need" | It doesn't say the npm organisation has to exist before the rename writes the scope into 79 files | Confirmed | Guide |
+| 23 | Guide 1.5 and 3A.3 | Publishing from `main` before the rename is merged aims the publish at Fossil's own scope | Confirmed | Guide |
 
 ### 1. The rename misses a percent-encoded scope
 
@@ -212,6 +213,16 @@ Step 2.5 says "the docs site's icons are in `packages/react/docs-site/public/`".
 Step 1.3 writes the scope into 79 files; step 3A.1 only then says to create the npm organisation for it. `@acme-design` turned out to be unavailable three steps after the fork was rebranded around it.
 
 **Fix:** add one line to "What you need": have the npm organisation created before step 1.3, so the rename uses a scope already in hand.
+
+### 23. Publishing from an unmerged `main` aims at the upstream scope
+
+Step 3A.3 says to publish "from an up-to-date `main`", and step 1.5 ends with merging the rename pull request. Nothing connects the two, and the order matters more than it looks.
+
+On this run the rename sat on a branch with its pull request still open, so `main` was the template's initial commit: Fossil's own package names, at versions already on the registry. `pnpm -r publish --access public` from there answered "There are no new packages that should be published" and did nothing, which looks like success and is not.
+
+It did nothing only because those versions already exist. For the one person most likely to run this, the author of the upstream system, the scope on that `main` is a scope they can publish to, so a version Fossil had not released yet would have gone up under `@fossil-design` from a fork's build. Nothing in the guide warns about that, and the symptom when you are lucky is a message that reads like there was nothing to do.
+
+**Fix:** make 3A.3 say to publish from a `main` that already has the rename merged, and have it say what the first publish should print, so "no new packages" reads as the error it is. Step 1.5's merge becomes a precondition of step 3, not an aside.
 
 ## Fixed so far
 
