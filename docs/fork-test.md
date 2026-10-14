@@ -46,7 +46,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 12  | Guide "What you need"    | `playwright install chromium` appears only in `AGENTS.md`                               | By inspection | Guide          |
 | 13  | Guide 4.3                | It omits `pnpm build`, and that apply refuses an uncommitted token tree                 | Proven        | Guide          |
 | 14  | Guide 4.4                | The font requirement is explained in 2.4 and fails here                                 | By inspection | Guide          |
-| 15  | Guide 4.6                | One sentence stands for the longest step in the guide                                   | By inspection | Guide          |
+| 15  | Guide 4.6                | One sentence stands for the longest step in the guide                                   | Confirmed     | Guide          |
 | 16  | Guide 2                  | The 8 KB `AGENTS.md` block budget is never mentioned                                    | Confirmed     | Guide          |
 | 17  | Guide 1.2                | Its reason for disabling Release doesn't hold when no changeset is pending              | Confirmed     | Guide          |
 
@@ -62,6 +62,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 27 | Guide 4.2 | It says which folder the files go in, not the two things about placement that break 4.5 | Confirmed | Guide |
 | 28 | `packages/tokens/src/semantic/typography.tokens.json` | Two token descriptions name Fossil's own typefaces, and travel into the fork's Figma file | Confirmed | Code and guide |
 | 29 | Guide 4.5 | It sends you to the Assets panel to turn the library on, where there is nothing to turn on | Confirmed | Guide, fixed |
+| 30 | `.figma/library.md` | The check demands a library text style on a text layer the sheet gives no typography for | Confirmed | Code |
 
 ### 1. The rename misses a percent-encoded scope
 
@@ -159,9 +160,28 @@ Guide 2.4 says Figma needs each face in each weight, and the styles script refus
 
 ### 15. Step 4.6 undersells the longest step
 
-"Let it build and check the components" stands for building every component nested-first, naming each layer exactly, binding every fill, padding, gap and radius to an imported variable, importing styles and icons by key, adding the component properties, then looping on the check until it passes. That was most of Phase 5b.
+"Let it build and check the components" is one sentence. Measured on this fork, it stands for:
 
-**Fix:** say what it involves and that it is the longest step, so an adopter plans for it.
+|                          |                                                             |
+| ------------------------ | ----------------------------------------------------------- |
+| Components               | 13                                                          |
+| Variants                 | 72, of which `Text` is 48: twelve text styles by four tones |
+| Named layers             | 96                                                          |
+| Nested instances         | 15                                                          |
+| Component properties     | 28, across `TEXT`, `BOOLEAN`, `INSTANCE_SWAP` and `SLOT`    |
+| Bindings the check reads | 386                                                         |
+| The build sheet          | 425 lines, 23,647 bytes                                     |
+
+It took 9 `use_figma` writes and 4 check runs, in an order the nesting fixes: `Icon` before `Button`, `Link` and `Clip`; `Figure` before `Clip`; `Button` before `Modal` and `Carousel`. Every component passed, and the report reads "The library matches the spec from `f0f60c3`".
+
+Two things cost a retry each, and neither is in the sheet or in the skill's list of traps:
+
+- **A slot cannot fill a parent that has no auto layout.** The skill warns that a new slot has no auto layout of its own; the failure here was one level up. `Figure`'s `frame` layer is `position: relative; overflow: hidden` in CSS, so building it as the sheet describes gives a plain frame, and `layoutSizingHorizontal = 'FILL'` on the slot inside it throws `FILL can only be set on children of auto-layout frames`.
+- **A text layer with no typography in the spec still needs a library text style.** Issue 30.
+
+Worth recording alongside the count: the agent is the transport for every generated script, and carries each one verbatim. Step 4 moved roughly 400 KB of script text through the conversation — 85 KB for the apply and again for its idempotency run, 19 KB twice for the styles script, and 20 to 44 KB per check run, the full 13-component check being 44,142 characters against `use_figma`'s 50,000 limit. That ceiling is close enough to matter: a fork with a few more components will have to check in groups.
+
+**Fix:** say what 4.6 involves, that it is the longest step in the guide, and that the agent works nested-first from `.figma/library.md`. Give the adopter the shape of it — a component at a time, a check after each group — rather than one sentence that reads like a single command.
 
 ### 16. The `AGENTS.md` block budget is invisible until it fails
 
@@ -298,6 +318,22 @@ The skill said the same, in step 3 of its library workflow, and so does [ADR 001
 This is the sharpest kind of error in the Figma half of the guide, because 4.5 is one of the two steps an agent cannot do or check for you, and the agent is waiting on it. A fork that cannot find the switch has nothing to compare against: 4.3 and 4.4 both reported success, and 4.6 will fail later for a reason that looks like the components are wrong.
 
 **Fix:** both now give the path — **Libraries**, the book icon at the top of the Assets panel or the main menu, then the team under **Teams**, then the foundations library — and say that the panel alone won't do it. The skill also gains the check that makes this verifiable rather than assumed: `figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync()`, read in the components file, lists the foundations collections once the library is on and returns nothing until then. Run against this fork it returned `Semantic` with 55 variables and `Primitives` with 81, from `Acme Foundry Foundations`, which is how 4.5 was confirmed here instead of taken on trust.
+
+### 30. The sheet gives no typography, and the check demands one anyway
+
+The build sheet's rule for text is: "Text and icons inside a layer take the colour and text style it names, unless a layer inside names its own", and per component, "Text uses the text style named, or each part bound when the sheet lists parts". `Link` names neither. Its only layer is the component itself, with `fill` and, for `tone=accent`, a colour — no text style, and no parts to bind.
+
+Built that way, the check fails:
+
+```
+tone=inherit: the text label has no text style from the library.
+```
+
+The rule is in `checkVariant`: for a text node, when the spec gives no `typography` at all, the last branch requires _some_ text style whose stamp the file recognises. So the sheet's two cases are not exhaustive, and the third case — no typography named — is the one `Link` falls into, with the requirement stated only in the checking code.
+
+It was resolved by giving both `Link` labels `text/body`, which is right for an inline link in running text, but that was a guess the sheet did not sanction. Nothing says which style an unspecified text layer should take.
+
+**Fix:** have `sheet.ts` say it. Either emit the inherited text style for a layer that has none of its own, so the sheet always names one, or state the rule in the sheet's preamble: a text layer with no typography of its own takes a library text style, and name which. The first is better, because the spec already knows the answer — `Link`'s CSS inherits the surrounding text style, and the sheet could say so.
 
 ## Fixed so far
 
