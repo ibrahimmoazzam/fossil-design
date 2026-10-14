@@ -9,7 +9,8 @@ export interface BrandOptions {
   /**
    * The app's own token files, such as `src/styles/site-tokens.css`. Their custom properties
    * count as known everywhere. Inside them, and only there, primitive tokens and raw values
-   * are allowed, so a site token can alias a Fossil primitive or hold a brand-specific colour.
+   * are allowed, so a site token can alias one of the system's primitives or hold a
+   * brand-specific colour.
    */
   siteTokens?: readonly string[];
   /** The directory `siteTokens` paths resolve from. Defaults to the working directory. */
@@ -84,7 +85,7 @@ function disallowedMessage(property: string, value: string): string {
 }
 
 /**
- * Fossil Design's Stylelint config: semantic tokens only, no raw colours, spacing, radii,
+ * The design system's Stylelint config: semantic tokens only, no raw colours, spacing, radii,
  * fonts or durations, and no margins other than `0`.
  */
 export function brand({
