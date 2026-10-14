@@ -512,11 +512,11 @@ export function readExamples(
     problems.push(...codeProblems.map((p) => `${at}: ${p}`));
     if (code === undefined) continue;
 
-    const fossil: string[] = [];
+    const system: string[] = [];
     const react: string[] = [];
     const placeholders: [string, string][] = [];
     for (const name of freeNames(code)) {
-      if (name in inputs.exports) fossil.push(name);
+      if (name in inputs.exports) system.push(name);
       else if (reactExports.has(name)) react.push(name);
       else if (stories.placeholders.has(name))
         placeholders.push([name, stories.placeholders.get(name) ?? '']);
@@ -527,7 +527,7 @@ export function readExamples(
     }
     const imports = [
       ...importLine(react, 'react'),
-      ...importLine(fossil, inputs.packageName),
+      ...importLine(system, inputs.packageName),
     ];
     examples.push({
       name: story.name,

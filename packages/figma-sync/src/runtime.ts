@@ -171,8 +171,8 @@ export function known<T>(value: T | undefined, what: string): T {
   return value;
 }
 
-/** Fossil's collections, by the key stamped on each. */
-export function fossilCollections(
+/** The sync's own collections, by the key stamped on each. */
+export function stampedCollections(
   collections: readonly FigmaCollection[],
 ): Record<string, FigmaCollection> {
   const byKey: Record<string, FigmaCollection> = {};
@@ -272,7 +272,7 @@ export function ensureCollections(
   owned: Record<string, FigmaCollection>;
   modeIds: Record<string, Record<string, string>>;
 } {
-  const owned = fossilCollections(collections);
+  const owned = stampedCollections(collections);
   const modeIds: Record<string, Record<string, string>> = {};
   for (const c of specs) {
     let collection = owned[c.key];
@@ -300,7 +300,7 @@ export function ensureCollections(
 export async function read(spec: ReadSpec, figma: Figma): Promise<ReadPage> {
   const collections = await figma.variables.getLocalVariableCollectionsAsync();
   const variables = await figma.variables.getLocalVariablesAsync();
-  const owned = fossilCollections(collections);
+  const owned = stampedCollections(collections);
   const keyOf: Record<string, string> = {};
   for (const [key, c] of Object.entries(owned)) keyOf[c.id] = key;
   const records = variables
@@ -361,13 +361,15 @@ export async function finish(spec: FinishSpec, figma: Figma): Promise<unknown> {
   for (const path of spec.paths) expected[path] = true;
   const missing = spec.paths.filter((path) => !index[path]);
   const ownedIds = Object.values(owned).map((c) => c.id);
-  const inFossil = variables.filter((v) =>
+  const ownedVariables = variables.filter((v) =>
     ownedIds.includes(v.variableCollectionId),
   );
-  const orphans = inFossil
+  const orphans = ownedVariables
     .filter((v) => stamp(v) !== '' && !expected[stamp(v)])
     .map((v) => stamp(v));
-  const unstamped = inFossil.filter((v) => stamp(v) === '').map((v) => v.name);
+  const unstamped = ownedVariables
+    .filter((v) => stamp(v) === '')
+    .map((v) => v.name);
   if (missing.length === 0)
     for (const c of Object.values(owned)) setStamp(c, spec.commit, 'commit');
 

@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import * as fossil from '../src/index.ts';
+import * as system from '../src/index.ts';
 import {
   agentsBlock,
   blockMarkers,
@@ -299,7 +299,7 @@ describe("the package's docs", () => {
   it('cover every component, with nothing missing', () => {
     const inputs: Inputs = {
       root: fileURLToPath(new URL('..', import.meta.url)),
-      exports: fossil,
+      exports: system,
       packageName: '@fossil-design/react',
     };
     const { components, problems } = collect(inputs);
