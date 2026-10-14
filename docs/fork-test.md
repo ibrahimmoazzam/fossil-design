@@ -56,6 +56,8 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 21 | Guide 2.5 | It calls `public/` the site's icons, and a fork has no artwork of its own | Confirmed | Guide |
 | 22 | Guide "What you need" | It doesn't say the npm organisation has to exist before the rename writes the scope into 79 files | Confirmed | Guide |
 | 23 | Guide 1.5 and 3A.3 | Publishing from `main` before the rename is merged aims the publish at Fossil's own scope | Confirmed | Guide |
+| 24 | Guide 3A.3 | Nothing verifies the publish, so a half-finished one leaves a broken set | Confirmed | Guide |
+| 25 | `scripts/rename.ts` | The workspace root's `package.json` keeps the name `fossil-design` | Confirmed | Code |
 
 ### 1. The rename misses a percent-encoded scope
 
@@ -223,6 +225,20 @@ On this run the rename sat on a branch with its pull request still open, so `mai
 It did nothing only because those versions already exist. For the one person most likely to run this, the author of the upstream system, the scope on that `main` is a scope they can publish to, so a version Fossil had not released yet would have gone up under `@fossil-design` from a fork's build. Nothing in the guide warns about that, and the symptom when you are lucky is a message that reads like there was nothing to do.
 
 **Fix:** make 3A.3 say to publish from a `main` that already has the rename merged, and have it say what the first publish should print, so "no new packages" reads as the error it is. Step 1.5's merge becomes a precondition of step 3, not an aside.
+
+### 24. Nothing verifies the publish
+
+Step 3A.3 runs `pnpm -r publish --access public` and says pnpm publishes in dependency order and skips what is already published. It does not say how to tell whether it worked.
+
+On this run three of the four packages published and `tokens` did not, leaving `@acme-foundry/react@0.5.1` declaring a dependency on `@acme-foundry/tokens@^0.6.1` that does not resolve. The scope's own permissions list names all four, so even `npm access list packages` looks right; only `npm view` on each one shows the gap. Anyone installing the component package in that state gets an unresolvable dependency.
+
+**Fix:** end 3A.3 with a check: `npm view <scope>/<name> version` for each published package, and an install of the component package into an empty folder. State that a partial publish is the likely failure, since the registry's permission list will not show it.
+
+### 25. The workspace root keeps Fossil's name
+
+`pnpm rename` rewrites package names across the workspace, but the root `package.json` keeps `"name": "fossil-design"`. The root is private and unpublished, so nothing breaks, and it is the name an adopter sees at the top of their own manifest.
+
+**Fix:** have the rename set the root's name from the repository it was given, so `ibrahimmoazzam/acme-foundry` makes it `acme-foundry`.
 
 ## Fixed so far
 
