@@ -354,6 +354,22 @@ It does not refuse. It reports a clean bill of health: nothing missing, no orpha
 
 A first draft of this finding said the apply would refuse with 136 name clashes. It does not, and the difference matters: a refusal is a message, and this is a published library quietly growing a second copy of itself.
 
+What a migration has to cover, counted on Acme's live files. The foundations file:
+
+| Stamp key    | On                | Under `fossil` | Under `acme` |
+| ------------ | ----------------- | -------------- | ------------ |
+| `path`       | variables         | 136            | 0            |
+| `collection` | collections       | 2              | 0            |
+| `commit`     | collections       | 2              | 0            |
+| `path`       | text styles       | 12             | 0            |
+| `path`       | effect styles     | 3              | 0            |
+| `page`       | the Icons page    | 1              | 0            |
+| `section`    | the Icons section | 1              | 0            |
+| `icon`       | icon components   | 6              | 0            |
+| `svg`        | icon components   | 6              | 0            |
+
+169 stamps on 162 nodes, across seven keys, and nothing under the brand's namespace. The components file reports 34 `fossil` stamps across 247 nodes, but owns none of them: they are read through from the icon components imported from the foundations library, which [ADR 0018](./decisions/0018-figma-foundations-and-components.md) records as keeping their stamps. So the migration is one file, and the components follow when the library update is accepted.
+
 **Fix:** the change needs a migration, which is the test ADR 0020 itself sets — "whether changing it would be a migration rather than a rename". A one-off `pnpm figma:restamp <old>` that generates a script re-stamping every variable, collection, style, page and icon from the old namespace to the brand's, run once before the first apply, keeps the fork's library and leaves no permanent reference to Fossil's name in anyone's runtime. Carrying the old namespace in the apply spec as a fallback would work too and is worse, because it makes every future apply carry a migration.
 
 Until then, the templating is safe for Fossil and for a fork that has not yet built its library, and unsafe for a fork that has. Acme's own re-verification is therefore held: the apply was not run against its published files.
