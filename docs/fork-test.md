@@ -61,6 +61,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 26 | `package.json` | Claude Code's auto mode refuses `pnpm figma:apply`, which writes nothing to Figma | Confirmed | Code |
 | 27 | Guide 4.2 | It says which folder the files go in, not the two things about placement that break 4.5 | Confirmed | Guide |
 | 28 | `packages/tokens/src/semantic/typography.tokens.json` | Two token descriptions name Fossil's own typefaces, and travel into the fork's Figma file | Confirmed | Code and guide |
+| 29 | Guide 4.5 | It sends you to the Assets panel to turn the library on, where there is nothing to turn on | Confirmed | Guide, fixed |
 
 ### 1. The rename misses a percent-encoded scope
 
@@ -288,12 +289,23 @@ Guide 1.4's `git grep Fossil` cannot find them, for the reason issue 5 records: 
 
 **Fix:** two things, because there are two faults. Fossil's own two descriptions should stop naming a specific face, since the sentence's point is that the token is a seam an app can repoint. And step 2 should say to read the `$description` of every token being rebranded, because those strings are the text a fork's designers read in Figma, which [ADR 0020](./decisions/0020-what-a-fork-renames.md) rule 1 makes the brand's.
 
+### 29. The Assets panel is not where a library is turned on
+
+Step 4.5 said to publish the foundations file, "then, in the components file, turn it on from the **Assets** panel's libraries". The Assets panel has no switch. The library is turned on in the **Libraries** modal, which the panel's book icon opens: inside it, the team's published libraries are grouped under **Teams**, and each has a toggle. So the instruction names the thing you click to get there and not the thing you do, and the panel it names shows nothing relevant until after the step is finished.
+
+The skill said the same, in step 3 of its library workflow, and so does [ADR 0018](./decisions/0018-figma-foundations-and-components.md)'s consequence that "turning a library on is a step only a person can do, in the Assets panel". The record of the decision is left as it was written; the two sets of instructions are the ones a person follows.
+
+This is the sharpest kind of error in the Figma half of the guide, because 4.5 is one of the two steps an agent cannot do or check for you, and the agent is waiting on it. A fork that cannot find the switch has nothing to compare against: 4.3 and 4.4 both reported success, and 4.6 will fail later for a reason that looks like the components are wrong.
+
+**Fix:** both now give the path — **Libraries**, the book icon at the top of the Assets panel or the main menu, then the team under **Teams**, then the foundations library — and say that the panel alone won't do it. The skill also gains the check that makes this verifiable rather than assumed: `figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync()`, read in the components file, lists the foundations collections once the library is on and returns nothing until then. Run against this fork it returned `Semantic` with 55 variables and `Primitives` with 81, from `Acme Foundry Foundations`, which is how 4.5 was confirmed here instead of taken on trust.
+
 ## Fixed so far
 
 On this branch, with the issue's number and what it took:
 
 | #     | Fix                                                                                                                                                                                   | Commit    |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| 29    | Guide 4.5 and the skill give the Libraries path, and the skill gains a read that confirms the library is on                                                                           | `pending` |
 | 19    | `AGENTS.md`, `packages/react/AGENTS.md` and ADR 0016 call the script with `pnpm run docs`                                                                                             | `8244a2c` |
 | 1     | `rewrites()` also rewrites `%40<scope>`, with a case for it in `tests/rename.test.ts`                                                                                                 | `0e61106` |
 | 20    | The Stylelint config's tests take a primitive colour from the built `lint.json`                                                                                                       | `a79062a` |

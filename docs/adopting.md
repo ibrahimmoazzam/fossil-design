@@ -180,7 +180,7 @@ The Figma library is two files ([ADR 0018](./decisions/0018-figma-foundations-an
 
 **4.4 Build the library.** Ask Claude Code to build the Figma component library. In the foundations file, it creates the text styles, effect styles and icons.
 
-**4.5 Publish the foundations file** as a library. Then, in the components file, turn it on from the **Assets** panel's libraries. Only a person can; the Plugin API can't.
+**4.5 Publish the foundations file** as a library. Then, in the components file, open **Libraries** — the book icon at the top of the **Assets** panel, or **Main menu › Libraries** — find your team under **Teams**, and turn on **Acme Design Foundations**. The Assets panel on its own won't do it: it is where you open Libraries, and the switch is inside. Only a person can publish or turn on a library; the Plugin API can't.
 
 **4.6 Let it build and check the components.** Claude Code builds each component in the components file from the library's variables, styles and icons, then checks both files against the code until the check passes.
 
