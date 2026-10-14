@@ -102,6 +102,9 @@ export function rename(text: string, list: readonly Rewrite[]): string {
   );
 }
 
+/** The workspace root's package name: the repository's own name, which a fork's is. */
+export const rootName = (repo: string) => repo.split('/')[1] ?? repo;
+
 /** The `owner/name` of a GitHub repository URL, as package.json records it. */
 export function repoOf(url: string): string {
   const match = /github\.com[/:]([^/]+\/[^/.]+?)(?:\.git)?\/?$/.exec(url);
@@ -198,6 +201,21 @@ function main() {
     npmScope: to.npmScope,
   };
   writeFileSync(configFile, `${JSON.stringify(nextConfig, null, 2)}\n`);
+
+  // The workspace root is private and unpublished, so nothing reads its name, but it is the
+  // name at the top of a fork's own manifest.
+  if (from.repo !== to.repo) {
+    const manifestFile = new URL('package.json', root);
+    const text = readFileSync(manifestFile, 'utf8');
+    const renamed = text.replace(
+      /("name":\s*)"[^"]*"/,
+      `$1${JSON.stringify(rootName(to.repo))}`,
+    );
+    if (renamed !== text) {
+      writeFileSync(manifestFile, renamed);
+      changed.push('package.json');
+    }
+  }
 
   console.log(
     `brand.config.json: ${to.name}, --${to.cssPrefix}-*, ${to.npmScope}`,

@@ -4,6 +4,7 @@ import {
   rename,
   repoOf,
   rewrites,
+  rootName,
   type Identity,
 } from '../scripts/rename.ts';
 
@@ -63,6 +64,11 @@ describe('rename', () => {
     expect(
       toAcme('https://github.com/ibrahimmoazzam/fossil-design/issues'),
     ).toBe('https://github.com/acme/acme-design/issues');
+  });
+
+  it('names the workspace root after the repository', () => {
+    expect(rootName('ibrahimmoazzam/acme-foundry')).toBe('acme-foundry');
+    expect(rootName('fossil-design')).toBe('fossil-design');
   });
 
   it('leaves what only looks like the old names', () => {
