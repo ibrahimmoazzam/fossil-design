@@ -42,7 +42,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 8   | Guide 1.4                | Rewriting the sync's messages fails a test that asserts one                             | Proven        | Guide and code |
 | 9   | Guide 1.4                | It must end with `pnpm format`                                                          | Confirmed     | Guide          |
 | 10  | Guide 1.4                | It doesn't name `docs-site/meta.ts` or `og-image.png`                                   | By inspection | Guide          |
-| 11  | Guide 1.4                | It doesn't say whether the exported `BrandOptions` type is a name that stays            | By inspection | Guide          |
+| 11  | Guide 1.4                | It doesn't say which exported names stay                                                | Confirmed     | Guide, fixed   |
 | 12  | Guide "What you need"    | `playwright install chromium` appears only in `AGENTS.md`                               | By inspection | Guide          |
 | 13  | Guide 4.3                | It omits `pnpm build`, and that apply refuses an uncommitted token tree                 | By inspection | Guide          |
 | 14  | Guide 4.4                | The font requirement is explained in 2.4 and fails here                                 | By inspection | Guide          |
@@ -126,11 +126,11 @@ Rewriting a Markdown table reflowed it, and `pnpm lint` failed on Prettier befor
 
 **Fix:** add `meta.ts` to the checklist, and widen 2.5 past icons.
 
-### 11. Is `BrandOptions` a name that stays?
+### 11. Which exported names stay?
 
-Guide 1.4 lists the names that stay on purpose, including "the `brand()` factory in both lint configs". Both configs also export an interface named `BrandOptions`, which is public API in the fork's own packages. The list neither includes nor excludes it.
+Guide 1.4 listed the names that stay on purpose, including the factory both lint configs export, but not the options interface beside it, which was public API in a fork's own packages.
 
-**Fix:** say which, in the same sentence as the factory.
+Answered by removing the question. Neither the factory nor the config file is written into anything Fossil and a fork exchange, so neither had a reason to carry Fossil's name: the file is `brand.config.json` and the export is `brand()` with `BrandOptions`. What stays is only what Fossil writes into a shared artifact, which [ADR 0020](./decisions/0020-what-a-fork-renames.md) states and step 1.4 now repeats.
 
 ### 12. Chromium is never mentioned
 
@@ -223,6 +223,7 @@ On this branch, with the issue's number and what it took:
 | 1     | `rewrites()` also rewrites `%40<scope>`, with a case for it in `tests/rename.test.ts`                                                                                                 | `0e61106` |
 | 20    | The Stylelint config's tests take a primitive colour from the built `lint.json`                                                                                                       | `a79062a` |
 | 2, 18 | `scripts/fonts.ts` checks each stylesheet against the faces and weights the text styles use                                                                                           | `0ab2c06` |
+| 11    | The config file is `brand.config.json` and both lint configs export `brand()`, so the question is removed rather than answered: [ADR 0020](./decisions/0020-what-a-fork-renames.md)   | `15d5df9` |
 | 8     | Thirteen strings resolved by kind, under [ADR 0020](./decisions/0020-what-a-fork-renames.md): prose reads `brand.config.json`, format identifiers stay, Figma-side messages rephrased | `pending` |
 
 Issue 20's fix was proved against what broke it: the new test file, copied into the fork where `base.color.blue.600` no longer exists, passes with no reference to it.
