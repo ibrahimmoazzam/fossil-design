@@ -10,7 +10,7 @@ The guide is the only part of Fossil with no check behind it. The token build va
 | ------- | --------------------------------------------------------------------------------------------------------- |
 | Copy    | [ibrahimmoazzam/acme-design](https://github.com/ibrahimmoazzam/acme-design), public, from the template    |
 | Created | 2026-10-12, from `5305359`, so it predates [#46](https://github.com/ibrahimmoazzam/fossil-design/pull/46) |
-| Brand   | Acme Design, prefix `acme`, scope `@acme-design`, as the guide's own examples                             |
+| Brand   | Acme Foundry, prefix `acme`, scope `@acme-foundry`                                                        |
 | Route   | 3A, publishing under its own scope                                                                        |
 
 Timings, on a warm pnpm store and an M-series laptop. A cold store and a cold CI runner are both slower, and the install especially so.
@@ -54,8 +54,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 19 | `AGENTS.md` | `pnpm --filter react docs` runs pnpm's own `docs` command, not the script | Confirmed | Docs |
 | 20 | `packages/stylelint-config/test/config.test.ts` | The guide's own worked example in 2.1 turns the suite red | Confirmed | Code and guide |
 | 21 | Guide 2.5 | It calls `public/` the site's icons, and a fork has no artwork of its own | Confirmed | Guide |
-| 22 | Guide 1.3 and 3A.1 | The scope is baked into 79 files before anything checks it, and the only check is creating it | Confirmed | Guide |
-| 23 | `scripts/rename.ts` | A later name change rewrites `fossil.config.json` alone, so step 1.4's work is redone by hand | Confirmed | Guide |
+| 22 | Guide "What you need" | It doesn't say the npm organisation has to exist before the rename writes the scope into 79 files | Confirmed | Guide |
 
 ### 1. The rename misses a percent-encoded scope
 
@@ -105,7 +104,7 @@ After renaming, `AGENTS.md` asserted that the published `@acme-design/*` package
 
 ### 7. A find-and-replace breaks grammar
 
-Swapping `Fossil` for `Acme Design` produced "a Acme Design token" three times, because the article precedes the name.
+Swapping `Fossil` for `Acme Foundry` produced "a Acme Foundry token" three times, because the article precedes the name.
 
 **Fix:** tell the adopter to read the diff, and note the article.
 
@@ -208,27 +207,11 @@ Step 2.5 says "the docs site's icons are in `packages/react/docs-site/public/`".
 
 **Fix:** widen 2.5 past icons, and say plainly that the favicon, the touch icon and the preview card are Fossil's artwork until replaced.
 
-### 22. The scope is committed before anyone checks it, and checking it creates it
+### 22. The scope has to exist before the rename
 
-Step 1.3 renames the fork, writing the scope into 79 files, and step 3A.1 only then says to create the npm organisation for it. `@acme-design` turned out to be unavailable three steps after the fork had been rebranded around it. Nothing earlier asks the adopter to check, and "What you need" mentions only an npm account with two-factor authentication.
+Step 1.3 writes the scope into 79 files; step 3A.1 only then says to create the npm organisation for it. `@acme-design` turned out to be unavailable three steps after the fork was rebranded around it.
 
-Checking is the trap. There is no read-only way to do it:
-
-- a free package name proves nothing, because an organisation can hold no public packages: `@acme-design/tokens` and `@acme-design/react` both answered 404 while the organisation existed;
-- npmjs.com answers 403 to any automated request, for names that exist and names that don't alike;
-- the registry's user endpoint answers 401 without credentials.
-
-So the only check is npmjs.com's **Add Organization** form, and submitting it _creates_ the organisation. Over this run, seven names were tried and seven organisations came into existence as a result: the "taken" answers were mostly self-inflicted, by the act of checking. An adopter who tries five names owns five namespaces, and deleting one is six clicks under a Billing tab they never visited.
-
-**Fix:** say in "What you need" that the scope has to be settled before step 1.3, that creating the organisation is the only way to find out whether the name is free, and that each attempt leaves an organisation behind. Then 1.3 renames to a scope already in hand. Do not claim, as an earlier draft of this file did, that the names were squatted: that was wrong, and the real hazard is worse, because it is caused by following the advice to check.
-
-### 23. Changing the name later redoes step 1.4 by hand
-
-The system's name lives only in `fossil.config.json`, and `pnpm rename` rewrites nothing else for it: the scope, the prefix, the bin and the repository are spelled out in files, the name is not. That is the right design, since the name only appears in prose a person wrote. But it means renaming Acme Design to Acme Foundry left 65 mentions of the old name across 31 files, all of them written by hand in step 1.4, outside Fossil's own `docs/` and the rename script's own fixtures.
-
-The guide never says this, and its step 1.3 reads as though the rename covers the name too.
-
-**Fix:** say in 1.3 that the name is written into the config and read from there, so prose that names the system is step 1.4's work, and a later change of name means doing 1.4 again.
+**Fix:** add one line to "What you need": have the npm organisation created before step 1.3, so the rename uses a scope already in hand.
 
 ## Fixed so far
 
@@ -255,7 +238,7 @@ Both now load the same faces the Make guidelines tell an app to load, so the doc
 
 Issue 8's fix splits the thirteen strings three ways, which [ADR 0020](./decisions/0020-what-a-fork-renames.md) records. The six that name the system, including the Figma descriptions on `Box`, `Stack` and `Icon`, now read `config.name`, and the two tests that cover them assert against the same config, so a fork's suite passes unchanged. The five sent to Figma were rephrased, because `script()` embeds the runtime's source text and hashes it, so no name can be read there: they never meant the brand anyway. "No Fossil text style" meant "no text style from the library", and "stamped as Fossil's Semantic collection" meant "carries the Semantic stamp". Two more name the tool's own format and keep it.
 
-Proved in the fork: with the changed sync copied in, its 84 tests pass and `Box`'s Figma description reads "a frame bound to Acme Design's variables".
+Proved in the fork: with the changed sync copied in, its 84 tests pass and `Box`'s Figma description reads "a frame bound to Acme Foundry's variables".
 
 The block measured 7985 bytes against its 8192 budget here, against 7917 in the fork, where the shorter prefix saves the difference. That is 207 bytes of headroom in Fossil itself, which sharpens issue 16.
 
