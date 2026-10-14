@@ -44,7 +44,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 10  | Guide 1.4                | It doesn't name `docs-site/meta.ts` or `og-image.png`                                   | By inspection | Guide          |
 | 11  | Guide 1.4                | It doesn't say which exported names stay                                                | Confirmed     | Guide, fixed   |
 | 12  | Guide "What you need"    | `playwright install chromium` appears only in `AGENTS.md`                               | By inspection | Guide          |
-| 13  | Guide 4.3                | It omits `pnpm build`, and that apply refuses an uncommitted token tree                 | By inspection | Guide          |
+| 13  | Guide 4.3                | It omits `pnpm build`, and that apply refuses an uncommitted token tree                 | Proven        | Guide          |
 | 14  | Guide 4.4                | The font requirement is explained in 2.4 and fails here                                 | By inspection | Guide          |
 | 15  | Guide 4.6                | One sentence stands for the longest step in the guide                                   | By inspection | Guide          |
 | 16  | Guide 2                  | The 8 KB `AGENTS.md` block budget is never mentioned                                    | Confirmed     | Guide          |
@@ -58,6 +58,9 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 23 | Guide 1.5 and 3A.3 | Publishing from `main` before the rename is merged aims the publish at Fossil's own scope | Confirmed | Guide |
 | 24 | Guide 3A.3 | Nothing verifies the publish, so a half-finished one leaves a broken set | Confirmed | Guide |
 | 25 | `scripts/rename.ts` | The workspace root's `package.json` keeps the name `fossil-design` | Confirmed | Code |
+| 26 | `package.json` | Claude Code's auto mode refuses `pnpm figma:apply`, which writes nothing to Figma | Confirmed | Code |
+| 27 | Guide 4.2 | It says which folder the files go in, not the two things about placement that break 4.5 | Confirmed | Guide |
+| 28 | `packages/tokens/src/semantic/typography.tokens.json` | Two token descriptions name Fossil's own typefaces, and travel into the fork's Figma file | Confirmed | Code and guide |
 
 ### 1. The rename misses a percent-encoded scope
 
@@ -241,6 +244,49 @@ The run's own set is complete now: all four packages answer `npm view`, and `npm
 `pnpm rename` rewrites package names across the workspace, but the root `package.json` keeps `"name": "fossil-design"`. The root is private and unpublished, so nothing breaks, and it is the name an adopter sees at the top of their own manifest.
 
 **Fix:** have the rename set the root's name from the repository it was given, so `ibrahimmoazzam/acme-foundry` makes it `acme-foundry`.
+
+### 26. Auto mode refuses the one command that only writes files
+
+`pnpm figma:apply` reads `tokens.json` and git, and writes five scripts into `packages/figma-sync/.figma/`. It opens no network connection and changes nothing in Figma; the agent carries the scripts there afterwards, through `use_figma`, under the skill's own confirmation rule. Claude Code's auto-mode classifier refused it anyway:
+
+```
+Permission for this action was denied by the Claude Code auto mode classifier.
+Reason: [Unrequested Commit in a Connected App]
+```
+
+`pnpm figma:library-spec` ran unrefused in the same session, and it is the same kind of work: read the repository, write generated scripts to the same folder. So the refusal tracks the word "apply" in the task name rather than anything the command does. The scripts were produced by calling the CLI directly instead, which is the same code by a name that does not read as a write.
+
+It matters because guide 4.1 names Claude Code as the agent and the whole of step 4 runs through it. The refusal lands on the first command of 4.3, before anything has happened, and the reason given names a write to Figma that is not in the command.
+
+**Fix:** the name should describe what the command does locally, since `figma:apply` describes the step it belongs to rather than its own effect. `figma:scripts`, beside `figma:library-spec`, would say it. Alternatively the template ships a permission rule for the `figma:*` generators in `.claude/settings.json`, which is narrower but leaves the misleading name. Either way the skill should say that generating the scripts touches nothing, so a refusal here is not a sign that something was about to be written.
+
+### 27. Step 4.2 names the folder but not the two constraints that bite
+
+"Create two design files in a team project, not in Drafts, because you'll publish both." That covers Drafts, and leaves two conditions a fork can fail while following it exactly:
+
+- **The team's plan, not the account's.** Publishing a library needs Professional or Education, which 4.2 does not repeat and "What you need" states as a property of the reader rather than of the team. A Figma plan belongs to a team, a new team's plan is chosen when it is created, and Starter is the choice that needs no action. On a Starter team everything through 4.4 works, because variables, styles and components are all local writes; 4.5 is where it stops, and 4.5 is a step only a person can do. The account in this run already held several Education teams and still got a plan choice when creating a new one.
+- **Both files in the same team.** On Professional and Education a library publishes at team level, and the team-or-organisation choice appears only on Organization and Enterprise. Two files in two different teams would pass 4.3 and 4.4, publish at 4.5, and then offer nothing to turn on in the Assets panel. Nothing in the guide says the two files are related by anything other than both being "in a team project", which reads as satisfiable separately.
+
+The project inside the team does not matter, and neither does anything else about location: the sync addresses each file by the key after `/design/`, and no part of the token build, the scripts or the checks reads the project or the team. That is worth saying too, because it is the question a fork asks.
+
+Confirmed for the plan constraint, which this run hit: creating a team called Acme offered Starter, Professional and Education, and Education had to be chosen. Not triggered for the same-team constraint, because both files went into Acme; it rests on Figma's documented team-level publishing rather than on a probe, and proving it would mean building a second library to throw away.
+
+**Fix:** 4.2 should say both files go in one team, that the team is on Education or Professional, and that the agent needs nothing but the two URLs.
+
+### 28. Fossil's typefaces are written into the fork's Figma file
+
+`font.family.heading` and `font.family.mono` carry these `$description` values, and the apply wrote both into the fork's foundations file as the variables' descriptions:
+
+```
+Headings. An app can point this at its own face; the portfolio uses Roobert.
+Labels and code. An app can point this at its own face; the portfolio uses Roobert Mono.
+```
+
+Acme Foundry's faces are Sora and IBM Plex Mono. So the two variables a designer opens when asking which typeface to use are the two that name a typeface the fork does not have, attributed to a portfolio that is not theirs. These are the only two of the 91 token descriptions that do this.
+
+Guide 1.4's `git grep Fossil` cannot find them, for the reason issue 5 records: neither says "Fossil". Step 2 is where a fork replaces its typefaces, and 2.4 covers Figma's font list and the Make `@import` but not the descriptions beside the tokens being changed. Nothing in the build or the checks compares a description against the brand, and nothing can: a description is prose.
+
+**Fix:** two things, because there are two faults. Fossil's own two descriptions should stop naming a specific face, since the sentence's point is that the token is a seam an app can repoint. And step 2 should say to read the `$description` of every token being rebranded, because those strings are the text a fork's designers read in Figma, which [ADR 0020](./decisions/0020-what-a-fork-renames.md) rule 1 makes the brand's.
 
 ## Fixed so far
 
