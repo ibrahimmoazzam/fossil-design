@@ -73,7 +73,7 @@ The rest is free for a public project: npm, GitHub Actions, and GitHub Pages for
 ```
 packages/tokens/src/{primitive,semantic}/*.tokens.json    DTCG source of truth, git, PR-reviewed
       |
-      |  --- figma:apply (everything) --->   Figma Variables
+      |  --- apply scripts (everything) -->   Figma Variables
       |  <--- figma:diff (values only) ---   (via an agent, through use_figma)
       |
       v
@@ -345,7 +345,7 @@ This is the most technically interesting phase. It has no dependency on Phase 4,
      - a variable renamed in Figma (stamp and name disagree);
      - a semantic variable detached from its alias to a raw value.
    - **Units and precision.** Compare colours after converting Figma's 0–1 channels to hex, and dimensions in px against a fixed rem base, both within a rounding tolerance. Otherwise every sync reports value changes that didn't happen.
-2. **Apply script.** `pnpm figma:apply` generates the Plugin API script from the token files. For each variable, the script:
+2. **Apply script.** `pnpm figma:apply-scripts` generates the Plugin API script from the token files. For each variable, the script:
    - stamps `setSharedPluginData('fossil', 'path', '<canonical.token.path>')`, shared so any plugin or agent can read it;
    - sets `setVariableCodeSyntax('WEB', 'var(--fossil-...)')`;
    - sets `scopes` per token type on semantic variables (colour to fills and strokes, spacing to gap, radius to corner radius), never `ALL_SCOPES`;
@@ -586,7 +586,7 @@ Always-on context beat retrieval, which is the same finding behind Fossil's alwa
    - the escape-hatch policy and gap-logging rule stated explicitly.
 8. **Completeness check in CI.** The docs generator fails if a component lacks its JSDoc contract.
 9. **Split the Figma library into foundations and components.** Today one file holds both. Two published libraries let a team swap or switch off either half in a design file:
-   - **Foundations library:** the variables, the text and effect styles, and the icons. It is what `figma:apply` and the styles script write. A team that forks Fossil for its own brand replaces this one and keeps the components.
+   - **Foundations library:** the variables, the text and effect styles, and the icons. It is what the apply scripts and the styles script write. A team that forks Fossil for its own brand replaces this one and keeps the components.
    - **Components library:** the component sets and components, with every binding pointing at a foundations variable. A team that builds its own components in another UI library, such as one on Base UI, replaces this one and keeps the foundations.
    - Each is its own file that nobody designs in, published on its own. A designer turns on whichever the file needs, from the libraries panel. Fossil's own design files turn on both.
    - Components in the components file bind to the foundations library's published variables, imported by key (`figma.variables.importVariableByKeyAsync`, which only returns the library's variable from a different file). The library spec and check name variables as they do today; only where a script finds the variable changes.

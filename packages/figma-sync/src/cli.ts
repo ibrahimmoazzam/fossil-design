@@ -161,7 +161,7 @@ function restamp(old: string | undefined): void {
   console.log(
     [
       `Wrote ${shown(name)} (${String(Math.ceil(text.length / 1024))} KB).`,
-      `Pass it to use_figma exactly as it is, in the foundations file, before the next pnpm figma:apply. It reports what it moved and what is left under ${old}, which should be nothing.`,
+      `Pass it to use_figma exactly as it is, in the foundations file, before the next pnpm figma:apply-scripts and its scripts. It reports what it moved and what is left under ${old}, which should be nothing.`,
       `An apply that runs first finds no collection of its own and builds a second copy of the library beside the first, so this comes before it.`,
     ].join('\n'),
   );
@@ -179,7 +179,7 @@ async function compare(dryRun: boolean): Promise<void> {
   );
   if (snapshot.commit === '')
     throw new UsageError(
-      'Figma has no finished apply to compare against. Run pnpm figma:apply, and every script it writes, first.',
+      'Figma has no finished apply to compare against. Run pnpm figma:apply-scripts, and every script it writes, first.',
     );
   try {
     git('cat-file', '-e', `${snapshot.commit}^{commit}`);

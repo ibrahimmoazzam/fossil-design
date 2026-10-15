@@ -370,7 +370,7 @@ export async function styles(
   const need = (path: string, what: string) => {
     if (!byPath[path])
       problems.push(
-        `${what} binds to ${path}, which isn't in Figma. Run pnpm figma:apply and its scripts first.`,
+        `${what} binds to ${path}, which isn't in Figma. Run pnpm figma:apply-scripts and its scripts first.`,
       );
   };
   const loads: Record<string, { family: string; style: string }> = {};

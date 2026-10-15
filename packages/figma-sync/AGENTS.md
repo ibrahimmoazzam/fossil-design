@@ -6,7 +6,7 @@ Fossil's own code for syncing tokens with Figma variables, and for generating an
 
 ```sh
 pnpm test --project figma-sync   # the sync's and the library's tests, against a fake Figma
-pnpm figma:apply                 # write the apply scripts to .figma/
+pnpm figma:apply-scripts         # write the apply scripts to .figma/ (writes nothing to Figma)
 pnpm figma:read [page]           # write a read script to .figma/
 pnpm figma:diff [--dry-run]      # compare saved read results with git, and write value changes
 pnpm figma:restamp <old>         # move every Figma stamp from an old namespace to the brand's, once
