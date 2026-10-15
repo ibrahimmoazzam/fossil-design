@@ -73,8 +73,9 @@ describe('rename', () => {
 
   it('leaves what only looks like the old names', () => {
     for (const text of [
-      // What Fossil writes into a shared artifact, and so keeps: the stamp it puts on a
-      // Figma variable, the vendor key in a token file, and the markers in AGENTS.md.
+      // The vendor key in a token file, which stays, and the markers the token build writes
+      // into AGENTS.md. The CSS prefix is rewritten with its -- and - around it, so the bare
+      // word isn't one; the Figma stamp is the prefix itself and never a literal here.
       "getSharedPluginData('fossil', key)",
       'com.ibrahimmoazzam.fossil',
       '<!-- fossil:foundations -->',

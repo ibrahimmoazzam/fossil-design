@@ -56,7 +56,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 22  | Guide "What you need"                                 | It doesn't say the npm organisation has to exist before the rename writes the scope into 79 files | Confirmed     | Guide, fixed          |
 | 23  | Guide 1.5 and 3A.3                                    | Publishing from `main` before the rename is merged aims the publish at Fossil's own scope         | Confirmed     | Guide, fixed          |
 | 24  | Guide 3A.3                                            | Nothing verifies the publish, so a half-finished one leaves a broken set                          | Confirmed     | Guide, fixed          |
-| 25  | `scripts/rename.ts`                                   | The workspace root's `package.json` keeps the name `fossil-design`                                | Confirmed     | Code                  |
+| 25  | `scripts/rename.ts`                                   | The workspace root's `package.json` keeps the name `fossil-design`                                | Confirmed     | Code, fixed           |
 | 26  | `package.json`                                        | Claude Code's auto mode refuses `pnpm figma:apply`, which writes nothing to Figma                 | Confirmed     | Code, fixed           |
 | 27  | Guide 4.2                                             | It says which folder the files go in, not the two things about placement that break 4.5           | Confirmed     | Guide, fixed          |
 | 28  | `packages/tokens/src/semantic/typography.tokens.json` | Two token descriptions name Fossil's own typefaces, and travel into the fork's Figma file         | Confirmed     | Code and guide, fixed |
@@ -269,6 +269,8 @@ The run's own set is complete now: all four packages answer `npm view`, and `npm
 
 **Fix:** have the rename set the root's name from the repository it was given, so `ibrahimmoazzam/acme-foundry` makes it `acme-foundry`.
 
+**Fixed** in `dc2e570`, alongside the stamp work that needed [ADR 0020](./decisions/0020-what-a-fork-renames.md) written. `main()` rewrites the root manifest's `name` from `rootName(to.repo)` when the repository changes, and `tests/rename.test.ts` covers it. Only the name moves: the root stays private and keeps its own description, which step 1.4 lists among the prose a fork owns.
+
 ### 26. Auto mode refuses the one command that only writes files
 
 `pnpm figma:apply` reads `tokens.json` and git, and writes five scripts into `packages/figma-sync/.figma/`. It opens no network connection and changes nothing in Figma; the agent carries the scripts there afterwards, through `use_figma`, under the skill's own confirmation rule. Claude Code's auto-mode classifier refused it anyway:
@@ -432,6 +434,7 @@ On this branch, with the issue's number and what it took:
 | 22            | "What you need" has the npm organisation created before the rename, because the rename is what spends the scope                                                                                             | `pending` |
 | 23, 24        | Guide 3A.3 publishes from a `main` with the rename merged, says what "no new packages" means there, and ends with `npm view` on each package and an install                                                 | `pending` |
 | 12            | "What you need" installs Chromium, and says which `pnpm test` fails without it                                                                                                                              | `pending` |
+| 25            | `pnpm rename` names the workspace root after the repository it was given                                                                                                                                    | `dc2e570` |
 | 29            | Guide 4.5 and the skill give the Libraries path, and the skill gains a read that confirms the library is on                                                                                                 | `pending` |
 | 31            | `pnpm figma:restamp <old namespace>` moves a fork's stamps before its first apply, with the duplication it prevents held in a test                                                                          | `pending` |
 | 13, 27        | Guide 4.3 states both preconditions as requirements, and 4.2 gives the two placement constraints that decide 4.5, with what does not matter                                                                 | `pending` |

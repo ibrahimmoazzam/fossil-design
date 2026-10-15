@@ -77,7 +77,7 @@ Work through the checklist below rather than a grep. A grep comes at the end, as
 - `.claude/skills/fossil-figma-sync/SKILL.md`: its description and its prose.
 - The component contracts in `packages/react/src/components/`: sixteen JSDoc lines, such as "Classes from the app's own stylesheet, added to Fossil's". These travel furthest of anything here. They reach `packages/react/docs/`, the `AGENTS.md` block of every app that installs your package, and your editor's tooltips.
 
-**Comments and test fixtures,** which only your own contributors read, and which an agent working in the repository reads with them: `scripts/rename.ts`, `tests/rename.test.ts`, `.github/workflows/ci.yml`, `packages/react/vite.config.ts`, `packages/react/scripts/docs.test.ts`, `packages/react/scripts/fonts.test.ts`, `packages/tokens/scripts/build.ts` and `packages/figma-sync/src/`.
+**Comments and test fixtures,** which only your own contributors read, and which an agent working in the repository reads with them: `scripts/rename.ts`, `tests/`, `.github/workflows/ci.yml`, `packages/react/vite.config.ts`, `packages/react/scripts/docs.test.ts`, `packages/react/scripts/fonts.test.ts`, `packages/tokens/scripts/build.ts` and `packages/figma-sync/src/`.
 
 **Three things a grep can't find,** because they say what Fossil is without naming it:
 
