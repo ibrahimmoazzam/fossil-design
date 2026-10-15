@@ -80,7 +80,7 @@ Commit, push, open a pull request, and merge it once CI passes.
 
 Tokens come in two tiers ([Key decisions](./key-decisions.md#10-two-tiers-not-three)). Primitives hold raw values, and semantic tokens name what each value is for. Components only use semantic tokens, so replacing primitives rebrands everything built on them.
 
-**2.1 Replace the primitive values** in `packages/tokens/src/primitive/`: colours, sizes, radii, timing and font families. Rename a primitive whose name no longer describes it, such as `base.color.blue.600` once your accent is green, and update the semantic tokens that alias it. Until your first release, nothing outside the repository uses these names, so a rename needs no deprecation. After it, deprecate with `replacedBy`, as [ADR 0005](./decisions/0005-token-taxonomy.md) describes.
+**2.1 Replace the primitive values** in `packages/tokens/src/primitive/`: colours, sizes, radii, timing and font families. Rename a primitive whose name no longer describes it, such as `base.color.blue.600` once your accent is green, and update the semantic tokens that alias it. Read each token's `$description` as you go, in both tiers: it is prose, so no check can catch one that has stopped being true, and it travels further than the value — into `tokens.json`, into the foundations block in `AGENTS.md`, and onto the Figma variable your designers read when they ask which token to use. Until your first release, nothing outside the repository uses these names, so a rename needs no deprecation. After it, deprecate with `replacedBy`, as [ADR 0005](./decisions/0005-token-taxonomy.md) describes.
 
 **2.2 Change the semantic mapping where your brand needs it,** in `packages/tokens/src/semantic/`, such as which primitive `color.accent.default` aliases in light and in dark. Keep the semantic names: the components, the lint lists and the Figma bindings use them.
 
@@ -89,6 +89,7 @@ Tokens come in two tiers ([Key decisions](./key-decisions.md#10-two-tiers-not-th
 **2.4 Fonts.** Fossil ships no fonts; the font tokens name them. Two places need fonts by name:
 
 - **Figma.** Building the library needs each face, in each weight the text styles use, among Figma's fonts. Google Fonts are; the Figma MCP server can't load custom fonts.
+- **The font tokens' own descriptions.** `font.family.heading` and `font.family.mono` describe what the token is for, and a description that names a face names the wrong one once you have changed it (2.1).
 - **Figma Make.** Rewrite the font `@import` in `packages/react/docs-src/guidelines/setup.md`. The build fails if it misses a family a font token uses.
 
 **2.5 The docs site's icons** are in `packages/react/docs-site/public/`.
@@ -170,19 +171,34 @@ Use the React version the packages develop on, 19. Inside the workspace, the com
 
 ## 4. Put it in Figma
 
-The Figma library is two files ([ADR 0018](./decisions/0018-figma-foundations-and-components.md)): foundations, with the variables, text and effect styles and icons, and components, built from them. An agent carries Fossil's generated scripts to Figma through the Figma MCP server, because on these plans nothing else can write to Figma. The `fossil-figma-sync` skill in `.claude/skills/` holds the steps, and asks before each write.
+The Figma library is two files ([ADR 0018](./decisions/0018-figma-foundations-and-components.md)): foundations, with the variables, text and effect styles and icons, and components, built from them. An agent carries Fossil's generated scripts to Figma through the Figma MCP server, because on these plans nothing else can write to Figma. The `fossil-figma-sync` skill in `.claude/skills/` holds the steps, and asks before each write. Every `pnpm figma:*` command only reads your repository and writes scripts into `packages/figma-sync/.figma/`; nothing reaches Figma until the agent carries a script there.
+
+If you already have Figma files that were built before you renamed the fork, their hidden stamps still carry the old name, and the skill's migration section moves them before 4.3. A fork starting here has nothing to migrate.
 
 **4.1 Connect Claude Code to Figma:** `claude plugin install figma@claude-plugins-official` installs the Figma MCP server and Figma's skills, and `/mcp` signs in.
 
-**4.2 Create two design files in a team project,** not in Drafts, because you'll publish both: `Acme Design Foundations` and `Acme Design Components`.
+**4.2 Create two design files in one team,** not in Drafts, because you'll publish both: `Acme Design Foundations` and `Acme Design Components`. Two things about where they go decide whether 4.5 works, and nothing else does:
 
-**4.3 Apply the variables.** From an up-to-date `main`, ask Claude Code to apply the tokens to Figma, and give it the foundations file's URL. It creates a `Primitives` and a `Semantic` collection, with light and dark modes. Applying a second time should change nothing.
+- **Both in the same team.** On Professional and Education a library publishes to its team. Two files in two different teams get through 4.3 and 4.4, publish at 4.5, and then offer nothing to turn on.
+- **A team on Professional or Education.** Publishing a library needs one of those plans, and a plan belongs to the team, not to you: creating a team offers Starter, which is the choice that needs no action and cannot publish. Everything up to 4.5 works on Starter, because variables, styles and components are all local writes. 4.5 is where it stops, and 4.5 is a step only a person can do.
+
+Nothing else about location matters — not the project, not the folder. The sync addresses each file by the key after `/design/` in its URL, and no part of the token build, the scripts or the checks reads the project or the team. The agent needs the two URLs and nothing more.
+
+**4.3 Apply the variables.** From an up-to-date `main`, with `pnpm install --frozen-lockfile && pnpm build` run and your token changes committed. Both are required, not advice: the sync reads `packages/tokens/dist/tokens.json`, which only the build writes, and it refuses an uncommitted token source, because it stamps the commit on Figma as the base for the next comparison. Step 2 ends with a build and a commit, so this bites when you come back to a clean clone.
+
+Then ask Claude Code to apply the tokens to Figma, and give it the foundations file's URL. It creates a `Primitives` and a `Semantic` collection, with light and dark modes, and a variable for every token. Applying a second time should change nothing, and that is the check that the first one worked.
 
 **4.4 Build the library.** Ask Claude Code to build the Figma component library. In the foundations file, it creates the text styles, effect styles and icons.
 
 **4.5 Publish the foundations file** as a library. Then, in the components file, open **Libraries** — the book icon at the top of the **Assets** panel, or **Main menu › Libraries** — find your team under **Teams**, and turn on **Acme Design Foundations**. The Assets panel on its own won't do it: it is where you open Libraries, and the switch is inside. Only a person can publish or turn on a library; the Plugin API can't.
 
-**4.6 Let it build and check the components.** Claude Code builds each component in the components file from the library's variables, styles and icons, then checks both files against the code until the check passes.
+**4.6 Let it build and check the components.** This is the longest step in the guide, and the only one where the agent writes Figma itself rather than carrying a generated script. `pnpm figma:library-spec` writes `packages/figma-sync/.figma/library.md`, the build sheet: every component, its variants and properties, and the variable, text style or effect style each layer binds. Claude Code builds from that sheet in the components file, importing each variable, style and icon from the foundations library, and checks its work with `pnpm figma:library-check`.
+
+Measured on a fork of Fossil's 13 components, that sheet is 425 lines and stands for 72 variants — `Text` alone is 48, twelve text styles by four tones — 96 named layers, 15 nested instances, 28 component properties and 386 bindings for the check to read. It took nine writes to Figma and four check runs. So expect to work through it with the agent rather than to issue it:
+
+- **Nested components first,** because an instance needs its component to exist: `Icon` before `Button`, `Link` and `Clip`; `Figure` before `Clip`; `Button` before `Modal` and `Carousel`.
+- **Check in groups,** `pnpm figma:library-check Card Modal Tabs`, rather than everything at once. Each check carries its components' spec to Figma in one script, and `use_figma` takes 50,000 characters; Fossil's full 13-component check is 44,000 of them, so a fork with more components has to group them. A short script also costs less to resend.
+- **Fix what the report lists, then check again.** It names the component, the layer and the token it expected.
 
 **4.7 Publish the components file.**
 
