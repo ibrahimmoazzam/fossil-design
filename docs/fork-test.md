@@ -6,12 +6,12 @@ The guide is the only part of Fossil with no check behind it. The token build va
 
 ## The run
 
-|         |                                                                                                                                                              |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Copy    | `ibrahimmoazzam/acme-foundry`, public, from the template, and deleted with its packages and Figma files on 2026-10-15, so the second run starts from nothing |
-| Created | 2026-10-12, from `5305359`, so it predates [#46](https://github.com/ibrahimmoazzam/fossil-design/pull/46)                                                    |
-| Brand   | Acme Foundry, prefix `acme`, scope `@acme-foundry`                                                                                                           |
-| Route   | 3A, publishing under its own scope                                                                                                                           |
+|         |                                                                                                                                                                                                                                                              |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Copy    | [ibrahimmoazzam/acme-foundry](https://github.com/ibrahimmoazzam/acme-foundry), public, from the template, archived on 2026-10-15 with its packages unpublished, its npm organisation deleted and its Figma files gone, so the second run starts from nothing |
+| Created | 2026-10-12, from `5305359`, so it predates [#46](https://github.com/ibrahimmoazzam/fossil-design/pull/46)                                                                                                                                                    |
+| Brand   | Acme Foundry, prefix `acme`, scope `@acme-foundry`                                                                                                                                                                                                           |
+| Route   | 3A, publishing under its own scope                                                                                                                                                                                                                           |
 
 Timings, on a warm pnpm store and an M-series laptop. A cold store and a cold CI runner are both slower, and the install especially so.
 
