@@ -8,6 +8,7 @@ import {
   setStamp,
   sha256,
   stamp,
+  stampedCollections,
   tagged,
   type Branded,
   type Figma,
@@ -151,8 +152,21 @@ export interface CheckResult {
   hash: string;
 }
 
+/**
+ * A one-off migration: every stamp the file carries under an old namespace, moved to the brand's.
+ * A fork whose Figma library was built before the stamp followed the brand needs it once.
+ * [ADR 0020](../../../../docs/decisions/0020-what-a-fork-renames.md).
+ */
+export interface RestampSpec extends Branded {
+  kind: 'restamp';
+  /** The namespace the file's stamps sit under now: the CSS prefix the system had before it was renamed. */
+  old: string;
+}
+
 interface Stamped {
   getSharedPluginData(namespace: string, key: string): string;
+  /** Every key set in a namespace, which is how a migration finds stamps it doesn't know. */
+  getSharedPluginDataKeys(namespace: string): string[];
   setSharedPluginData(namespace: string, key: string, value: string): void;
 }
 
@@ -1090,4 +1104,104 @@ export async function check(
       );
   }
   return result();
+}
+
+/** One node's, style's, variable's or collection's stamps, moved from the old namespace to the brand's. */
+export function moveStamps(
+  spec: RestampSpec,
+  node: Stamped,
+  kind: string,
+  name: string,
+  moved: Record<string, number>,
+  problems: string[],
+): void {
+  for (const key of node.getSharedPluginDataKeys(spec.old)) {
+    const value = stamp(spec.old, node, key);
+    if (value === '') continue;
+    const current = stamp(spec.ns, node, key);
+    if (current !== '' && current !== value) {
+      problems.push(
+        `The ${kind} ${name} is stamped ${key} ${value} under ${spec.old} and ${key} ${current} under ${spec.ns}. Clear whichever is wrong in Figma, then run the migration again.`,
+      );
+      continue;
+    }
+    if (current === '') setStamp(spec.ns, node, value, key);
+    setStamp(spec.old, node, '', key);
+    moved[`${kind} ${key}`] = (moved[`${kind} ${key}`] ?? 0) + 1;
+  }
+}
+
+/**
+ * Moves every stamp this file carries under an old namespace to the brand's, and leaves none behind.
+ * A fork whose Figma library was built before the stamp followed the brand runs it once, in the
+ * foundations file, before its next apply: without it the apply finds no collection of its own and
+ * builds a second copy of the whole library beside the first. Running it again finishes an
+ * interrupted run, and on a file that has already moved it reports nothing to move.
+ */
+export async function restamp(
+  spec: RestampSpec,
+  figma: Canvas,
+): Promise<unknown> {
+  if (spec.old === spec.ns)
+    throw new Error(
+      `The old namespace and the brand's are both ${spec.ns}, so there is nothing to move.`,
+    );
+  const collections = await figma.variables.getLocalVariableCollectionsAsync();
+  const targets: { kind: string; name: string; node: Stamped }[] = [];
+  for (const c of collections)
+    targets.push({ kind: 'collection', name: c.name, node: c });
+  for (const v of await figma.variables.getLocalVariablesAsync())
+    targets.push({ kind: 'variable', name: v.name, node: v });
+  for (const s of await figma.getLocalTextStylesAsync())
+    targets.push({ kind: 'text style', name: s.name, node: s });
+  for (const s of await figma.getLocalEffectStylesAsync())
+    targets.push({ kind: 'effect style', name: s.name, node: s });
+  let instances = 0;
+  const walk = (nodes: readonly SceneNode[]) => {
+    for (const n of nodes) {
+      // An instance reads the stamps of the component it comes from, so they aren't this file's to move.
+      if (n.type === 'INSTANCE') {
+        instances += 1;
+        continue;
+      }
+      targets.push({ kind: 'node', name: n.name, node: n });
+      walk(n.children ?? []);
+    }
+  };
+  for (const page of figma.root.children) {
+    targets.push({ kind: 'page', name: page.name, node: page });
+    await figma.setCurrentPageAsync(page);
+    walk(page.children);
+  }
+
+  // The sync's own collections say this is the foundations file, under either namespace, so a run
+  // that was interrupted after the collections moved still finishes.
+  if (
+    Object.keys(stampedCollections(spec.old, collections)).length === 0 &&
+    Object.keys(stampedCollections(spec.ns, collections)).length === 0
+  )
+    throw new Error(
+      `No variable collection in this file is stamped ${spec.old} or ${spec.ns}. Run the migration in the foundations file, which holds the variables: a components file reads every stamp through the library it imports, so it has none of its own to move.`,
+    );
+
+  const under = (ns: string) =>
+    targets.reduce(
+      (total, t) => total + t.node.getSharedPluginDataKeys(ns).length,
+      0,
+    );
+  const before = under(spec.old);
+  const moved: Record<string, number> = {};
+  const problems: string[] = [];
+  for (const t of targets)
+    moveStamps(spec, t.node, t.kind, t.name, moved, problems);
+  return tagged(spec.ns, 'restamp', {
+    from: spec.old,
+    before,
+    moved: Object.keys(moved)
+      .sort()
+      .map((row) => `${row}: ${String(moved[row] ?? 0)}`),
+    remaining: under(spec.old),
+    instances,
+    problems,
+  });
 }

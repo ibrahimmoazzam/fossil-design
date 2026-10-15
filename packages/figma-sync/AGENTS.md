@@ -9,6 +9,7 @@ pnpm test --project figma-sync   # the sync's and the library's tests, against a
 pnpm figma:apply                 # write the apply scripts to .figma/
 pnpm figma:read [page]           # write a read script to .figma/
 pnpm figma:diff [--dry-run]      # compare saved read results with git, and write value changes
+pnpm figma:restamp <old>         # move every Figma stamp from an old namespace to the brand's, once
 pnpm figma:library-spec          # write the library spec, its build sheet and the styles script to .figma/
 pnpm figma:library-check [Name]  # write the components file's check, for every component or the ones named
 pnpm figma:library-check foundations  # write the foundations file's check: its styles and icons
@@ -25,13 +26,13 @@ The CLIs run through Node's type stripping, so there's no build step. `pnpm --fi
 - `src/scripts.ts` writes the scripts that carry `runtime.ts` and a spec to `use_figma`.
 - `src/snapshot.ts` checks saved read results.
 - `src/diff.ts` is the three-way diff. `src/write.ts` writes Figma's values into the token files.
-- `src/cli.ts` holds the sync's three commands and hands the library's to `src/library/cli.ts`. `src/fake-figma.ts` stands in for Figma in tests.
+- `src/cli.ts` holds the sync's four commands and hands the library's to `src/library/cli.ts`. `src/fake-figma.ts` stands in for Figma in tests.
 - `src/library/` is the component library:
   - `code.ts` reads a component's variant map, defaults, props and JSX with the TypeScript compiler, and its CSS Module with PostCSS;
   - `components.ts` is the reviewed table of what code can't say: each component's root layer, the layers Figma must have, derived axes and the kind of each Figma property. Every name in it is checked against code;
   - `spec.ts` turns both into the spec, with CSS's cascade, `Box` props through `Box`'s generated classes, and `Text` elements as text layers;
   - `styles.ts` writes the text and effect styles and icons from the token build; `sheet.ts` writes the build sheet;
-  - `runtime.ts` is the library's code that runs in Figma: the styles script and the check. The generator merges it with `src/runtime.ts`, and a script carries every function whose name it calls, so a local helper mustn't share a runtime function's name;
+  - `runtime.ts` is the library's code that runs in Figma: the styles script, the check and the stamp migration, which is here because it walks pages and styles as well as variables. The generator merges it with `src/runtime.ts`, and a script carries every function whose name it calls, so a local helper mustn't share a runtime function's name;
   - `fake-canvas.ts` adds pages, nodes, styles and fonts to the fake Figma, and `toLibrary()` turns a fake into a components file whose variables and styles come from a library; `cli.ts` holds the two commands.
 - `src/fixtures/tokens/` is a frozen copy of the reference token source, which the tests run on. A value changed in Figma, or a fork's own brand, therefore can't break them. Refresh the copy only when the token format changes. Tests that check the live source read `packages/tokens/src` directly.
 
@@ -69,4 +70,5 @@ Each one is verified in `docs/Learnings.md`:
 - A number variable bound to line height is read as pixels, so text styles set line height as a percentage and the check compares the value.
 - Figma's Space Grotesk has no SemiBold. The styles script refuses a text style whose font Figma doesn't have, before it writes anything.
 - The Plugin API can't turn a library on in a file; a person does, from the Assets panel. Then `figma.teamLibrary` lists its variables, but not its styles or components, so the styles script returns their keys.
-- A variable, style or component imported from a library keeps its shared plugin data, so the check reads the stamp of each one a component uses through its id.
+- A variable, style or component imported from a library keeps its shared plugin data, so the check reads the stamp of each one a component uses through its id. The same read-through is why the migration skips instances: their stamps belong to the file they come from.
+- A shared plugin data namespace is at least three alphanumeric characters, and setting a value to `''` removes the key. So a brand whose CSS prefix is shorter than three characters, or carries a hyphen, can't be stamped on Figma at all.

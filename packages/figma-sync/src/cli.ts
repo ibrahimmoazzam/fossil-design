@@ -22,6 +22,7 @@ import {
   libraryReport,
   librarySpec,
 } from './library/cli.ts';
+import type { RestampSpec } from './library/runtime.ts';
 import { figmaTokens } from './model.ts';
 import { script } from './scripts.ts';
 import { readSnapshot, SnapshotError } from './snapshot.ts';
@@ -135,6 +136,37 @@ function read(arg: string | undefined): void {
   );
 }
 
+/**
+ * The one-off migration a fork needs when its Figma library was built before the stamp followed the
+ * brand: every stamp under the old namespace moved to this one's.
+ */
+function restamp(old: string | undefined): void {
+  if (old === undefined)
+    throw new UsageError(
+      `Usage: cli.ts restamp <old namespace>. It writes one script that moves every stamp the Figma file carries under <old namespace> to ${NS}, this brand's. The old namespace is the CSS prefix the system had before it was renamed.`,
+    );
+  if (old === NS)
+    throw new UsageError(
+      `The stamps already belong to ${NS}, so there is nothing to migrate.`,
+    );
+  if (!/^[a-z0-9]{3,}$/i.test(old))
+    throw new UsageError(
+      `Figma can't hold "${old}" as a namespace: shared plugin data takes at least three alphanumeric characters.`,
+    );
+  const spec: RestampSpec = { kind: 'restamp', ns: NS, old };
+  const text = script(spec, `move every ${old} stamp to ${NS}`);
+  mkdirSync(WORK, { recursive: true });
+  const name = join(WORK, 'restamp.js');
+  writeFileSync(name, text);
+  console.log(
+    [
+      `Wrote ${shown(name)} (${String(Math.ceil(text.length / 1024))} KB).`,
+      `Pass it to use_figma exactly as it is, in the foundations file, before the next pnpm figma:apply. It reports what it moved and what is left under ${old}, which should be nothing.`,
+      `An apply that runs first finds no collection of its own and builds a second copy of the library beside the first, so this comes before it.`,
+    ].join('\n'),
+  );
+}
+
 async function compare(dryRun: boolean): Promise<void> {
   const files = existsSync(WORK)
     ? readdirSync(WORK).filter((f) => /^snapshot-\d+\.json$/.test(f))
@@ -186,13 +218,14 @@ try {
   if (command === 'apply') apply();
   else if (command === 'read') read(arg);
   else if (command === 'diff') await compare(arg === '--dry-run');
+  else if (command === 'restamp') restamp(arg);
   else if (command === 'library-spec') librarySpec();
   else if (command === 'library-check' && arg === 'report') {
     if (!libraryReport()) process.exitCode = 1;
   } else if (command === 'library-check') libraryCheck(args);
   else
     throw new UsageError(
-      'Usage: cli.ts apply | read [page] | diff [--dry-run] | library-spec | library-check [component...] | library-check report',
+      'Usage: cli.ts apply | read [page] | diff [--dry-run] | restamp <old namespace> | library-spec | library-check [component...] | library-check report',
     );
 } catch (error) {
   if (!(

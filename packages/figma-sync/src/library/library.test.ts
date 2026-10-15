@@ -11,7 +11,14 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { TokensFile } from '../../../tokens/src/metadata.ts';
 import { NS } from '../brand.ts';
-import { sha256 } from '../runtime.ts';
+import { COLLECTIONS } from '../model.ts';
+import {
+  sha256,
+  type ApplySpec,
+  type FinishSpec,
+  type SyncValue,
+  type VariableSpec,
+} from '../runtime.ts';
 import { CHANGED, script } from '../scripts.ts';
 import { checkParts, LibraryError, readResults, reportLines } from './cli.ts';
 import { readComponent, readStylesheet } from './code.ts';
@@ -1281,5 +1288,201 @@ describe('the library check', () => {
     // A script carries only what it calls; the check has no use for the styles script.
     expect(script(part, 'check')).not.toContain('function styles(');
     expect(sha256('')).toHaveLength(64);
+  });
+});
+
+describe('the stamp migration', () => {
+  const OLD = 'legacy';
+  const COMMIT = 'c0ffee0000000000000000000000000000000000';
+  const icons: IconSpec[] = [
+    {
+      name: 'CloseIcon',
+      key: 'close',
+      viewBox: '0 -960 960 960',
+      paths: ['M0 0Z'],
+    },
+  ];
+  const styles: StylesSpec = stylesSpec(TOKENS, icons).spec;
+  // Everything the styles script binds, so the file the migration runs on is a whole foundations file.
+  const variables: VariableSpec[] = [
+    'font.family.body',
+    'base.font.size.5',
+    'base.font.weight.400',
+    'base.letter-spacing.none',
+    'base.space.0',
+    'base.space.025',
+    'base.space.100',
+    'color.shadow.default',
+    'color.text.default',
+  ].map((path) => {
+    const color = path.startsWith('color');
+    const type = color
+      ? 'COLOR'
+      : path.startsWith('font.family')
+        ? 'STRING'
+        : 'FLOAT';
+    const value: SyncValue = color
+      ? { hex: '#000000', alpha: 1 }
+      : type === 'STRING'
+        ? 'Figtree'
+        : 16;
+    const values: Record<string, SyncValue> = color
+      ? { Light: value, Dark: value }
+      : { Value: value };
+    return {
+      path,
+      name: path.replaceAll('.', '/'),
+      collection: color ? 'semantic' : 'primitive',
+      type,
+      values,
+      scopes: [],
+      code: `var(--fx-${path.replaceAll('.', '-')})`,
+      description: '',
+      renamedFrom: [],
+    } satisfies VariableSpec;
+  });
+  const collections = [COLLECTIONS.primitive, COLLECTIONS.semantic];
+  const applySpec = (ns: string): ApplySpec => ({
+    kind: 'apply',
+    ns,
+    part: 1,
+    parts: 1,
+    collections,
+    variables,
+  });
+  const finishSpec = (ns: string): FinishSpec => ({
+    kind: 'finish',
+    ns,
+    commit: COMMIT,
+    collections,
+    paths: variables.map((v) => v.path),
+  });
+  const migration = (old = OLD, ns = NS) =>
+    script({ kind: 'restamp', ns, old }, 'restamp');
+
+  /** A foundations file as a fork built it: variables, styles, the Icons page and its icons. */
+  const foundationsUnder = async (ns: string) => {
+    const canvas = new FakeCanvas();
+    canvas.fonts = [{ family: 'Figtree', style: 'Regular' }];
+    await run(script(applySpec(ns), 'apply'), canvas);
+    await run(script(finishSpec(ns), 'finish'), canvas);
+    await run(script({ ...styles, ns }, 'styles'), canvas);
+    return canvas;
+  };
+
+  interface Result {
+    from: string;
+    before: number;
+    moved: string[];
+    remaining: number;
+    instances: number;
+    problems: string[];
+  }
+
+  it('moves every stamp in the file, of every kind, and leaves none behind', async () => {
+    const canvas = await foundationsUnder(OLD);
+    const result = (await run(migration(), canvas)) as Result;
+    expect(result.problems).toEqual([]);
+    expect(result.moved).toEqual([
+      'collection collection: 2',
+      'collection commit: 2',
+      'effect style path: 1',
+      'node icon: 1',
+      'node section: 1',
+      'node svg: 1',
+      'page page: 1',
+      'text style path: 1',
+      'variable path: 9',
+    ]);
+    expect(result).toMatchObject({ from: OLD, before: 19, remaining: 0 });
+    // The applied commit moves with the rest, so the next diff still has its base.
+    const semantic = canvas.collections[1];
+    expect(semantic?.getSharedPluginData(NS, 'commit')).toBe(COMMIT);
+    expect(semantic?.getSharedPluginDataKeys(OLD)).toEqual([]);
+    expect(canvas.variable('color.text.default').id).toBeTruthy();
+  });
+
+  it('is what keeps the next apply from building a second library', async () => {
+    const migrated = await foundationsUnder(OLD);
+    await run(migration(), migrated);
+    expect(await run(script(applySpec(NS), 'apply'), migrated)).toMatchObject({
+      created: [],
+      updated: [],
+      unchanged: variables.length,
+    });
+    expect(
+      await run(script({ ...styles, ns: NS }, 'styles'), migrated),
+    ).toMatchObject({
+      created: [],
+      updated: [],
+    });
+    expect(migrated.collections).toHaveLength(2);
+    expect(migrated.all).toHaveLength(variables.length);
+    expect(migrated.textStyles).toHaveLength(1);
+    expect(migrated.root.children).toHaveLength(2);
+
+    // Without it, the apply owns nothing in the file and builds the library again beside it: the
+    // clash check looks only inside the collection it just made. fork-test.md issue 31.
+    const left = await foundationsUnder(OLD);
+    const applied = (await run(script(applySpec(NS), 'apply'), left)) as {
+      created: string[];
+    };
+    expect(applied.created).toHaveLength(variables.length);
+    expect(left.collections).toHaveLength(4);
+    expect(left.all).toHaveLength(variables.length * 2);
+  });
+
+  it('finds nothing to move the second time', async () => {
+    const canvas = await foundationsUnder(OLD);
+    await run(migration(), canvas);
+    expect(await run(migration(), canvas)).toMatchObject({
+      before: 0,
+      moved: [],
+      remaining: 0,
+      problems: [],
+    });
+  });
+
+  it('refuses a file whose stamps belong to a library it imports', async () => {
+    const components = await foundationsUnder(OLD);
+    components.toLibrary();
+    await expect(run(migration(), components)).rejects.toThrow(
+      'Run the migration in the foundations file',
+    );
+  });
+
+  it('leaves an instance’s stamps to the file they come from', async () => {
+    const canvas = await foundationsUnder(OLD);
+    const instance = canvas.node('INSTANCE', 'CloseIcon');
+    instance.setSharedPluginData(OLD, 'icon', 'close');
+    const result = (await run(migration(), canvas)) as Result;
+    expect(result.instances).toBe(1);
+    expect(instance.getSharedPluginData(OLD, 'icon')).toBe('close');
+    expect(instance.getSharedPluginData(NS, 'icon')).toBe('');
+  });
+
+  it('reports a stamp that differs under both namespaces instead of overwriting it', async () => {
+    const canvas = await foundationsUnder(OLD);
+    const variable = canvas.all.find((v) => v.name === 'color/text/default');
+    if (!variable) throw new Error('No variable to clash with');
+    variable.setSharedPluginData(NS, 'path', 'color.text.muted');
+    const result = (await run(migration(), canvas)) as Result;
+    expect(result.problems).toEqual([
+      `The variable color/text/default is stamped path color.text.default under ${OLD} and path color.text.muted under ${NS}. Clear whichever is wrong in Figma, then run the migration again.`,
+    ]);
+    expect(result.remaining).toBe(1);
+    expect(variable.getSharedPluginData(NS, 'path')).toBe('color.text.muted');
+    expect(variable.getSharedPluginData(OLD, 'path')).toBe(
+      'color.text.default',
+    );
+  });
+
+  it('refuses a namespace Figma cannot hold, and the brand’s own', async () => {
+    await expect(
+      run(migration(NS), await foundationsUnder(NS)),
+    ).rejects.toThrow('there is nothing to move');
+    expect(() => {
+      new FakeCanvas().createTextStyle().setSharedPluginData('xy', 'path', 'a');
+    }).toThrow('at least 3 alphanumeric characters');
   });
 });

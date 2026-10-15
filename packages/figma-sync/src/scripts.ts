@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import config from '../../../brand.config.json' with { type: 'json' };
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
-import type { CheckSpec, StylesSpec } from './library/runtime.ts';
+import type { CheckSpec, RestampSpec, StylesSpec } from './library/runtime.ts';
 import type { Spec } from './runtime.ts';
 
 export const hash = (text: string): string =>
@@ -64,7 +64,7 @@ export const CHANGED =
 
 /** A script for use_figma that refuses to run if anything in it was changed. */
 export function script(
-  spec: Spec | StylesSpec | CheckSpec,
+  spec: Spec | StylesSpec | CheckSpec | RestampSpec,
   title: string,
 ): string {
   const names = included(spec.kind);

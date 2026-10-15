@@ -129,6 +129,8 @@ type FigmaValue =
 
 interface Stamped {
   getSharedPluginData(namespace: string, key: string): string;
+  /** Every key set in a namespace, which is how a migration finds stamps it doesn't know. */
+  getSharedPluginDataKeys(namespace: string): string[];
   setSharedPluginData(namespace: string, key: string, value: string): void;
 }
 

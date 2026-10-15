@@ -28,15 +28,28 @@ export const float32 = (value: Value): Value => {
   };
 };
 
-class Data {
+/** Shared plugin data, as strict as Figma: a namespace of three alphanumeric characters or more, and
+ * an empty value removes the key. */
+export class Data {
   readonly #data = new Map<string, string>();
 
   getSharedPluginData(namespace: string, key: string): string {
     return this.#data.get(`${namespace}:${key}`) ?? '';
   }
 
+  getSharedPluginDataKeys(namespace: string): string[] {
+    return [...this.#data.keys()]
+      .filter((entry) => entry.startsWith(`${namespace}:`))
+      .map((entry) => entry.slice(namespace.length + 1));
+  }
+
   setSharedPluginData(namespace: string, key: string, value: string): void {
-    this.#data.set(`${namespace}:${key}`, value);
+    if (!/^[a-z0-9]{3,}$/i.test(namespace))
+      throw new Error(
+        'in setSharedPluginData: The namespace must be at least 3 alphanumeric characters',
+      );
+    if (value === '') this.#data.delete(`${namespace}:${key}`);
+    else this.#data.set(`${namespace}:${key}`, value);
   }
 }
 

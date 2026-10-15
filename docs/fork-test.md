@@ -63,7 +63,7 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 28 | `packages/tokens/src/semantic/typography.tokens.json` | Two token descriptions name Fossil's own typefaces, and travel into the fork's Figma file | Confirmed | Code and guide |
 | 29 | Guide 4.5 | It sends you to the Assets panel to turn the library on, where there is nothing to turn on | Confirmed | Guide, fixed |
 | 30 | `.figma/library.md` | The check demands a library text style on a text layer the sheet gives no typography for | Confirmed | Code |
-| 31 | `packages/figma-sync/src/runtime.ts` | Templating the stamp namespace silently duplicates a fork's existing library | Proven | Code and docs |
+| 31 | `packages/figma-sync/src/runtime.ts` | Templating the stamp namespace silently duplicates a fork's existing library | Proven | Code and docs, fixed |
 
 ### 1. The rename misses a percent-encoded scope
 
@@ -372,7 +372,9 @@ What a migration has to cover, counted on Acme's live files. The foundations fil
 
 **Fix:** the change needs a migration, which is the test ADR 0020 itself sets — "whether changing it would be a migration rather than a rename". A one-off `pnpm figma:restamp <old>` that generates a script re-stamping every variable, collection, style, page and icon from the old namespace to the brand's, run once before the first apply, keeps the fork's library and leaves no permanent reference to Fossil's name in anyone's runtime. Carrying the old namespace in the apply spec as a fallback would work too and is worse, because it makes every future apply carry a migration.
 
-Until then, the templating is safe for Fossil and for a fork that has not yet built its library, and unsafe for a fork that has. Acme's own re-verification is therefore held: the apply was not run against its published files.
+**Fixed.** `pnpm figma:restamp <old namespace>` writes one 7 KB script. It collects every local collection, variable, text style, effect style, page and node, moves each key `getSharedPluginDataKeys(old)` reports to the brand's namespace, clears the old one, and reports what it moved by kind and key, what is left under the old namespace, and any stamp that differs under both, which it refuses to overwrite. It skips instances, whose stamps are the library's. It refuses a file with no collection stamped under either namespace, which is how it declines the components file, and it tolerates a run that was interrupted after the collections moved, so a second run finishes the job rather than refusing.
+
+Seven tests in `src/library/library.test.ts` run it against a whole foundations file built under another namespace: 19 stamps across nine kind-and-key pairs move, nothing is left behind, the applied commit survives so the next diff keeps its base, and the apply and styles scripts that follow report every variable, style and icon unchanged. The same tests hold the duplication itself: without the migration the apply creates a second pair of collections and a second copy of every variable, which is what the probe above found.
 
 ## Fixed so far
 
@@ -381,6 +383,7 @@ On this branch, with the issue's number and what it took:
 | #     | Fix                                                                                                                                                                                   | Commit    |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | 29    | Guide 4.5 and the skill give the Libraries path, and the skill gains a read that confirms the library is on                                                                           | `pending` |
+| 31    | `pnpm figma:restamp <old namespace>` moves a fork's stamps before its first apply, with the duplication it prevents held in a test                                                    | `pending` |
 | 19    | `AGENTS.md`, `packages/react/AGENTS.md` and ADR 0016 call the script with `pnpm run docs`                                                                                             | `8244a2c` |
 | 1     | `rewrites()` also rewrites `%40<scope>`, with a case for it in `tests/rename.test.ts`                                                                                                 | `0e61106` |
 | 20    | The Stylelint config's tests take a primitive colour from the built `lint.json`                                                                                                       | `a79062a` |
