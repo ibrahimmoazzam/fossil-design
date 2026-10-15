@@ -376,6 +376,31 @@ What a migration has to cover, counted on Acme's live files. The foundations fil
 
 Seven tests in `src/library/library.test.ts` run it against a whole foundations file built under another namespace: 19 stamps across nine kind-and-key pairs move, nothing is left behind, the applied commit survives so the next diff keeps its base, and the apply and styles scripts that follow report every variable, style and icon unchanged. The same tests hold the duplication itself: without the migration the apply creates a second pair of collections and a second copy of every variable, which is what the probe above found.
 
+**Run against Acme's published foundations file.** The migration first:
+
+```
+{"acme":"restamp","from":"fossil","before":169,
+ "moved":["collection collection: 2","collection commit: 2","effect style path: 3",
+          "node icon: 6","node section: 1","node svg: 6","page page: 1",
+          "text style path: 12","variable path: 136"],
+ "remaining":0,"instances":0,"problems":[]}
+```
+
+Every row matches the table above, and the total matches the 169 counted before any code was written. Then the apply, in five scripts, and the foundations check:
+
+```
+part 1 of 4: created [] updated [] unchanged 40
+part 2 of 4: created [] updated [] unchanged 40
+part 3 of 4: created [] updated [] unchanged 40
+part 4 of 4: created [] updated [] unchanged 16
+finish:      commit adc90f1 missing [] orphans [] unstamped []
+check:       The library matches the spec from adc90f1.
+```
+
+136 variables, every one unchanged, in a file the sync could not see at all an hour earlier. Two collections, not four.
+
+A prediction made before the run was wrong in a way worth keeping: it expected roughly 136 `code syntax` updates, on the grounds that the live variables would still read `var(--fossil-…)`. They did not. Code syntax comes from `tokens.json`, and the fork's library was built _after_ the CSS prefix was renamed and _before_ the stamp followed the brand, so the prefix had already reached Figma and only the stamp lagged. The apply was therefore a pure no-op, which is the strongest evidence the migration moved the library rather than replacing it.
+
 ## Fixed so far
 
 On this branch, with the issue's number and what it took:
