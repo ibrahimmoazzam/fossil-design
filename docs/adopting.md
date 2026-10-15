@@ -147,7 +147,7 @@ Tokens come in two tiers ([Key decisions](./key-decisions.md#10-two-tiers-not-th
 - **The font tokens' own descriptions.** `font.family.heading` and `font.family.mono` describe what the token is for, and a description that names a face names the wrong one once you have changed it (2.1).
 - **Figma Make.** Rewrite the font `@import` in `packages/react/docs-src/guidelines/setup.md`. The build fails if it misses a family a font token uses.
 
-**2.5 The docs site's icons** are in `packages/react/docs-site/public/`.
+**2.5 The docs site's artwork** is in `packages/react/docs-site/public/`: `favicon.ico`, `favicon.svg`, `apple-touch-icon.png`, and `og-image.png`, the card a link to your site shows in a chat or a feed. All four are Fossil's artwork until you replace them, and nothing in the build or the checks notices that you haven't, so a fork that skips this ships another system's logo as its own. The card is 1200 by 630, which `ogImage` in `docs-site/meta.ts` declares along with the URL a scraper fetches it from.
 
 Commit with the foundations block the build writes into `AGENTS.md`. CI fails if the build would change it.
 
