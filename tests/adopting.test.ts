@@ -18,13 +18,21 @@ function step(heading: string, next: string): string {
 const checklist = step('1.4 ', '1.5 ');
 
 /**
+ * The name step 1.4 is written about. Fossil's, until a fork rewrites this file with the rest of
+ * 1.4's prose, after which it is the fork's own and the check still holds: every file that names
+ * the system is in the checklist. A fork that rewrites the prose and not this line greps for a
+ * name its files no longer carry, and the assertion below is what says so.
+ */
+const system = 'Fossil';
+
+/**
  * Every file whose prose still says Fossil after a rename. `pnpm rename` rewrites the names
  * things are addressed by, never the word itself, so this is what step 1.4 has to account for.
  * `keep` holds the paths that record Fossil's own history, which the same rename skips.
  */
 const described = execFileSync(
   'git',
-  ['grep', '-l', 'Fossil', '--', '.', ...keep],
+  ['grep', '-l', system, '--', '.', ...keep],
   {
     cwd: root,
     encoding: 'utf8',
@@ -52,7 +60,10 @@ function names(path: string): boolean {
 
 describe('the adoption guide', () => {
   it('has files to account for, so the grep behind this test still works', () => {
-    expect(described.length).toBeGreaterThan(20);
+    expect(
+      described.length,
+      `No file says ${system}, so this test is checking nothing. In a fork, ${system} is the name 1.4 is written about: rewrite it here with the rest of the step's prose.`,
+    ).toBeGreaterThan(20);
   });
 
   it.each(described)('names %s in step 1.4', (path) => {

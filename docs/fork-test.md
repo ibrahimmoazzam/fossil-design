@@ -30,7 +30,7 @@ The parent repository reports the same test counts, 41 files passed and 11 skipp
 
 Status says how far each one is established. **Confirmed** means the run produced it. **Proven** means a deliberate probe produced it, then reverted. **By inspection** means the code says so but this run could not trigger it, and the reason is given.
 
-Issues 1 to 32 are this run's. Issues 33 to 35 came later, from a dry rename of the branch tip in a scratch clone, made before the second run started rather than during the first: all three are faults the fixes above introduced, which Fossil's own green CI cannot see.
+Issues 1 to 32 are this run's. Issues 33 to 36 came later, from a dry rename of the branch tip in a scratch clone, made before the second run started rather than during the first: all four are faults the fixes above introduced, which Fossil's own green CI cannot see.
 
 | #   | Where                                                 | Issue                                                                                                 | Status        | Goes to               |
 | --- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------- | --------------------- |
@@ -69,6 +69,7 @@ Issues 1 to 32 are this run's. Issues 33 to 35 came later, from a dry rename of 
 | 33  | `packages/tokens/scripts/formats.ts`                  | The foundations markers follow the CSS prefix, which the rename leaves, so a fork's first build fails | Proven        | Code and docs, fixed  |
 | 34  | `packages/tokens/scripts/build.test.ts`               | Two tests assert those markers as literals, so a fork's suite is red once 33 is fixed                 | Proven        | Code, fixed           |
 | 35  | `tests/rename.test.ts`                                | The rename rewrites its own fixtures' inputs and not their expectations                               | Proven        | Code, fixed           |
+| 36  | `tests/adopting.test.ts`                              | Its grep target is a name spelled out, so a fork's checklist check passes or fails on how 1.4 read it | Proven        | Code and guide, fixed |
 
 ### 1. The rename misses a percent-encoded scope
 
@@ -461,6 +462,19 @@ Which assertions fail depends on what the fork called itself, which is the worst
 
 **Fixed.** Every fixture is written from the two `Identity` constants, so the rename either rewrites both sides of a case or neither, and the negative cases keep testing what they mean: a longer scope, a longer bin name and a longer repository name are built from the old identity too.
 
+### 36. The checklist's own test greps for a name a fork has to rewrite
+
+`tests/adopting.test.ts` greps for `Fossil` and holds step 1.4 to naming every file it finds. In a fork, two readings of 1.4 are both defensible and they end differently. Rewrite the literal along with the rest of the prose in `tests/`, which the step's own bullet asks for, and the check becomes "every file that names your system is named in your checklist": it passes, and it is the check a fork wants, because the fork's own docs site offers the fork as a template. Leave it, reasoning that the grep looks for the upstream's name, and the suite fails once 1.4 is done:
+
+```
+AssertionError: expected 1 to be greater than 20
+❯ tests/adopting.test.ts:55:30
+```
+
+The 1 is the test file itself, which still said Fossil in a comment. Nothing in the test or the guide said which reading was meant, and the probe took both. [ADR 0020](./decisions/0020-what-a-fork-renames.md) rule 1 again: a test may not assert a system name as a literal, and this one asserted it as a search.
+
+**Fixed.** The grep's target is a named constant whose comment says it is the name the step is written about and that a fork rewrites it with the prose, the assertion carries the same sentence as its failure message, and guide 1.4's "Comments and test fixtures" bullet names the file and what to do with that line.
+
 ## Fixed so far
 
 On this branch, with the issue's number and what it took:
@@ -470,6 +484,7 @@ On this branch, with the issue's number and what it took:
 | 4, 5, 6, 7, 9 | Guide 1.4 is a checklist of every file that still says Fossil, grouped by [ADR 0020](./decisions/0020-what-a-fork-renames.md)'s three kinds of name, and `tests/adopting.test.ts` holds it against the grep | `pending` |
 | 32            | The token validator's mode refusal names the format's modes rather than the system, and its test follows                                                                                                    | `pending` |
 | 33, 34, 35    | `pnpm rename` rewrites the foundations markers, the token build's test takes them from the build, and the rename's own fixtures come from the identities                                                    | `pending` |
+| 36            | The checklist's test names the system it greps for, says in its failure what a fork does with it, and guide 1.4 names the line                                                                              | `pending` |
 | 22            | "What you need" has the npm organisation created before the rename, because the rename is what spends the scope                                                                                             | `pending` |
 | 23, 24        | Guide 3A.3 publishes from a `main` with the rename merged, says what "no new packages" means there, and ends with `npm view` on each package and an install                                                 | `pending` |
 | 12            | "What you need" installs Chromium, and says which `pnpm test` fails without it                                                                                                                              | `pending` |
@@ -515,7 +530,7 @@ The block measured 7985 bytes against its 8192 budget here, against 7917 in the 
 
 Every issue above is resolved: in the guide, in the code, or as a decision recorded with its reasoning. That is not Phase 8's third exit criterion, which asks for a fresh fork that reaches a building, linting app and a Figma file with variables and the generated library from the guide alone. No run has followed the rewritten guide from a fresh copy, and the copy this run used is already past the steps that changed.
 
-The dry rename that found issues 33 to 35 establishes less than a run. It took a clone of the branch tip through 1.3 and a find-and-replace standing in for 1.4, and ended with `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm check:packages` all passing, and lint only after `pnpm format`, which is issue 9 behaving as the guide now says it will. What it cannot establish is anything the guide asks a person to read and decide, which is most of step 1.4, or anything outside the repository: npm, Pages, Figma.
+The dry rename that found issues 33 to 36 establishes less than a run. It took a clone of the branch tip through 1.3 and a find-and-replace standing in for 1.4, and ended with `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm check:packages` all passing, and lint only after `pnpm format`, which is issue 9 behaving as the guide now says it will. What it cannot establish is anything the guide asks a person to read and decide, which is most of step 1.4, or anything outside the repository: npm, Pages, Figma.
 
 Step 1.4 is where a second run would earn the most. Issues 4 to 7 are the point where this one needed a person's judgment rather than a command, and the checklist that replaced the list of seven is longer than what it replaced. `tests/adopting.test.ts` holds it to naming every file that still says Fossil; nothing can hold it to being followable. The other untested text is 3A.3's check, which has only ever been run against a published set that was already complete.
 
