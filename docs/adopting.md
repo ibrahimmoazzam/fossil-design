@@ -167,7 +167,9 @@ Follow one route: 3A to publish under your own npm scope, or 3B to keep your app
 - In **Settings › Actions › General**, allow GitHub Actions to create and approve pull requests. The release workflow opens a version pull request.
 - In **Settings › Rules › Rulesets**, add a ruleset for the default branch that blocks force pushes and deletions, requires a pull request, and requires the checks `Check on Node 22.14.0`, `Check on Node 24` and `Smoke-test the packed packages`.
 
-**3A.3 Publish the first versions by hand,** from an up-to-date `main`. npm's trusted publishing can't create a package, so each one needs a version on npm first:
+**3A.3 Publish the first versions by hand,** from a `main` that has your rename merged. That is step 1.5's pull request, and it is a precondition of this step rather than an aside: a `main` without it still carries Fossil's package names, at versions the registry already has, so `pnpm -r publish` answers "There are no new packages that should be published" and stops. That reads like success, and it is the lucky outcome: it did nothing only because those versions exist. A version the upstream system hasn't released yet, from a scope your account may write to, would have gone up under the upstream's name from your build.
+
+npm's trusted publishing can't create a package, so each package needs a version on npm first:
 
 ```sh
 npm login
@@ -176,6 +178,17 @@ pnpm -r publish --access public
 ```
 
 pnpm publishes in dependency order and replaces `workspace:` ranges with real versions. If npm asks for your two-factor code, run it again with `--otp <code>`; it skips what's already published. Each package keeps the version it had in Fossil; to start your own numbering, change `version` in each published `package.json` first.
+
+Then check what went up, because a partial publish is the likely failure and nothing reports it as one. Your scope's permission list names all four packages whether or not they published, so it looks right either way:
+
+```sh
+for p in tokens react eslint-config stylelint-config; do
+  npm view @acme-design/$p version
+done
+cd "$(mktemp -d)" && npm install @acme-design/react
+```
+
+Four versions, and an install that brings `tokens` in with `react`. The install is the check that matters: it resolves the dependency range the publish wrote. On this system's own fork test ([`fork-test.md`](./fork-test.md)) three of the four published, which left `react` declaring a dependency on a `tokens` that did not exist, and only `npm view` showed it. Publish a missing one on its own with `pnpm --filter <folder> publish --access public`.
 
 **3A.4 Let the release workflow publish from now on,** by trusting it for each published package:
 
