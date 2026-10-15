@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Space+Grotesk:wght@700&family=Space+Mono:wght@400&display=swap"
 />
 <style>
   /* Storybook's frame takes the same scrollbars as the pages: a transparent track. manager.ts
@@ -14,7 +14,7 @@
   }
 
   /* The repository chip under the site name. theme.ts sets its token values on the element. */
-  .fossil-repo-chip {
+  .site-repo-chip {
     display: inline-flex;
     align-items: center;
     gap: var(--chip-gap);
@@ -30,11 +30,11 @@
     white-space: nowrap;
   }
 
-  .fossil-repo-chip:hover {
+  .site-repo-chip:hover {
     border-color: var(--chip-border-hover);
   }
 
-  .fossil-repo-chip:focus-visible {
+  .site-repo-chip:focus-visible {
     outline: var(--chip-focus-width) solid var(--chip-focus);
     outline-offset: var(--chip-focus-offset);
   }

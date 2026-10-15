@@ -1,5 +1,6 @@
 import type { ReadPage, ReadVariable } from './runtime.ts';
 import { hash } from './scripts.ts';
+import { NS } from './brand.ts';
 
 /** Everything the read scripts returned, checked. */
 export interface Snapshot {
@@ -23,7 +24,7 @@ export class SnapshotError extends Error {
 const isPage = (value: unknown): value is ReadPage =>
   typeof value === 'object' &&
   value !== null &&
-  (value as { fossil?: unknown }).fossil === 'read';
+  (value as Record<string, unknown>)[NS] === 'read';
 
 /**
  * Joins the saved results of the read scripts, after checking each one's hash. A result cut off
@@ -45,7 +46,7 @@ export function readSnapshot(
       continue;
     }
     if (!isPage(value)) {
-      problems.push(`${name} isn't a Fossil read result.`);
+      problems.push(`${name} isn't a figma-sync read result.`);
       continue;
     }
     const { page, pages: count, whole, commit, collections, variables } = value;

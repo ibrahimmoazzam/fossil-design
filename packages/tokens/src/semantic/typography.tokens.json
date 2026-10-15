@@ -4,7 +4,7 @@
       "$type": "fontFamily",
       "heading": {
         "$value": "{base.font.family.space-grotesk}",
-        "$description": "Headings. An app can point this at its own face; the portfolio uses Roobert."
+        "$description": "Headings. An app can point this at its own face."
       },
       "body": {
         "$value": "{base.font.family.figtree}",
@@ -12,7 +12,7 @@
       },
       "mono": {
         "$value": "{base.font.family.space-mono}",
-        "$description": "Labels and code. An app can point this at its own face; the portfolio uses Roobert Mono."
+        "$description": "Labels and code. An app can point this at its own face."
       }
     },
     "weight": {

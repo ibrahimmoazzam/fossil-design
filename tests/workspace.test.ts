@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import config from '../fossil.config.json' with { type: 'json' };
+import config from '../brand.config.json' with { type: 'json' };
 import rootManifest from '../package.json' with { type: 'json' };
 import { patterns } from '../scripts/rename.ts';
 
@@ -29,7 +29,7 @@ const published = workspaces.filter(
   ({ manifest }) => manifest.private !== true,
 );
 
-describe('fossil.config.json', () => {
+describe('brand.config.json', () => {
   it('names the system, CSS prefix and npm scope', () => {
     expect(config.name).not.toBe('');
     expect(config.cssPrefix).toMatch(patterns.cssPrefix);

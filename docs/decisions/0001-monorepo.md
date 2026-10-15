@@ -24,7 +24,7 @@ Option 2, with pnpm workspaces.
 
 - Fossil is React only, so there is no implementation-neutral token repository to keep apart.
 - A token change and everything it affects land in one pull request, checked by one CI run.
-- GitHub's "Use this template" copies one repository. `fossil.config.json` renames the system in one place only if there is one place.
+- GitHub's "Use this template" copies one repository. `brand.config.json` renames the system in one place only if there is one place.
 
 Option 3 is rejected. Workspace symlinks would hide the bugs that a published package exposes: a wrong `exports` map, declarations that don't resolve for a consumer, build output that only runs under Fossil's own bundler config ([`PRD.md`](../PRD.md), section 2, "Distribution").
 
@@ -36,6 +36,6 @@ pnpm, rather than npm or Yarn workspaces, because:
 
 ## Consequences
 
-- Package names in `package.json` can't read `fossil.config.json`. A fork renames them by hand, and `tests/workspace.test.ts` fails with the exact names to change. _Superseded by [0019](./0019-renaming-a-fork.md): `pnpm rename` renames them._
+- Package names in `package.json` can't read `brand.config.json`. A fork renames them by hand, and `tests/workspace.test.ts` fails with the exact names to change. _Superseded by [0019](./0019-renaming-a-fork.md): `pnpm rename` renames them._
 - CI installs once and builds the packages in dependency order.
 - Dependabot can't read the lockfile format that pnpm 11 and later write ([dependabot-core#14919](https://github.com/dependabot/dependabot-core/issues/14919)), which constrains the choice of dependency-update bot.

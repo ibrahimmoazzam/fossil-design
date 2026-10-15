@@ -14,11 +14,11 @@ The config sets rules, not a parser. A TypeScript app already has one from `type
 
 ```js
 // eslint.config.js
-import fossil from '@fossil-design/eslint-config';
+import brand from '@fossil-design/eslint-config';
 import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
-export default defineConfig(tseslint.configs.recommended, fossil);
+export default defineConfig(tseslint.configs.recommended, brand);
 ```
 
 ## What it checks
@@ -37,9 +37,9 @@ return (
 
 ```js
 // eslint.config.js
-import { fossil } from '@fossil-design/eslint-config';
+import { brand } from '@fossil-design/eslint-config';
 
-export default [...fossil({ layoutElements: 'warn', deprecations: true })];
+export default [...brand({ layoutElements: 'warn', deprecations: true })];
 ```
 
 - **`layoutElements`**: `'error'` (the default) or `'warn'`, for an app still moving onto Fossil.

@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import config from '../../../brand.config.json' with { type: 'json' };
 import { Box, type IconComponent } from '../src/index.ts';
 import {
   ClaudeIcon,
@@ -95,7 +96,7 @@ function Label({
 }
 
 const description =
-  'The Fossil repo holds the tokens, as DTCG JSON, and the React components. Each release syncs and generates the Figma libraries, the foundations and the components, and builds the npm packages: the React components, the tokens, the lint configs, the docs, the AGENTS.md block and the Make guidelines. ' +
+  `The ${config.name} repo holds the tokens, as DTCG JSON, and the React components. Each release syncs and generates the Figma libraries, the foundations and the components, and builds the npm packages: the React components, the tokens, the lint configs, the docs, the AGENTS.md block and the Make guidelines. ` +
   'Each feature is designed in Figma from the libraries, or in Figma Make from a Make kit built from the npm packages, then built by a coding agent such as Claude Code, Cursor, Codex or GitHub Copilot, which reads the design through the Figma MCP server and builds with the packages and their docs, and shipped in a pull request on GitHub that the lint configs and type check guard. ' +
   'Two contribution loops come back to the repo: a designer’s value-only edits in the Figma libraries return as a pull request, and the gaps a build finds, with escapes repeated in review, become new components and patterns.';
 
@@ -112,7 +113,7 @@ export function LifecycleDiagram() {
     <Box
       as="figure"
       tabIndex={0}
-      data-fossil-wide=""
+      data-site-wide=""
       aria-label="Design-to-code lifecycle. Scrolls sideways on a narrow screen."
       className={styles.figure}
     >
@@ -172,7 +173,7 @@ export function LifecycleDiagram() {
           rx={16}
         />
         <text className={styles.groupTitle} x={384} y={56}>
-          Fossil repo
+          {config.name} repo
         </text>
         <Node
           x={384}

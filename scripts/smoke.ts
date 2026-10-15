@@ -1,4 +1,4 @@
-// Installs Fossil's packed tarballs into apps outside the workspace, with npm, as a consumer
+// Installs the packed tarballs into apps outside the workspace, with npm, as a consumer
 // would, then type-checks each app, lints it with the shared configs, builds it and checks what
 // it renders. A workspace symlink would hide broken exports, declarations and directives.
 // Then it runs the AGENTS.md bin, as an app would, and checks every installed path the block
@@ -18,14 +18,14 @@ import {
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import config from '../fossil.config.json' with { type: 'json' };
+import config from '../brand.config.json' with { type: 'json' };
 import { pnpm, run } from './run.ts';
 
 const root = new URL('../', import.meta.url);
 const packages = ['tokens', 'react', 'stylelint-config', 'eslint-config'];
 const apps =
   process.argv.slice(2).length > 0 ? process.argv.slice(2) : ['next', 'vite'];
-const work = mkdtempSync(join(tmpdir(), 'fossil-smoke-'));
+const work = mkdtempSync(join(tmpdir(), `${config.cssPrefix}-smoke-`));
 const env = { ...process.env, NEXT_TELEMETRY_DISABLED: '1' };
 // Class names carry the CSS prefix, as vite.config.ts names them.
 const boxClass = `${config.cssPrefix}-box-`;
@@ -49,7 +49,7 @@ async function check(app: string, dir: string) {
     expectIncludes(
       'The prerendered page',
       html,
-      'Fossil smoke test',
+      'Smoke test',
       boxClass,
       '<dialog',
     );
@@ -73,7 +73,7 @@ async function check(app: string, dir: string) {
       expectIncludes(
         'The server render',
         html,
-        'Fossil smoke test',
+        'Smoke test',
         boxClass,
         '<dialog',
       );
@@ -187,7 +187,7 @@ function expectRules(where: string, actual: string[], expected: string[]) {
   }
 }
 
-/** The fixture breaks four rules; each must fail lint in a consumer, as it does in Fossil. */
+/** The fixture breaks four rules; each must fail lint in a consumer, as it does here. */
 function checkOffSystem(app: string, dir: string) {
   const source = join(dir, app === 'next' ? 'app' : 'src');
   cpSync(new URL('smoke/off-system/', root), source, { recursive: true });
@@ -245,6 +245,5 @@ try {
     process.stdout.write(`${app}: lint rejects an off-system component\n`);
   }
 } finally {
-  if (!process.env.FOSSIL_KEEP_SMOKE)
-    rmSync(work, { recursive: true, force: true });
+  if (!process.env.KEEP_SMOKE) rmSync(work, { recursive: true, force: true });
 }

@@ -1,13 +1,14 @@
 // Packs every published package as npm would receive it, then checks the tarball with
 // publint and attw, so "a consumer can resolve these types" is a check rather than a hope.
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import brand from '../brand.config.json' with { type: 'json' };
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pnpm } from './run.ts';
 
 const root = new URL('../', import.meta.url);
 const packagesDir = new URL('packages/', root);
-const destination = mkdtempSync(join(tmpdir(), 'fossil-pack-'));
+const destination = mkdtempSync(join(tmpdir(), `${brand.cssPrefix}-pack-`));
 
 const published = readdirSync(packagesDir, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())

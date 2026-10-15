@@ -1,5 +1,5 @@
 // Renames a fork: the system name, CSS prefix, npm scope and GitHub repository. Changing
-// fossil.config.json alone isn't enough, because package names, imports, stylesheets and
+// brand.config.json alone isn't enough, because package names, imports, stylesheets and
 // repository URLs spell the old values out. Fossil's history (docs/ and changelogs) stays as written.
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -26,7 +26,7 @@ export const keep = [
   ':!docs/**',
   ':!**/CHANGELOG.md',
   ':!pnpm-lock.yaml',
-  ':!fossil.config.json',
+  ':!brand.config.json',
 ];
 
 const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -68,6 +68,15 @@ export function rewrites(from: Identity, to: Identity): Rewrite[] {
         '(?![\\w-])',
       ),
     );
+    // A shields.io badge takes its label percent-encoded, so the scope reads %40fossil-design.
+    list.push(
+      rewrite(
+        `%40${from.npmScope.slice(1)}`,
+        `%40${to.npmScope.slice(1)}`,
+        '(?<![\\w.~-])',
+        '(?![\\w.~-])',
+      ),
+    );
   }
   if (from.cssPrefix !== to.cssPrefix) {
     list.push(
@@ -77,6 +86,16 @@ export function rewrites(from: Identity, to: Identity): Rewrite[] {
       rewrite(
         `${from.cssPrefix}-agents-md`,
         `${to.cssPrefix}-agents-md`,
+        '(?<![\\w-])',
+        '(?![\\w-])',
+      ),
+    );
+    // The token build names AGENTS.md's foundations markers after the prefix, and refuses a file
+    // whose markers it can't find, so a fork that kept Fossil's would fail its first build.
+    list.push(
+      rewrite(
+        `${from.cssPrefix}:foundations`,
+        `${to.cssPrefix}:foundations`,
         '(?<![\\w-])',
         '(?![\\w-])',
       ),
@@ -92,6 +111,9 @@ export function rename(text: string, list: readonly Rewrite[]): string {
     text,
   );
 }
+
+/** The workspace root's package name: the repository's own name, which a fork's is. */
+export const rootName = (repo: string) => repo.split('/')[1] ?? repo;
 
 /** The `owner/name` of a GitHub repository URL, as package.json records it. */
 export function repoOf(url: string): string {
@@ -115,7 +137,7 @@ function main() {
     },
   });
 
-  const configFile = new URL('fossil.config.json', root);
+  const configFile = new URL('brand.config.json', root);
   const config = JSON.parse(readFileSync(configFile, 'utf8')) as Omit<
     Identity,
     'repo'
@@ -190,8 +212,23 @@ function main() {
   };
   writeFileSync(configFile, `${JSON.stringify(nextConfig, null, 2)}\n`);
 
+  // The workspace root is private and unpublished, so nothing reads its name, but it is the
+  // name at the top of a fork's own manifest.
+  if (from.repo !== to.repo) {
+    const manifestFile = new URL('package.json', root);
+    const text = readFileSync(manifestFile, 'utf8');
+    const renamed = text.replace(
+      /("name":\s*)"[^"]*"/,
+      `$1${JSON.stringify(rootName(to.repo))}`,
+    );
+    if (renamed !== text) {
+      writeFileSync(manifestFile, renamed);
+      changed.push('package.json');
+    }
+  }
+
   console.log(
-    `fossil.config.json: ${to.name}, --${to.cssPrefix}-*, ${to.npmScope}`,
+    `brand.config.json: ${to.name}, --${to.cssPrefix}-*, ${to.npmScope}`,
   );
   for (const [key, label] of [
     ['npmScope', 'npm scope'],
@@ -212,7 +249,7 @@ function main() {
       '--ignore-unknown',
       '--log-level',
       'warn',
-      'fossil.config.json',
+      'brand.config.json',
       ...changed,
     ],
     root,

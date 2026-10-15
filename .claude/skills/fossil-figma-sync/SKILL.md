@@ -27,11 +27,21 @@ Fossil's Figma library is two files, each published as a library (ADR 0018):
 2. `pnpm install --frozen-lockfile && pnpm build`. The sync reads `packages/tokens/dist/tokens.json`.
 3. Get the URL of the file the step runs on from the user: the foundations file for the sync and the styles script, the components file for building and checking components. Its key is the part after `/design/`.
 
+## Moving the stamps after a rename
+
+The sync stamps every variable, style, page and icon with the brand's namespace, from `brand.config.json`'s CSS prefix. A file built under another one — a fork whose library was built before the rename, or before the stamp followed the brand — has to move its stamps before anything else, in the foundations file:
+
+1. Run `pnpm figma:restamp <old namespace>`, with the prefix the system had then, and send `.figma/restamp.js` to `use_figma`.
+2. Read the result: `before` is what it found, `moved` counts each kind and key, and `remaining` must be `0`. `instances` are instances of library components, whose stamps belong to the file they come from. Anything in `problems` is a stamp that differs under both namespaces; it names what to clear in Figma, and the migration can be run again.
+3. Then apply. It will report every variable as unchanged, because the library it now owns is the one that was already there.
+
+Run it once, before the first apply under the new name. An apply that goes first finds no collection of its own, builds a second `Primitives` and `Semantic` beside the originals, duplicates every variable, and reports nothing wrong — the components stay bound to the old variables while the sync believes the new ones are the library.
+
 ## Apply: code to Figma
 
 In the foundations file.
 
-1. Run `pnpm figma:apply`. It refuses if the token source has uncommitted changes, because it stamps the current commit on Figma as the base for the next diff. It writes `packages/figma-sync/.figma/apply-1.js` up to `apply-N.js`.
+1. If the file was stamped under another namespace, move the stamps first, as above. Then run `pnpm figma:apply-scripts`. It writes `packages/figma-sync/.figma/apply-1.js` up to `apply-N.js` and nothing else — no `figma:*` command touches Figma, so a refusal here is never a sign that something was about to be written. It needs `pnpm build` first, because it reads `packages/tokens/dist/tokens.json`, and it refuses an uncommitted token source, because it stamps the current commit on Figma as the base for the next diff.
 2. Send each script to `use_figma`, in order, waiting for each result:
    - every script but the last returns the variables it `created`, `renamed` and `updated`;
    - the last returns `commit`, `missing`, `orphans` and `unstamped`, and stamps the commit only when nothing is missing.
@@ -88,7 +98,7 @@ Load Figma's `figma-generate-library` skill as well as `figma-use`, and name bot
    - `library-spec.json`, the same spec as data;
    - `styles.js`, the script for the text styles, effect styles and the icon glyph components.
 2. **In the foundations file,** applied from `main` (see Apply above), send `styles.js` to `use_figma`, exactly as it is. It checks fonts and variables before it writes anything, puts the icons on the Icons page, and a second run changes nothing. Its result's `keys` gives the key of every text style, effect style and icon, by name; keep them for step 4.
-3. **The user** publishes the foundations file, then turns it on as a library in the components file, from the Assets panel. The Plugin API can't turn a library on.
+3. **The user** publishes the foundations file, then turns it on in the components file: **Libraries** — the book icon at the top of the **Assets** panel, or the main menu — then their team under **Teams**, then the foundations library. The Plugin API can't turn a library on, and the Assets panel on its own doesn't either: it opens Libraries, and the switch is inside. Confirm it before building, with a read in the components file: `figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync()` lists the foundations collections once the library is on, and returns nothing until then.
 4. **In the components file,** build each component the sheet lists, nested components first (`Icon` before `Button`, `Figure` before `Clip`), with your own `use_figma` code:
    - Put it in a section named after it, on a page named `Components`. A component with variants is a component set with the default variant at the top left.
    - Name every layer the sheet lists exactly as written: it is the CSS class, or the state selector, it stands for, such as `tab[aria-selected='true']`.

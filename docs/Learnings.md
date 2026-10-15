@@ -230,7 +230,7 @@ The split tracks two things. Tokens that feed several component libraries get a 
 Fossil sits on the monorepo side for three reasons, and the last is decisive:
 - **React only.** No implementation-neutral token repo is needed.
 - **One token build feeds everything.** The CSS, the lint lists, `Box`'s generated CSS and the Figma sync all read it, so a token rename is one reviewed, CI-checked pull request instead of several released in order.
-- **Adoption is by template.** GitHub's "Use this template" copies one repository, and `fossil.config.json` renames the system in one place only if there is one place. A split Fossil would hand a team five repositories to copy and re-link.
+- **Adoption is by template.** GitHub's "Use this template" copies one repository, and `brand.config.json` renames the system in one place only if there is one place. A split Fossil would hand a team five repositories to copy and re-link.
 
 The portfolio stays out on purpose (section 6, "Site location"). Atlassian's monorepo includes its products; Fossil's one consumer installs from npm like anyone else's.
 
@@ -648,7 +648,7 @@ Building the bundled docs settled these, each checked against the installed vers
 
 Before writing the adoption guide, a copy of the repository was renamed to Acme Design (`acme`, `@acme-design`, `acme/acme-design`) on 8 October 2026 and taken through each step that runs outside Figma and npm ([ADR 0019](decisions/0019-renaming-a-fork.md)):
 
-- **`fossil.config.json` alone renames little.** The token build, the class names and the generated docs read it. Package names, imports, every component stylesheet's `var(--fossil-…)`, the lint configs' imports, the smoke-test apps and the repository URLs spell the values out: 79 files in all.
+- **`brand.config.json` alone renames little.** The token build, the class names and the generated docs read it. Package names, imports, every component stylesheet's `var(--fossil-…)`, the lint configs' imports, the smoke-test apps and the repository URLs spell the values out: 79 files in all.
 - **Three replacements and a reinstall nearly suffice.** Replacing the scope, the custom property prefix and the bin's name, then running `pnpm install` and Prettier, gave a copy that built and linted. 15 tests failed, because they set the prefix `fossil` themselves or expected the `AGENTS.md` markers under Fossil's scope. With those reading the config, the copy renamed by `pnpm rename` passed `pnpm build`, `pnpm lint`, `pnpm typecheck`, all 383 tests, `pnpm check:packages` and `pnpm smoke`, and a build afterwards changed no committed file.
 - **An app on React 18 in `apps/` fails to type-check.** Inside the workspace, the components' declarations take `react`'s types from the package's own `@types/react` 19, through the workspace link, and React 18's `ReactNode` rejects what they return. The same app installing the packed tarballs type-checks, as the smoke test shows. On React 19, an app in `apps/` built, linted and type-checked with the packages, and its `acme-agents-md` wrote the block and passed `--check`.
 - **Stylelint lints each file with the nearest config.** Under an app with its own `stylelint.config.js`, the root config's `ignoreFiles` doesn't apply, so the root `pnpm lint` linted the app's built CSS. A `.stylelintignore` in the working directory applies to every file.

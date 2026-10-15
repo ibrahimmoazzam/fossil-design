@@ -1,14 +1,16 @@
 import comments from '@eslint-community/eslint-plugin-eslint-comments';
 import type { Linter } from 'eslint';
+import { prefix } from './generated/brand.js';
 
-export interface FossilOptions {
+export interface BrandOptions {
   /**
    * How a raw layout element such as `<div>` is reported. Defaults to `'error'`; `'warn'`
-   * suits an app still moving onto Fossil.
+   * suits an app still moving onto the design system.
    */
   layoutElements?: 'error' | 'warn';
   /**
-   * Adds `@typescript-eslint/no-deprecated`, which flags deprecated Fossil components and
+   * Adds `@typescript-eslint/no-deprecated`, which flags the design system's deprecated
+   * components and
    * props. It needs typescript-eslint's plugin and type information, so register both first,
    * for example with `tseslint.configs.recommendedTypeChecked`.
    */
@@ -41,7 +43,7 @@ export const layoutElements = [
 
 /**
  * `no-restricted-syntax` entries that ban each raw layout element. A config that sets its own
- * `no-restricted-syntax` replaces Fossil's, so spread these into it to keep both.
+ * `no-restricted-syntax` replaces this one's, so spread these into it to keep both.
  */
 export const layoutElementRestrictions = layoutElements.map((element) => ({
   selector: `JSXOpeningElement[name.type='JSXIdentifier'][name.name='${element}']`,
@@ -49,17 +51,17 @@ export const layoutElementRestrictions = layoutElements.map((element) => ({
 }));
 
 /**
- * Fossil Design's ESLint config: layout goes through `Box`, and every disable comment says
- * why. Spread it after your own configs.
+ * The design system's ESLint config: layout goes through `Box`, and every disable comment
+ * says why. Spread it after your own configs.
  */
-export function fossil({
+export function brand({
   layoutElements: severity = 'error',
   deprecations = false,
   files = ['**/*.jsx', '**/*.tsx'],
-}: FossilOptions = {}): Linter.Config[] {
+}: BrandOptions = {}): Linter.Config[] {
   const configs: Linter.Config[] = [
     {
-      name: 'fossil/disables',
+      name: `${prefix}/disables`,
       files: ['**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx}'],
       linterOptions: { reportUnusedDisableDirectives: 'error' },
       plugins: {
@@ -81,7 +83,7 @@ export function fossil({
       },
     },
     {
-      name: 'fossil/layout',
+      name: `${prefix}/layout`,
       files,
       rules: {
         'no-restricted-syntax': [severity, ...layoutElementRestrictions],
@@ -90,7 +92,7 @@ export function fossil({
   ];
   if (deprecations) {
     configs.push({
-      name: 'fossil/deprecations',
+      name: `${prefix}/deprecations`,
       files: ['**/*.{ts,tsx,mts,cts}'],
       rules: { '@typescript-eslint/no-deprecated': 'error' },
     });
@@ -98,6 +100,6 @@ export function fossil({
   return configs;
 }
 
-const config: Linter.Config[] = fossil();
+const config: Linter.Config[] = brand();
 
 export default config;

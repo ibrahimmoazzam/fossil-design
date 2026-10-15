@@ -526,9 +526,7 @@ export function validate(files: TokenFile[]): Result {
       else
         for (const [mode, v] of Object.entries(modes)) {
           if (!(MODES as readonly string[]).includes(mode))
-            report(
-              `Unknown mode "${mode}"; Fossil's modes are ${MODES.join(', ')}`,
-            );
+            report(`Unknown mode "${mode}"; the modes are ${MODES.join(', ')}`);
           else if (!isAlias(type, v))
             report(
               `The ${mode} value is a reference to another token, not a literal value`,

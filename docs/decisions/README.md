@@ -25,3 +25,4 @@ For the reasoning behind the decisions that carry the most weight, and what each
 | [0017](./0017-agents-md-block-and-make-guidelines.md) | The AGENTS.md block and the Make guidelines               | Accepted                            |
 | [0018](./0018-figma-foundations-and-components.md)    | Two Figma libraries: foundations and components           | Accepted                            |
 | [0019](./0019-renaming-a-fork.md)                     | Renaming a fork                                           | Accepted                            |
+| [0020](./0020-what-a-fork-renames.md)                 | What a fork renames, and what keeps Fossil's name         | Accepted                            |

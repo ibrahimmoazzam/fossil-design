@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import config from '../../../brand.config.json' with { type: 'json' };
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { format } from 'prettier';
@@ -18,6 +19,7 @@ import { CHANGED, script } from './scripts.ts';
 import { readSnapshot } from './snapshot.ts';
 import { applySpecs, scopesOf, variableSpecs } from './spec.ts';
 import { applyEdits } from './write.ts';
+import { NS } from './brand.ts';
 
 // A frozen copy of the reference token source, so a value changed in Figma or by a fork doesn't
 // break these tests. The live source has its own tests below.
@@ -78,7 +80,7 @@ const readAll = async (figma: FakeFigma) => {
   const pages: { name: string; text: string }[] = [];
   for (let page = 1, count = 1; page <= count; page++) {
     const result = (await run(
-      script({ kind: 'read', page, pageSize: 40 }, 'test'),
+      script({ kind: 'read', ns: NS, page, pageSize: 40 }, 'test'),
       figma,
     )) as ReadPage;
     count = result.pages;
@@ -252,7 +254,7 @@ describe('applying to a fresh file', () => {
       ['Semantic', ['Light', 'Dark']],
     ]);
     for (const c of figma.collections)
-      expect(c.getSharedPluginData('fossil', 'commit')).toBe(COMMIT);
+      expect(c.getSharedPluginData(NS, 'commit')).toBe(COMMIT);
     expect(first.at(-1)).toMatchObject({
       commit: COMMIT,
       missing: [],
@@ -435,7 +437,7 @@ describe('applying safely', () => {
   it('refuses two variables stamped with the same path', async () => {
     const figma = new FakeFigma();
     await applyAll(figma);
-    figma.variable('space.l').setSharedPluginData('fossil', 'path', 'space.m');
+    figma.variable('space.l').setSharedPluginData(NS, 'path', 'space.m');
     await expect(applyAll(figma)).rejects.toThrow(
       'More than one variable is stamped with space.m',
     );
@@ -633,11 +635,11 @@ describe('the three-way diff', () => {
       set(f, 'base.easing.ease', 'Value', { type: 'EASE_IN' });
     });
     expect(report.refused).toEqual([
-      "base.easing.ease (Value) uses Figma's EASE_IN easing. Fossil's easing tokens are cubic Béziers, and Figma doesn't document the curve behind a preset: set a custom curve in Figma instead.",
+      `base.easing.ease (Value) uses Figma's EASE_IN easing. ${config.name}'s easing tokens are cubic Béziers, and Figma doesn't document the curve behind a preset: set a custom curve in Figma instead.`,
     ]);
   });
 
-  it('refuses an alias to a variable that isn’t Fossil’s', async () => {
+  it('refuses an alias to a variable that isn’t the system’s', async () => {
     const report = await roundTrip((f) => {
       const mine = f.variables.createVariableCollection('Mine');
       const brand = f.variables.createVariable('brand', mine, 'COLOR');
@@ -647,7 +649,7 @@ describe('the three-way diff', () => {
       });
     });
     expect(report.refused).toEqual([
-      "color.accent.default (Light) aliases brand, which isn't one of Fossil's variables. Pick a Fossil variable for it in Figma.",
+      `color.accent.default (Light) aliases brand, which isn't one of ${config.name}'s variables. Pick a ${config.name} variable for it in Figma.`,
     ]);
   });
 });

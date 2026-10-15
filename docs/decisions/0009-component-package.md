@@ -61,7 +61,7 @@ This record covers what the PRD left open when the foundation was built: `Box`, 
 
 - `vite build` in library mode, with `preserveModules` rooted at `src`. React and React DOM stay external, as peers at `^18.3 || ^19`.
 - `src/index.ts` imports `@fossil-design/tokens/tokens.css` first, so `dist/style.css` opens with the tokens and needs nothing else.
-- Class names are `<cssPrefix>-[local]-[hash]`, with the prefix from `fossil.config.json`.
+- Class names are `<cssPrefix>-[local]-[hash]`, with the prefix from `brand.config.json`.
 - Output is not minified. Consumers minify anyway, and skipping Lightning CSS keeps it from adding `--lightningcss-*` variables.
 - A small plugin emits `style.css.d.ts`. TypeScript 6 checks side-effect imports, so `import '@fossil-design/react/style.css'` needs it.
 - `exports` lists `.` and `./style.css`, each with types.

@@ -14,7 +14,7 @@ const meta = {
     content: (
       <>
         <Text as="span" variant="caption">
-          Fossil Design is open source.
+          This design system is open source.
         </Text>
         <Link href="#source">Read the source</Link>
       </>

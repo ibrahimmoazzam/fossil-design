@@ -10,7 +10,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import config from '../../../fossil.config.json' with { type: 'json' };
+import config from '../../../brand.config.json' with { type: 'json' };
 import type { LintLists, TokensFile } from '../src/metadata.ts';
 import {
   build,
@@ -37,7 +37,7 @@ afterAll(() => {
   for (const dir of temporary) rmSync(dir, { recursive: true, force: true });
 });
 const tempDir = () => {
-  const dir = mkdtempSync(join(tmpdir(), 'fossil-build-'));
+  const dir = mkdtempSync(join(tmpdir(), 'tokens-build-'));
   temporary.push(dir);
   return dir;
 };
@@ -306,7 +306,7 @@ describe('building the token source', () => {
   });
 
   it('writes the foundations into AGENTS.md', () => {
-    expect(agents).toMatch(/^# Agents\n\n<!-- fossil:foundations:start -->/);
+    expect(agents.startsWith(`# Agents\n\n${BLOCK_START}`)).toBe(true);
     expect(agents).toContain('For padding and `gap`. Never margin.');
     expect(agents).toContain('| `space.m` | `--fossil-space-m` | 16px |');
     expect(agents).toContain(
@@ -641,10 +641,8 @@ describe('the AGENTS.md block', () => {
       agents: file,
     });
     const agents = readFileSync(file, 'utf8');
-    expect(agents).toMatch(/^# Agents\n\n<!-- fossil:foundations:start -->/);
-    expect(agents).toMatch(
-      /<!-- fossil:foundations:end -->\n\n## Boundaries\n$/,
-    );
+    expect(agents.startsWith(`# Agents\n\n${BLOCK_START}`)).toBe(true);
+    expect(agents.endsWith(`${BLOCK_END}\n\n## Boundaries\n`)).toBe(true);
     expect(agents).not.toContain('Stale.');
   });
 

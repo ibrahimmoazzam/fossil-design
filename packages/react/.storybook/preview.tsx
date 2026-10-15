@@ -3,7 +3,7 @@ import '@fossil-design/tokens/tokens.css';
 import { GLOBALS_UPDATED, SET_GLOBALS } from 'storybook/internal/core-events';
 import { addons } from 'storybook/preview-api';
 import { docsComponents } from '../docs-site/headings.tsx';
-import { FossilDocsContainer } from './DocsContainer.tsx';
+import { SiteDocsContainer } from './DocsContainer.tsx';
 
 const themes = ['system', 'light', 'dark'] as const;
 
@@ -28,7 +28,7 @@ const preview: Preview = {
   parameters: {
     a11y: { test: 'error' },
     docs: {
-      container: FossilDocsContainer,
+      container: SiteDocsContainer,
       components: docsComponents,
       toc: { headingSelector: 'h2' },
     },

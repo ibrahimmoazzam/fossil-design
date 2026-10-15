@@ -42,7 +42,7 @@ Checked in October 2026:
 
 ## Decision
 
-`pnpm --filter react docs` runs last in the package's build and writes `docs/`, which ships in the tarball and isn't committed:
+`pnpm --filter react run docs` runs last in the package's build and writes `docs/`, which ships in the tarball and isn't committed:
 
 | File                       | Holds                                                                                                                                         |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -56,7 +56,7 @@ Markdown carries instructions and JSON carries the API, following Indeed's bench
 
 The script writes nothing, and lists every problem, if a component lacks part of its contract, a prop lacks a description, or a component has no example. An example is a story tagged `example`, with a JSDoc comment saying why an app would do it. Its code is its own render, which may take no args, or else the component with the story's args, minus spies; a required prop left out fails. Every name it uses must come from `@fossil-design/react` or React, or be a module-level constant with a JSDoc comment, which the docs list as a value the app supplies, such as `image`: "The URL of your image." The generator writes the imports.
 
-`docs-src/rules.md` is the one hand-written source. Its placeholders come from `fossil.config.json` and the package's `bugs` URL, so a fork's docs name its own system and link its own gap form.
+`docs-src/rules.md` is the one hand-written source. Its placeholders come from `brand.config.json` and the package's `bugs` URL, so a fork's docs name its own system and link its own gap form.
 
 For Fossil's own development, Storybook runs `@storybook/addon-mcp` with `componentsManifest` on and `react-docgen-typescript`. `.mcp.json` registers its endpoint, `http://localhost:6006/mcp`, for Claude Code.
 

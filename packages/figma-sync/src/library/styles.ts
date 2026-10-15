@@ -8,6 +8,7 @@ import type {
   StylesSpec,
   TextStyleSpec,
 } from './runtime.ts';
+import { NS } from '../brand.ts';
 
 /** The foundations file's page for the icon glyphs. */
 export const ICONS_PAGE = 'Icons';
@@ -132,6 +133,7 @@ export function stylesSpec(
   return {
     spec: {
       kind: 'styles',
+      ns: NS,
       page: ICONS_PAGE,
       iconColor: ICON_COLOR,
       textStyles,

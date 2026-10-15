@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import * as fossil from '../src/index.ts';
+import * as system from '../src/index.ts';
 import {
   agentsBlock,
   blockMarkers,
@@ -14,7 +14,6 @@ import {
   readContract,
   readExamples,
   readStories,
-  unloadedFonts,
   type ComponentDocs,
   type Inputs,
   type Prop,
@@ -295,22 +294,12 @@ describe('the AGENTS.md block', () => {
   });
 });
 
-describe('the Make setup', () => {
-  it('names the fonts it never loads, as written or in a URL', () => {
-    const setup =
-      'family=Space+Grotesk:wght@700 and Figtree, from Google Fonts';
-    expect(
-      unloadedFonts(setup, ['Space Grotesk', 'Figtree', 'Space Mono']),
-    ).toEqual(['Space Mono']);
-  });
-});
-
 describe("the package's docs", () => {
   // It builds a TypeScript program for every component: up to 5s on a CI runner.
   it('cover every component, with nothing missing', () => {
     const inputs: Inputs = {
       root: fileURLToPath(new URL('..', import.meta.url)),
-      exports: fossil,
+      exports: system,
       packageName: '@fossil-design/react',
     };
     const { components, problems } = collect(inputs);

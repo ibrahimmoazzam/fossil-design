@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Space+Grotesk:wght@700&family=Space+Mono:wght@400&display=swap"
 />
 <style>
   /* Scrollbars across the site: the thumb in border.strong on a transparent track. The colour
@@ -93,11 +93,11 @@
 
   /* A page that marks its figure wide gives it the whole docs column: no table of contents
      beside it, and room past the reading width, up to a cap. */
-  .sbdocs-wrapper:has([data-fossil-wide]) .sbdocs-toc--custom {
+  .sbdocs-wrapper:has([data-site-wide]) .sbdocs-toc--custom {
     display: none;
   }
 
-  .sbdocs-wrapper:has([data-fossil-wide]) .sbdocs-content {
+  .sbdocs-wrapper:has([data-site-wide]) .sbdocs-content {
     max-width: 1400px;
   }
 

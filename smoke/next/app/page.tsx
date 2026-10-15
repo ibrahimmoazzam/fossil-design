@@ -12,7 +12,7 @@ import {
 } from '@fossil-design/react';
 import { DetailsModal } from './DetailsModal';
 
-/** A Server Component: Fossil's server-safe components render here, and its client ones hydrate. */
+/** A Server Component: the server-safe components render here, and the client ones hydrate. */
 export default function Page() {
   return (
     <>
@@ -25,7 +25,7 @@ export default function Page() {
       >
         <Stack gap="l">
           <Text as="h1" variant="heading-xl">
-            Fossil smoke test
+            Smoke test
           </Text>
           <Card title="Server rendered" titleAs="h2">
             Box, Stack, Text and Card render on the server.

@@ -223,7 +223,7 @@ Two tiers only work if they stay apart, so the boundary is enforced:
 
 Reading in a team's existing Figma tokens was cut for a related reason: an arbitrary token taxonomy doesn't map onto Fossil's semantic layer. Supporting it would be a separate product.
 
-The repository is shaped for copying. It is one monorepo, so the template copies one repository rather than five that would have to be linked up again. `fossil.config.json` holds the system name, CSS prefix and npm scope, and the class names, docs, `AGENTS.md` block and Make guidelines all follow it. Multi-brand theming is a non-goal for the same reason: a fork is how a second brand happens.
+The repository is shaped for copying. It is one monorepo, so the template copies one repository rather than five that would have to be linked up again. `brand.config.json` holds the system name, CSS prefix and npm scope, and the class names, docs, `AGENTS.md` block and Make guidelines all follow it. Multi-brand theming is a non-goal for the same reason: a fork is how a second brand happens.
 
 **What it costs.** Every team carries its own copy of the code. A fork can pull Fossil's later fixes, at the cost of merging them, while a copy made from the template starts a fresh history and can't. Package names, imports and stylesheets spell out the scope and prefix, so `pnpm rename` rewrites them, rather than the config file alone ([ADR 0019](./decisions/0019-renaming-a-fork.md)). Smaller adjustments don't need a copy: an app can point a semantic font family at its own faces, as the portfolio does to keep its commercial font, and keep tokens of its own in a site-tokens file.
 

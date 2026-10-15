@@ -1,3 +1,4 @@
+import config from '../../../../brand.config.json' with { type: 'json' };
 import type { Element } from './code.ts';
 
 export type PropertyType = 'TEXT' | 'BOOLEAN' | 'INSTANCE_SWAP' | 'SLOT';
@@ -42,9 +43,8 @@ export interface LibraryComponent {
 
 /** Components that render nothing visible, and Box and Stack, which auto layout already covers. */
 export const LEFT_OUT: Readonly<Record<string, string>> = {
-  Box: "Figma's auto layout does its job: a frame bound to Fossil's variables maps onto Box props.",
-  Stack:
-    "Figma's auto layout does its job: a frame bound to Fossil's variables maps onto Stack props.",
+  Box: `Figma's auto layout does its job: a frame bound to ${config.name}'s variables maps onto Box props.`,
+  Stack: `Figma's auto layout does its job: a frame bound to ${config.name}'s variables maps onto Stack props.`,
   VisuallyHidden:
     'It renders nothing visible, so an instance would be an invisible layer.',
 };
@@ -105,8 +105,7 @@ export const COMPONENTS: Readonly<Record<string, LibraryComponent>> = {
     // Without a size, an icon is 1em: s, at 18px, is the nearest beside 16px text.
     defaults: { size: 's' },
     properties: { icon: 'INSTANCE_SWAP' },
-    description:
-      "An icon: one of Fossil's, or the app's own. Decorative unless it has a label.",
+    description: `An icon: one of ${config.name}'s, or the app's own. Decorative unless it has a label.`,
   },
   Link: {
     drawn: {

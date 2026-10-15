@@ -30,7 +30,7 @@ The dry run had already found four gaps in Style Dictionary 5.5.5: durations pri
 
 **One run, checked before writing.** The build validates the source first. It then runs Style Dictionary once, with one platform and `log.warnings: 'error'`, and renders every output in memory with `formatPlatform`. Only when every output passes does it clear `dist/` and `src/generated/` and write. A failure writes nothing.
 
-**Style Dictionary names and converts; the source supplies the structure.** Style Dictionary names every custom property with `name/kebab` and the prefix from `fossil.config.json`, including the parts of each text style, which its `expand` splits. It converts literal values with its own transforms and two of Fossil's: DTCG durations (`150ms`) and font weight names (`600`). Fossil's formats match each Style Dictionary token to the validated source token it came from. References, dark values and lifecycle fields come from that source, not from `token.original`, which `expand` has already resolved.
+**Style Dictionary names and converts; the source supplies the structure.** Style Dictionary names every custom property with `name/kebab` and the prefix from `brand.config.json`, including the parts of each text style, which its `expand` splits. It converts literal values with its own transforms and two of Fossil's: DTCG durations (`150ms`) and font weight names (`600`). Fossil's formats match each Style Dictionary token to the validated source token it came from. References, dark values and lifecycle fields come from that source, not from `token.original`, which `expand` has already resolved.
 
 **`tokens.css`.**
 

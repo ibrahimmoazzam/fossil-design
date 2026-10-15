@@ -1,7 +1,7 @@
 import { ESLint, type Linter } from 'eslint';
 import tseslint from 'typescript-eslint';
 import { describe, expect, it } from 'vitest';
-import config, { fossil, layoutElements } from '../src/index.ts';
+import config, { brand, layoutElements } from '../src/index.ts';
 
 async function lint(
   code: string,
@@ -48,7 +48,7 @@ describe('layout through Box', () => {
 
   it('warns instead when asked', async () => {
     const [message] = await lint('export const A = () => <div />;', {
-      config: fossil({ layoutElements: 'warn' }),
+      config: brand({ layoutElements: 'warn' }),
     });
     expect(message?.severity).toBe(1);
   });
@@ -56,7 +56,7 @@ describe('layout through Box', () => {
   it('leaves files outside `files` alone', async () => {
     expect(
       await lint('export const A = () => <div />;', {
-        config: fossil({ files: ['src/**/*.tsx'] }),
+        config: brand({ files: ['src/**/*.tsx'] }),
         file: 'stories/A.tsx',
       }),
     ).toEqual([]);
@@ -112,7 +112,7 @@ describe('deprecations', () => {
             },
           },
         },
-        ...fossil({ deprecations: true }),
+        ...brand({ deprecations: true }),
       ],
     });
     const [result] = await eslint.lintText(

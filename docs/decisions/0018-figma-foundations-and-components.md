@@ -35,7 +35,7 @@ The PRD asked for the split to be verified on scratch files before anything chan
 
 Fossil's Figma library is two files, each published as a library and neither one designed in:
 
-- **Foundations:** the variables, which `figma:apply` writes and `figma:read` reads, with the stamped commit; the text and effect styles and the icon glyphs, which the styles script writes on an **Icons** page, stamped `icons`.
+- **Foundations:** the variables, which the apply scripts write and `figma:read` reads, with the stamped commit; the text and effect styles and the icon glyphs, which the styles script writes on an **Icons** page, stamped `icons`.
 - **Components:** the component sets and components on a page named **Components**, a section per component. It has no variables, styles or icons of its own. The build sheet says to turn the foundations library on, import variables by key through `figma.teamLibrary`, and import styles and icons by the keys the styles script returns.
 
 The check finds every variable and style a component uses by id, whether the file's own or imported, and compares its stamp with the spec. The foundations target checks that every text style, effect style and icon is there.

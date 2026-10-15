@@ -15,14 +15,14 @@ import {
 import { useState } from 'react';
 import styles from './app.module.css';
 
-/** Every kind of Fossil component, on React 18. */
+/** Every kind of component, on React 18. */
 export function App() {
   const [open, setOpen] = useState(false);
   return (
     <Box as="main" padding="l" className={styles.app}>
       <Stack gap="l">
         <Text as="h1" variant="heading-xl">
-          Fossil smoke test
+          Smoke test
         </Text>
         <Card title="React 18" titleAs="h2">
           Rendered by React 18 from the packed tarballs.
@@ -61,7 +61,7 @@ export function App() {
           ))}
         </Carousel>
         <Modal open={open} onOpenChange={setOpen} title="Details">
-          <Text>Fossil's own CSS fade runs this panel.</Text>
+          <Text>The system's own CSS fade runs this panel.</Text>
         </Modal>
       </Stack>
     </Box>

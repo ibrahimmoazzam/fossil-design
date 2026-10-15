@@ -1,4 +1,4 @@
-import { FakeFigma } from '../fake-figma.ts';
+import { Data, FakeFigma } from '../fake-figma.ts';
 import type { FigmaVariable } from '../runtime.ts';
 import type {
   Canvas,
@@ -29,18 +29,6 @@ const alias = (variable: FigmaVariable): Alias => ({
   type: 'VARIABLE_ALIAS',
   id: variable.id,
 });
-
-class Data {
-  readonly #data = new Map<string, string>();
-
-  getSharedPluginData(namespace: string, key: string): string {
-    return this.#data.get(`${namespace}:${key}`) ?? '';
-  }
-
-  setSharedPluginData(namespace: string, key: string, value: string): void {
-    this.#data.set(`${namespace}:${key}`, value);
-  }
-}
 
 /** A node as the library scripts see it. Fields Figma has only on some node types are set by the test. */
 export class FakeNode extends Data implements SceneNode {

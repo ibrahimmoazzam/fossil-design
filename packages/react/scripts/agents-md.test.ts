@@ -19,7 +19,7 @@ afterAll(() => {
   for (const dir of temporary) rmSync(dir, { recursive: true, force: true });
 });
 const app = (files: Record<string, string> = {}) => {
-  const dir = mkdtempSync(join(tmpdir(), 'fossil-agents-md-'));
+  const dir = mkdtempSync(join(tmpdir(), 'agents-md-'));
   temporary.push(dir);
   for (const [name, text] of Object.entries(files))
     writeFileSync(join(dir, name), text);

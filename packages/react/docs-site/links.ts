@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import fossilConfig from '../../../fossil.config.json' with { type: 'json' };
+import brand from '../../../brand.config.json' with { type: 'json' };
 import tokensFile from '@fossil-design/tokens/tokens.json';
 import { onGitHub, sitePage } from './repo.ts';
 
@@ -16,7 +16,7 @@ const site = (page: string, anchor?: string): Target => ({
 const web = (href: string): Target => ({ href });
 const npm = (name: string) => web(`https://www.npmjs.com/package/${name}`);
 const published = (pkg: string, file: string) =>
-  web(`https://cdn.jsdelivr.net/npm/${fossilConfig.npmScope}/${pkg}/${file}`);
+  web(`https://cdn.jsdelivr.net/npm/${brand.npmScope}/${pkg}/${file}`);
 
 const storyFiles = import.meta.glob<string>(
   '../src/components/*/*.stories.tsx',
@@ -39,7 +39,7 @@ export const components: Record<string, Target> = Object.fromEntries(
 
 /** The token reference groups by the first part of a token's path, such as `color`. */
 function token(term: string): Target | undefined {
-  const path = term.startsWith(`--${fossilConfig.cssPrefix}-`)
+  const path = term.startsWith(`--${brand.cssPrefix}-`)
     ? Object.keys(tokensFile.tokens).find(
         (key) => tokensFile.tokens[key]?.cssVar === term,
       )
@@ -68,7 +68,7 @@ const code: Record<string, Target> = {
   'docs/PRD.md': web(onGitHub('docs/PRD.md')),
   'gaps.md': web(onGitHub('docs/gaps.md')),
   'docs/gaps.md': web(onGitHub('docs/gaps.md')),
-  'fossil.config.json': web(onGitHub('fossil.config.json')),
+  'brand.config.json': web(onGitHub('brand.config.json')),
   'pnpm-workspace.yaml': web(onGitHub('pnpm-workspace.yaml')),
   'tsconfig.base.json': web(onGitHub('tsconfig.base.json')),
   'stylelint.config.js': web(onGitHub('stylelint.config.js')),
@@ -142,17 +142,13 @@ const code: Record<string, Target> = {
   'llms.txt': web('https://llmstxt.org/'),
 
   // Fossil's packages.
-  [`${fossilConfig.npmScope}/react`]: npm(`${fossilConfig.npmScope}/react`),
-  [`${fossilConfig.npmScope}/tokens`]: npm(`${fossilConfig.npmScope}/tokens`),
-  [`${fossilConfig.npmScope}/eslint-config`]: npm(
-    `${fossilConfig.npmScope}/eslint-config`,
+  [`${brand.npmScope}/react`]: npm(`${brand.npmScope}/react`),
+  [`${brand.npmScope}/tokens`]: npm(`${brand.npmScope}/tokens`),
+  [`${brand.npmScope}/eslint-config`]: npm(`${brand.npmScope}/eslint-config`),
+  [`${brand.npmScope}/stylelint-config`]: npm(
+    `${brand.npmScope}/stylelint-config`,
   ),
-  [`${fossilConfig.npmScope}/stylelint-config`]: npm(
-    `${fossilConfig.npmScope}/stylelint-config`,
-  ),
-  [`${fossilConfig.npmScope}/figma-sync`]: web(
-    onGitHub('packages/figma-sync/'),
-  ),
+  [`${brand.npmScope}/figma-sync`]: web(onGitHub('packages/figma-sync/')),
 
   // Other packages, each checked against the npm registry.
   ...Object.fromEntries(

@@ -73,7 +73,7 @@ The rest is free for a public project: npm, GitHub Actions, and GitHub Pages for
 ```
 packages/tokens/src/{primitive,semantic}/*.tokens.json    DTCG source of truth, git, PR-reviewed
       |
-      |  --- figma:apply (everything) --->   Figma Variables
+      |  --- apply scripts (everything) -->   Figma Variables
       |  <--- figma:diff (values only) ---   (via an agent, through use_figma)
       |
       v
@@ -109,7 +109,7 @@ Monorepo, pnpm workspaces.
 
 ```
 fossil-design/
-  fossil.config.json     system name, CSS prefix and npm scope: what a fork changes first
+  brand.config.json     system name, CSS prefix and npm scope: what a fork changes first
   packages/
     tokens/              DTCG source, Style Dictionary build, generated outputs
     react/               components (CSS Modules), stories, bundled agent docs
@@ -225,7 +225,7 @@ Phases are ordered by dependency. Each has an explicit exit criterion. Do not st
 6. GitHub Actions workflow: install, lint, typecheck, test and build on every PR.
 7. Create the `@fossil-design` npm org and set each workspace's `package.json` name per the table in section 2.
 8. **Trusted publishing.** Publish `0.0.1` of each published package by hand with 2FA. Run `npm trust github` for each, then publish `0.0.2` through the release workflow.
-9. `fossil.config.json` at the root holds the system name, CSS prefix and npm scope. Every build script reads it, so a fork renames the system in one place.
+9. `brand.config.json` at the root holds the system name, CSS prefix and npm scope. Every build script reads it, so a fork renames the system in one place.
 10. Root `README.md` stating what Fossil is and why it exists.
 11. **Agent instructions.** `AGENTS.md` is the cross-tool standard: read by 25+ agents and maintained by the Agentic AI Foundation under the Linux Foundation. It holds the repo rules. `CLAUDE.md` contains only `@AGENTS.md`.
     - Claude Code (v2.1.277 and later) reads `AGENTS.md` by itself only when no `CLAUDE.md` or `CLAUDE.local.md` exists. The import works whatever files a contributor adds.
@@ -345,7 +345,7 @@ This is the most technically interesting phase. It has no dependency on Phase 4,
      - a variable renamed in Figma (stamp and name disagree);
      - a semantic variable detached from its alias to a raw value.
    - **Units and precision.** Compare colours after converting Figma's 0–1 channels to hex, and dimensions in px against a fixed rem base, both within a rounding tolerance. Otherwise every sync reports value changes that didn't happen.
-2. **Apply script.** `pnpm figma:apply` generates the Plugin API script from the token files. For each variable, the script:
+2. **Apply script.** `pnpm figma:apply-scripts` generates the Plugin API script from the token files. For each variable, the script:
    - stamps `setSharedPluginData('fossil', 'path', '<canonical.token.path>')`, shared so any plugin or agent can read it;
    - sets `setVariableCodeSyntax('WEB', 'var(--fossil-...)')`;
    - sets `scopes` per token type on semantic variables (colour to fills and strokes, spacing to gap, radius to corner radius), never `ALL_SCOPES`;
@@ -586,7 +586,7 @@ Always-on context beat retrieval, which is the same finding behind Fossil's alwa
    - the escape-hatch policy and gap-logging rule stated explicitly.
 8. **Completeness check in CI.** The docs generator fails if a component lacks its JSDoc contract.
 9. **Split the Figma library into foundations and components.** Today one file holds both. Two published libraries let a team swap or switch off either half in a design file:
-   - **Foundations library:** the variables, the text and effect styles, and the icons. It is what `figma:apply` and the styles script write. A team that forks Fossil for its own brand replaces this one and keeps the components.
+   - **Foundations library:** the variables, the text and effect styles, and the icons. It is what the apply scripts and the styles script write. A team that forks Fossil for its own brand replaces this one and keeps the components.
    - **Components library:** the component sets and components, with every binding pointing at a foundations variable. A team that builds its own components in another UI library, such as one on Base UI, replaces this one and keeps the foundations.
    - Each is its own file that nobody designs in, published on its own. A designer turns on whichever the file needs, from the libraries panel. Fossil's own design files turn on both.
    - Components in the components file bind to the foundations library's published variables, imported by key (`figma.variables.importVariableByKeyAsync`, which only returns the library's variable from a different file). The library spec and check name variables as they do today; only where a script finds the variable changes.
@@ -657,7 +657,7 @@ This is the most publishable artifact in the project and the strongest case-stud
    - MDX architecture pages with an index of the ADRs.
    - the research behind the workflow, and the drift eval's design from `docs/drift-eval.md`, marked as planned until Phase 7 runs.
 2. **"Adopt Fossil" guide** for a team using the repo as a template:
-   1. Rename the fork with `pnpm rename`, which sets the name, prefix and scope in `fossil.config.json` and rewrites the files that spell them out (ADR 0019).
+   1. Rename the fork with `pnpm rename`, which sets the name, prefix and scope in `brand.config.json` and rewrites the files that spell them out (ADR 0019).
    2. Replace the primitive values, and the semantic mapping where the brand needs it.
    3. Choose how the app consumes the packages. Either publish under the team's own scope, with the same trusted-publishing bootstrap, or keep the app in the fork's own `apps/` folder and skip publishing.
    4. Create a Figma file, apply the variables, and generate the library.

@@ -27,13 +27,14 @@ pnpm rename --name … --scope …   # rename a fork: name, CSS prefix, npm scop
 - The browser tests need Chromium once per machine: `pnpm --filter react exec playwright install chromium`.
 - Storybook: `pnpm --filter react storybook`, at `localhost:6006`. Its MCP server is at `localhost:6006/mcp`, and `.mcp.json` registers it for Claude Code.
 - The docs site is Storybook's static build, `pnpm --filter react build-storybook`, deployed to GitHub Pages from `main` at `fossil.ibrahimmoazzam.com`. Its pages are MDX in `packages/react/docs-site/`, and most show a repo file as it is, through `RepoDoc`; `docs-site/pages.ts` maps each file to its page. The site links the first mention of each known name in a section, from `docs-site/links.ts`: add a tool, package or file there to link it. Its title, description, URL and preview card live in `docs-site/meta.ts`; `scripts/site-meta.ts` writes them into the built page, because Storybook's own title names Storybook and it writes no metadata of its own.
-- `pnpm --filter react docs` writes the docs bundled in `@fossil-design/react` from each component's JSDoc contract and its stories tagged `example`. From the same sources it writes the block the package's `fossil-agents-md` bin puts in an app's `AGENTS.md`, and the Figma Make guidelines in `guidelines/`. The package's build runs it last, and fails on an undocumented component or a block over 8 KB (ADRs 0016 and 0017). `packages/react/AGENTS.md` has the format.
-- `pnpm smoke [next|vite]` copies the apps in `smoke/` to a temporary folder, installs the packed tarballs with npm, then type-checks, lints, builds and checks what they render. Then it runs `fossil-agents-md` in each app and checks every installed file the block and the Make guidelines name. Last, it copies the off-system component in `smoke/off-system/` into each app and expects lint to reject every line of it. It needs the network. Set `FOSSIL_KEEP_SMOKE=1` to keep the folder.
+- `pnpm --filter react run docs` writes the docs bundled in `@fossil-design/react` from each component's JSDoc contract and its stories tagged `example`. From the same sources it writes the block the package's `fossil-agents-md` bin puts in an app's `AGENTS.md`, and the Figma Make guidelines in `guidelines/`. The package's build runs it last, and fails on an undocumented component or a block over 8 KB (ADRs 0016 and 0017). `packages/react/AGENTS.md` has the format.
+- `pnpm smoke [next|vite]` copies the apps in `smoke/` to a temporary folder, installs the packed tarballs with npm, then type-checks, lints, builds and checks what they render. Then it runs `fossil-agents-md` in each app and checks every installed file the block and the Make guidelines name. Last, it copies the off-system component in `smoke/off-system/` into each app and expects lint to reject every line of it. It needs the network. Set `KEEP_SMOKE=1` to keep the folder.
 - `pnpm --filter react generate` writes `Box`'s CSS and the `.module.css.d.ts` types. The react package's `build` and `typecheck` run it first. Neither output is committed.
 - Check the token source without building: `pnpm --filter tokens validate`. Token files live in `packages/tokens/src/primitive/` and `src/semantic/`; ADR 0005 holds their rules.
 - The token build writes `tokens.css`, `tokens.json`, `lint.json`, `foundations.md` and `tokens.md` to `packages/tokens/dist/`, the TypeScript in `src/generated/`, and the foundations block in this file. Commit the block with the token change; CI fails if the build changes it. ADR 0006 covers each output, and ADR 0016 the two Markdown files.
 - List deprecated tokens and their replacements: `pnpm --filter tokens deprecations`, after a build.
-- Sync tokens with Figma: `pnpm figma:apply`, `pnpm figma:read` and `pnpm figma:diff` write scripts and compare their results. Run a sync through the `fossil-figma-sync` skill in `.claude/skills/`, which needs the Figma MCP server. `packages/figma-sync/AGENTS.md` covers working on the sync itself.
+- Sync tokens with Figma: `pnpm figma:apply-scripts`, `pnpm figma:read` and `pnpm figma:diff` write scripts and compare their results. Every `figma:*` command only reads the repository and writes generated scripts to `packages/figma-sync/.figma/`; nothing reaches Figma until an agent carries a script there. Run a sync through the `fossil-figma-sync` skill in `.claude/skills/`, which needs the Figma MCP server. `packages/figma-sync/AGENTS.md` covers working on the sync itself.
+- A Figma file built before the stamp followed the brand needs `pnpm figma:restamp <old namespace>` once, before its next apply. Without it the apply owns nothing in the file and builds a second copy of the library beside the first. ADR 0020.
 - Build the Figma library, in two files (ADR 0018): `pnpm figma:library-spec` writes the spec, a build sheet and the styles script for the foundations file; `pnpm figma:library-check` writes the components file's check, `pnpm figma:library-check foundations` the foundations file's, and `pnpm figma:library-check report` verifies the results. Follow the same skill's library workflow.
 - Build before linting and type-checking. A package's types resolve through the built declarations of the packages it depends on, and the Stylelint config reads the built token lists.
 - Add a dependency to one package with `pnpm --filter <folder> add <name>`, and to the root with `pnpm add -D -w <name>`. TypeScript comes from the `catalog:` in `pnpm-workspace.yaml`.
@@ -55,13 +56,13 @@ Phase 0 pinned the tooling below; later phases pin the rest when they add it.
 ## Layout
 
 ```
-fossil.config.json     system name, CSS prefix, npm scope
+brand.config.json     system name, CSS prefix, npm scope
 packages/tokens        DTCG source and the Style Dictionary build
 packages/react         components (CSS Modules), stories, bundled agent docs, Make guidelines, the AGENTS.md bin
 packages/eslint-config, packages/stylelint-config
 packages/figma-sync    Figma sync and component library: core, scripts and checks (private)
 .claude/skills         the fossil-figma-sync skill
-tests/                 workspace-wide tests, such as package names against fossil.config.json
+tests/                 workspace-wide tests, such as package names against brand.config.json
 scripts/               workspace-wide scripts: the packed-tarball check and the smoke test
 smoke/                 consumer apps outside the workspace, built from the packed tarballs
 smoke/off-system       a deliberately off-system component that lint must reject
@@ -269,7 +270,7 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 - Any margin other than `0`. If approved, it gets a lint-disable comment with the reason.
 - Adding a dependency.
 - Adding, renaming or deleting a token.
-- Running `figma:apply`, or any `use_figma` write, against the real Figma file.
+- Any `use_figma` write against the real Figma file. Generating the scripts needs no permission, because it touches nothing but `.figma/`.
 - Changing a decision recorded in `docs/PRD.md`, `docs/Learnings.md` or `docs/key-decisions.md`.
 - Anything that publishes to npm or changes the release workflow.
 

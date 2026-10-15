@@ -31,8 +31,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
-    "typecheck": "tsc",
+    "generate": "node --experimental-strip-types --disable-warning=ExperimentalWarning ../../scripts/brand.ts src/generated/brand.ts",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && pnpm run generate && tsc -p tsconfig.build.json",
+    "typecheck": "pnpm run generate && tsc",
     "prepack": "pnpm run build"
   },
   "dependencies": {

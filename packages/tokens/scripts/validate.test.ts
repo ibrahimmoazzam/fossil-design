@@ -108,7 +108,7 @@ describe('order', () => {
 
 describe('the build', () => {
   it('fails on a semantic token holding a literal, before writing anything', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'fossil-tokens-'));
+    const dir = mkdtempSync(join(tmpdir(), 'tokens-validate-'));
     try {
       mkdirSync(join(dir, 'primitive'));
       mkdirSync(join(dir, 'semantic'));
@@ -303,7 +303,7 @@ describe('modes', () => {
           },
         }),
       ]),
-    ).toContain('Unknown mode "dim"; Fossil\'s modes are dark');
+    ).toContain('Unknown mode "dim"; the modes are dark');
   });
 });
 

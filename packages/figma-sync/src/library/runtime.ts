@@ -8,6 +8,9 @@ import {
   setStamp,
   sha256,
   stamp,
+  stampedCollections,
+  tagged,
+  type Branded,
   type Figma,
   type FigmaVariable,
 } from '../runtime.ts';
@@ -110,7 +113,7 @@ export interface IconSpec {
   paths: string[];
 }
 
-export interface StylesSpec {
+export interface StylesSpec extends Branded {
   kind: 'styles';
   page: string;
   /** The colour token an icon's glyph takes in its main component. */
@@ -120,7 +123,7 @@ export interface StylesSpec {
   icons: IconSpec[];
 }
 
-export interface CheckSpec {
+export interface CheckSpec extends Branded {
   kind: 'check';
   /** The foundations file's styles and icons, or the components file's components. */
   target: 'foundations' | 'components';
@@ -140,7 +143,6 @@ export interface CheckSpec {
 }
 
 export interface CheckResult {
-  fossil: 'check';
   part: number;
   parts: number;
   commit: string;
@@ -150,8 +152,21 @@ export interface CheckResult {
   hash: string;
 }
 
+/**
+ * A one-off migration: every stamp the file carries under an old namespace, moved to the brand's.
+ * A fork whose Figma library was built before the stamp followed the brand needs it once.
+ * [ADR 0020](../../../../docs/decisions/0020-what-a-fork-renames.md).
+ */
+export interface RestampSpec extends Branded {
+  kind: 'restamp';
+  /** The namespace the file's stamps sit under now: the CSS prefix the system had before it was renamed. */
+  old: string;
+}
+
 interface Stamped {
   getSharedPluginData(namespace: string, key: string): string;
+  /** Every key set in a namespace, which is how a migration finds stamps it doesn't know. */
+  getSharedPluginDataKeys(namespace: string): string[];
   setSharedPluginData(namespace: string, key: string, value: string): void;
 }
 
@@ -295,8 +310,8 @@ export function decoded(text: string): string {
 }
 
 /** The foundations file's Icons page, by its stamp. */
-export function iconsPage(figma: Canvas): PageNode | undefined {
-  return figma.root.children.find((p) => stamp(p, 'page') === 'icons');
+export function iconsPage(figma: Canvas, ns: string): PageNode | undefined {
+  return figma.root.children.find((p) => stamp(ns, p, 'page') === 'icons');
 }
 
 /** The font style Figma names for a weight, from the fonts it has. */
@@ -346,7 +361,8 @@ export async function styles(
 ): Promise<unknown> {
   const variables = await figma.variables.getLocalVariablesAsync();
   const byPath: Record<string, FigmaVariable> = {};
-  for (const v of variables) if (stamp(v) !== '') byPath[stamp(v)] = v;
+  for (const v of variables)
+    if (stamp(spec.ns, v) !== '') byPath[stamp(spec.ns, v)] = v;
   const fonts = await figma.listAvailableFontsAsync();
 
   // Check everything before writing anything, because a failed script may keep its partial writes.
@@ -354,7 +370,7 @@ export async function styles(
   const need = (path: string, what: string) => {
     if (!byPath[path])
       problems.push(
-        `${what} binds to ${path}, which isn't in Figma. Run pnpm figma:apply and its scripts first.`,
+        `${what} binds to ${path}, which isn't in Figma. Run pnpm figma:apply-scripts and its scripts first.`,
       );
   };
   const loads: Record<string, { family: string; style: string }> = {};
@@ -384,11 +400,11 @@ export async function styles(
 
   const textStyles = await figma.getLocalTextStylesAsync();
   for (const t of spec.textStyles) {
-    let style = textStyles.find((s) => stamp(s) === t.path);
+    let style = textStyles.find((s) => stamp(spec.ns, s) === t.path);
     const changes: string[] = [];
     if (!style) {
       style = figma.createTextStyle();
-      setStamp(style, t.path);
+      setStamp(spec.ns, style, t.path);
       created.push(t.name);
     }
     if (style.name !== t.name) {
@@ -438,11 +454,11 @@ export async function styles(
 
   const effectStyles = await figma.getLocalEffectStylesAsync();
   for (const e of spec.effectStyles) {
-    let style = effectStyles.find((s) => stamp(s) === e.path);
+    let style = effectStyles.find((s) => stamp(spec.ns, s) === e.path);
     const changes: string[] = [];
     if (!style) {
       style = figma.createEffectStyle();
-      setStamp(style, e.path);
+      setStamp(spec.ns, style, e.path);
       created.push(e.name);
     }
     if (style.name !== e.name) {
@@ -493,19 +509,21 @@ export async function styles(
       updated.push(`${e.name}: ${changes.join(', ')}`);
   }
 
-  let page = iconsPage(figma);
+  let page = iconsPage(figma, spec.ns);
   if (!page) {
     page = figma.createPage();
     page.name = spec.page;
-    setStamp(page, 'icons', 'page');
+    setStamp(spec.ns, page, 'icons', 'page');
     created.push(`the ${spec.page} page`);
   }
   await figma.setCurrentPageAsync(page);
-  let section = page.children.find((n) => stamp(n, 'section') === 'icons');
+  let section = page.children.find(
+    (n) => stamp(spec.ns, n, 'section') === 'icons',
+  );
   if (!section) {
     section = figma.createSection();
     section.name = 'Icons';
-    setStamp(section, 'icons', 'section');
+    setStamp(spec.ns, section, 'icons', 'section');
     page.appendChild(section);
     section.x = 0;
     section.y = 0;
@@ -515,11 +533,11 @@ export async function styles(
   const ids: string[] = [];
   const keys: Record<string, string> = {};
   spec.icons.forEach((icon, i) => {
-    let component = glyphs.find((n) => stamp(n, 'icon') === icon.key);
+    let component = glyphs.find((n) => stamp(spec.ns, n, 'icon') === icon.key);
     const changes: string[] = [];
     if (!component) {
       component = figma.createComponent();
-      setStamp(component, icon.key, 'icon');
+      setStamp(spec.ns, component, icon.key, 'icon');
       known(section, 'the Icons section').appendChild?.(component);
       component.resize?.(24, 24);
       component.fills = [];
@@ -532,7 +550,7 @@ export async function styles(
       changes.push('name');
     }
     const source = sha256(JSON.stringify([icon.viewBox, icon.paths]));
-    if (stamp(component, 'svg') !== source) {
+    if (stamp(spec.ns, component, 'svg') !== source) {
       for (const child of [...(component.children ?? [])]) child.remove();
       const drawn = figma.createNodeFromSvg(svgOf(icon));
       drawn.rescale?.(24 / drawn.width);
@@ -541,7 +559,7 @@ export async function styles(
         child.constraints = { horizontal: 'SCALE', vertical: 'SCALE' };
       }
       drawn.remove();
-      setStamp(component, source, 'svg');
+      setStamp(spec.ns, component, source, 'svg');
       changes.push('glyph');
     }
     for (const shape of component.children ?? []) {
@@ -567,17 +585,16 @@ export async function styles(
   section.resize?.(Math.max(400, 64 + spec.icons.length * 56), 136);
 
   for (const s of await figma.getLocalTextStylesAsync())
-    if (stamp(s) !== '') keys[s.name] = s.key;
+    if (stamp(spec.ns, s) !== '') keys[s.name] = s.key;
   for (const s of await figma.getLocalEffectStylesAsync())
-    if (stamp(s) !== '') keys[s.name] = s.key;
-  return {
-    fossil: 'styles',
+    if (stamp(spec.ns, s) !== '') keys[s.name] = s.key;
+  return tagged(spec.ns, 'styles', {
     created,
     updated,
     page: page.id,
     icons: ids,
     keys,
-  };
+  });
 }
 
 /**
@@ -586,6 +603,7 @@ export async function styles(
  */
 export async function stampsUsed(
   figma: Canvas,
+  ns: string,
   nodes: readonly SceneNode[],
 ): Promise<{
   paths: Record<string, string>;
@@ -620,14 +638,14 @@ export async function stampsUsed(
   const paths: Record<string, string> = {};
   for (const id of variableIds) {
     const v = await figma.variables.getVariableByIdAsync(id);
-    if (v) paths[id] = stamp(v);
+    if (v) paths[id] = stamp(ns, v);
   }
   // Not named styles, which would pull the styles script into the check's script.
   const stampsOf = async (ids: Set<string>) => {
     const found: Record<string, string> = {};
     for (const id of ids) {
       const s = await figma.getStyleByIdAsync(id);
-      if (s) found[id] = stamp(s);
+      if (s) found[id] = stamp(ns, s);
     }
     return found;
   };
@@ -757,7 +775,7 @@ export async function checkVariant(
           typeof id === 'string' ? context.effectStyles[id] : undefined;
         if (found !== layer.effect)
           problems.push(
-            `${at}${name(layer.name)} has ${found ? `the effect style ${found}` : 'no Fossil effect style'}, not ${layer.effect}.`,
+            `${at}${name(layer.name)} has ${found ? `the effect style ${found}` : 'no effect style from the library'}, not ${layer.effect}.`,
           );
       }
     }
@@ -782,7 +800,7 @@ export async function checkVariant(
       if (t?.style !== undefined) {
         if (style !== t.style)
           problems.push(
-            `${at}the text ${n.name} has ${style ? `the text style ${style}` : 'no Fossil text style'}, not ${t.style}.`,
+            `${at}the text ${n.name} has ${style ? `the text style ${style}` : 'no text style from the library'}, not ${t.style}.`,
           );
       } else if (t !== undefined) {
         for (const field of [
@@ -810,7 +828,9 @@ export async function checkVariant(
             `${at}the text ${n.name}'s line height isn't ${String(t.lineHeight)}%.`,
           );
       } else if (style === undefined)
-        problems.push(`${at}the text ${n.name} has no Fossil text style.`);
+        problems.push(
+          `${at}the text ${n.name} has no text style from the library.`,
+        );
       return;
     }
     if (
@@ -927,11 +947,11 @@ export async function check(
     components: [] as { name: string; problems: string[] }[],
     foundations,
   };
-  const result = (): CheckResult => ({
-    fossil: 'check',
-    ...content,
-    hash: sha256(JSON.stringify(content)),
-  });
+  const result = () =>
+    tagged(spec.ns, 'check', {
+      ...content,
+      hash: sha256(JSON.stringify(content)),
+    });
   const tops: SceneNode[] = [];
   const walk = (nodes: readonly SceneNode[]) => {
     for (const n of nodes) {
@@ -942,9 +962,11 @@ export async function check(
   };
 
   if (spec.target === 'foundations') {
-    const text = (await figma.getLocalTextStylesAsync()).map((s) => stamp(s));
+    const text = (await figma.getLocalTextStylesAsync()).map((s) =>
+      stamp(spec.ns, s),
+    );
     const effect = (await figma.getLocalEffectStylesAsync()).map((s) =>
-      stamp(s),
+      stamp(spec.ns, s),
     );
     for (const path of spec.textStyles)
       if (!text.includes(path))
@@ -952,7 +974,7 @@ export async function check(
     for (const path of spec.effectStyles)
       if (!effect.includes(path))
         foundations.push(`The effect style for ${path} is missing.`);
-    const icons = iconsPage(figma);
+    const icons = iconsPage(figma, spec.ns);
     if (!icons) {
       foundations.push(
         'There is no Icons page. Run the styles script from pnpm figma:library-spec in the foundations file.',
@@ -976,7 +998,11 @@ export async function check(
   }
   await figma.setCurrentPageAsync(page);
   walk(page.children);
-  const { paths, textStyles, effectStyles } = await stampsUsed(figma, tops);
+  const { paths, textStyles, effectStyles } = await stampsUsed(
+    figma,
+    spec.ns,
+    tops,
+  );
 
   const colored: Record<string, boolean> = {};
   for (const name of spec.colored) colored[name] = true;
@@ -1078,4 +1104,104 @@ export async function check(
       );
   }
   return result();
+}
+
+/** One node's, style's, variable's or collection's stamps, moved from the old namespace to the brand's. */
+export function moveStamps(
+  spec: RestampSpec,
+  node: Stamped,
+  kind: string,
+  name: string,
+  moved: Record<string, number>,
+  problems: string[],
+): void {
+  for (const key of node.getSharedPluginDataKeys(spec.old)) {
+    const value = stamp(spec.old, node, key);
+    if (value === '') continue;
+    const current = stamp(spec.ns, node, key);
+    if (current !== '' && current !== value) {
+      problems.push(
+        `The ${kind} ${name} is stamped ${key} ${value} under ${spec.old} and ${key} ${current} under ${spec.ns}. Clear whichever is wrong in Figma, then run the migration again.`,
+      );
+      continue;
+    }
+    if (current === '') setStamp(spec.ns, node, value, key);
+    setStamp(spec.old, node, '', key);
+    moved[`${kind} ${key}`] = (moved[`${kind} ${key}`] ?? 0) + 1;
+  }
+}
+
+/**
+ * Moves every stamp this file carries under an old namespace to the brand's, and leaves none behind.
+ * A fork whose Figma library was built before the stamp followed the brand runs it once, in the
+ * foundations file, before its next apply: without it the apply finds no collection of its own and
+ * builds a second copy of the whole library beside the first. Running it again finishes an
+ * interrupted run, and on a file that has already moved it reports nothing to move.
+ */
+export async function restamp(
+  spec: RestampSpec,
+  figma: Canvas,
+): Promise<unknown> {
+  if (spec.old === spec.ns)
+    throw new Error(
+      `The old namespace and the brand's are both ${spec.ns}, so there is nothing to move.`,
+    );
+  const collections = await figma.variables.getLocalVariableCollectionsAsync();
+  const targets: { kind: string; name: string; node: Stamped }[] = [];
+  for (const c of collections)
+    targets.push({ kind: 'collection', name: c.name, node: c });
+  for (const v of await figma.variables.getLocalVariablesAsync())
+    targets.push({ kind: 'variable', name: v.name, node: v });
+  for (const s of await figma.getLocalTextStylesAsync())
+    targets.push({ kind: 'text style', name: s.name, node: s });
+  for (const s of await figma.getLocalEffectStylesAsync())
+    targets.push({ kind: 'effect style', name: s.name, node: s });
+  let instances = 0;
+  const walk = (nodes: readonly SceneNode[]) => {
+    for (const n of nodes) {
+      // An instance reads the stamps of the component it comes from, so they aren't this file's to move.
+      if (n.type === 'INSTANCE') {
+        instances += 1;
+        continue;
+      }
+      targets.push({ kind: 'node', name: n.name, node: n });
+      walk(n.children ?? []);
+    }
+  };
+  for (const page of figma.root.children) {
+    targets.push({ kind: 'page', name: page.name, node: page });
+    await figma.setCurrentPageAsync(page);
+    walk(page.children);
+  }
+
+  // The sync's own collections say this is the foundations file, under either namespace, so a run
+  // that was interrupted after the collections moved still finishes.
+  if (
+    Object.keys(stampedCollections(spec.old, collections)).length === 0 &&
+    Object.keys(stampedCollections(spec.ns, collections)).length === 0
+  )
+    throw new Error(
+      `No variable collection in this file is stamped ${spec.old} or ${spec.ns}. Run the migration in the foundations file, which holds the variables: a components file reads every stamp through the library it imports, so it has none of its own to move.`,
+    );
+
+  const under = (ns: string) =>
+    targets.reduce(
+      (total, t) => total + t.node.getSharedPluginDataKeys(ns).length,
+      0,
+    );
+  const before = under(spec.old);
+  const moved: Record<string, number> = {};
+  const problems: string[] = [];
+  for (const t of targets)
+    moveStamps(spec, t.node, t.kind, t.name, moved, problems);
+  return tagged(spec.ns, 'restamp', {
+    from: spec.old,
+    before,
+    moved: Object.keys(moved)
+      .sort()
+      .map((row) => `${row}: ${String(moved[row] ?? 0)}`),
+    remaining: under(spec.old),
+    instances,
+    problems,
+  });
 }
