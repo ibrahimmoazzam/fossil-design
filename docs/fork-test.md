@@ -111,6 +111,8 @@ After renaming, `AGENTS.md` asserted that the published `@acme-design/*` package
 
 **Fix:** list the claims a fork must delete rather than reword, in the same checklist.
 
+**Decided: the guide flags them, and deletes nothing for the adopter.** The alternative was for 1.4 to tell a fork to delete the inherited prose that cannot be true of it — the drift eval, the measured numbers, the positioning — which would trim what a fork inherits. It isn't worth the loss: a fork can read its own docs and cut what it doesn't want, and the prose it would lose is the record of why the system is shaped this way, which is most of what makes a fork worth taking. So 1.4 names the claims that read as the fork's own and says to settle each one, and the fork decides whether that means rewording, keeping with attribution, or deleting.
+
 ### 7. A find-and-replace breaks grammar
 
 Swapping `Fossil` for `Acme Foundry` produced "a Acme Foundry token" three times, because the article precedes the name.
@@ -311,6 +313,8 @@ Labels and code. An app can point this at its own face; the portfolio uses Roobe
 Acme Foundry's faces are Sora and IBM Plex Mono. So the two variables a designer opens when asking which typeface to use are the two that name a typeface the fork does not have, attributed to a portfolio that is not theirs. These are the only two of the 91 token descriptions that do this.
 
 Guide 1.4's `git grep Fossil` cannot find them, for the reason issue 5 records: neither says "Fossil". Step 2 is where a fork replaces its typefaces, and 2.4 covers Figma's font list and the Make `@import` but not the descriptions beside the tokens being changed. Nothing in the build or the checks compares a description against the brand, and nothing can: a description is prose.
+
+**Fixed, and confirmed on the live file.** With the two descriptions rewritten and taken into the fork, the next apply reported exactly `["font.family.heading: description", "font.family.mono: description"]` against 134 variables unchanged, and the two variables now read "An app can point this at its own face" with no face named. A description change publishes like any other modification, so it reaches a fork's designers the same way.
 
 **Fix:** two things, because there are two faults. Fossil's own two descriptions should stop naming a specific face, since the sentence's point is that the token is a seam an app can repoint. And step 2 should say to read the `$description` of every token being rebranded, because those strings are the text a fork's designers read in Figma, which [ADR 0020](./decisions/0020-what-a-fork-renames.md) rule 1 makes the brand's.
 
