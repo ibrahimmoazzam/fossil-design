@@ -11,7 +11,7 @@ The examples use a system called Acme Design, with the CSS prefix `acme`, the np
 - A GitHub account or organisation for the repository.
 - Node 22.14 or later, and pnpm 12.8.1, the version `package.json` pins.
 - For the Figma steps: a Figma Professional or Education plan, a Full seat, and an agent the Figma MCP server accepts. This guide uses Claude Code.
-- To publish packages: an npm account with two-factor authentication.
+- To publish packages: an npm account with two-factor authentication, and the organisation for your npm scope already created ([3A.1](#3a-publish-under-your-scope) says how). Create it before you rename, not when you reach step 3: the rename writes your scope through every package name, dependency, import and badge, so a scope that turns out to be taken costs you a second rename.
 
 ## 1. Copy and rename
 
