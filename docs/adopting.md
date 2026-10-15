@@ -151,6 +151,8 @@ Tokens come in two tiers ([Key decisions](./key-decisions.md#10-two-tiers-not-th
 
 Commit with the foundations block the build writes into `AGENTS.md`. CI fails if the build would change it.
 
+Step 2 also spends a budget you can't see. The same token sources write the block that `acme-agents-md` puts in an app's own `AGENTS.md`, and that block is capped at 8 KB, because it sits in an app agent's context on every request ([ADR 0017](./decisions/0017-agents-md-block-and-make-guidelines.md)). Fossil's own is a couple of hundred bytes under the cap. A new token costs about 100 bytes, a new component a few, and a longer CSS prefix costs a little on every custom property the block names. `pnpm build` fails when it goes over, naming the size and the files to shorten, and the block's own `foundations.md` is where detail belongs once the block can't hold it.
+
 ## 3. Choose how apps get the packages
 
 Follow one route: 3A to publish under your own npm scope, or 3B to keep your apps in this repository.
