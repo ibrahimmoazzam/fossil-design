@@ -472,6 +472,12 @@ Proved in the fork: with the changed sync copied in, its 84 tests pass and `Box`
 
 The block measured 7985 bytes against its 8192 budget here, against 7917 in the fork, where the shorter prefix saves the difference. That is 207 bytes of headroom in Fossil itself, which sharpens issue 16.
 
+## What closing all of them doesn't settle
+
+Every issue above is resolved: in the guide, in the code, or as a decision recorded with its reasoning. That is not Phase 8's third exit criterion, which asks for a fresh fork that reaches a building, linting app and a Figma file with variables and the generated library from the guide alone. No run has followed the rewritten guide from a fresh copy, and the copy this run used is already past the steps that changed.
+
+Step 1.4 is where a second run would earn the most. Issues 4 to 7 are the point where this one needed a person's judgment rather than a command, and the checklist that replaced the list of seven is longer than what it replaced. `tests/adopting.test.ts` holds it to naming every file that still says Fossil; nothing can hold it to being followable. The other untested text is 3A.3's check, which has only ever been run against a published set that was already complete.
+
 ## Resolved before the test reached them
 
 - `manager.ts` hard-coded the front page's title beside `brand.config.json`'s name. [#46](https://github.com/ibrahimmoazzam/fossil-design/pull/46) routes it through `siteTitle` in `meta.ts`. The fork predates that commit, so it still carries the old shape.
