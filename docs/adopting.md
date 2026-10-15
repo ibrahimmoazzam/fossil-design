@@ -260,6 +260,8 @@ Then ask Claude Code to apply the tokens to Figma, and give it the foundations f
 
 **4.4 Build the library.** Ask Claude Code to build the Figma component library. In the foundations file, it creates the text styles, effect styles and icons.
 
+This is where 2.4's font requirement is tested, five steps after it is explained: the styles script refuses a text style whose face Figma doesn't have, in the weight the style sets. If it refuses, the fix is in Figma's font list rather than in the script.
+
 **4.5 Publish the foundations file** as a library. Then, in the components file, open **Libraries** — the book icon at the top of the **Assets** panel, or **Main menu › Libraries** — find your team under **Teams**, and turn on **Acme Design Foundations**. The Assets panel on its own won't do it: it is where you open Libraries, and the switch is inside. Only a person can publish or turn on a library; the Plugin API can't.
 
 **4.6 Let it build and check the components.** This is the longest step in the guide, and the only one where the agent writes Figma itself rather than carrying a generated script. `pnpm figma:library-spec` writes `packages/figma-sync/.figma/library.md`, the build sheet: every component, its variants and properties, and the variable, text style or effect style each layer binds. Claude Code builds from that sheet in the components file, importing each variable, style and icon from the foundations library, and checks its work with `pnpm figma:library-check`.
