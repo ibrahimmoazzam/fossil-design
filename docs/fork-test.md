@@ -6,12 +6,12 @@ The guide is the only part of Fossil with no check behind it. The token build va
 
 ## The run
 
-|         |                                                                                                           |
-| ------- | --------------------------------------------------------------------------------------------------------- |
-| Copy    | [ibrahimmoazzam/acme-design](https://github.com/ibrahimmoazzam/acme-design), public, from the template    |
-| Created | 2026-10-12, from `5305359`, so it predates [#46](https://github.com/ibrahimmoazzam/fossil-design/pull/46) |
-| Brand   | Acme Foundry, prefix `acme`, scope `@acme-foundry`                                                        |
-| Route   | 3A, publishing under its own scope                                                                        |
+|         |                                                                                                                                                              |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Copy    | `ibrahimmoazzam/acme-foundry`, public, from the template, and deleted with its packages and Figma files on 2026-10-15, so the second run starts from nothing |
+| Created | 2026-10-12, from `5305359`, so it predates [#46](https://github.com/ibrahimmoazzam/fossil-design/pull/46)                                                    |
+| Brand   | Acme Foundry, prefix `acme`, scope `@acme-foundry`                                                                                                           |
+| Route   | 3A, publishing under its own scope                                                                                                                           |
 
 Timings, on a warm pnpm store and an M-series laptop. A cold store and a cold CI runner are both slower, and the install especially so.
 
@@ -267,7 +267,7 @@ On this run three of the four packages published and `tokens` did not, leaving `
 
 **Fix:** end 3A.3 with a check: `npm view <scope>/<name> version` for each published package, and an install of the component package into an empty folder. State that a partial publish is the likely failure, since the registry's permission list will not show it.
 
-The run's own set is complete now: all four packages answer `npm view`, and `npm i @acme-foundry/react` in an empty folder resolves and installs `tokens` with it. The finding stands on the window where it did not, which read as success.
+The run's own set was completed afterwards: all four packages answered `npm view`, and `npm i @acme-foundry/react` in an empty folder resolved and installed `tokens` with it. The scope was then unpublished with the rest of the copy. The finding stands on the window where it did not, which read as success.
 
 ### 25. The workspace root keeps Fossil's name
 
