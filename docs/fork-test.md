@@ -35,12 +35,12 @@ Status says how far each one is established. **Confirmed** means the run produce
 | 1   | `scripts/rename.ts`      | The npm badge spells the scope percent-encoded, so the rename misses it                 | Confirmed     | Code           |
 | 2   | `.storybook/*-head.html` | The docs site loads Space Grotesk without weight 700, and hard-codes all three families | Confirmed     | Code           |
 | 3   | Guide 1.2 and 6          | The Docs workflow fails on `main` until Pages is configured                             | Confirmed     | Guide          |
-| 4   | Guide 1.4                | Its seven categories leave 117 mentions of Fossil in 50 files                           | Confirmed     | Guide          |
-| 5   | Guide 1.4                | Its `git grep` cannot see prose that describes Fossil without naming it                 | Confirmed     | Guide          |
-| 6   | Guide 1.4                | The rename turns Fossil's claims into plausible false ones                              | Confirmed     | Guide          |
-| 7   | Guide 1.4                | A plain find-and-replace breaks grammar                                                 | Confirmed     | Guide          |
+| 4   | Guide 1.4                | Its seven categories leave 117 mentions of Fossil in 50 files                           | Confirmed     | Guide, fixed   |
+| 5   | Guide 1.4                | Its `git grep` cannot see prose that describes Fossil without naming it                 | Confirmed     | Guide, fixed   |
+| 6   | Guide 1.4                | The rename turns Fossil's claims into plausible false ones                              | Confirmed     | Guide, fixed   |
+| 7   | Guide 1.4                | A plain find-and-replace breaks grammar                                                 | Confirmed     | Guide, fixed   |
 | 8   | Guide 1.4                | Rewriting the sync's messages fails a test that asserts one                             | Proven        | Guide and code |
-| 9   | Guide 1.4                | It must end with `pnpm format`                                                          | Confirmed     | Guide          |
+| 9   | Guide 1.4                | It must end with `pnpm format`                                                          | Confirmed     | Guide, fixed   |
 | 10  | Guide 1.4                | It doesn't name `docs-site/meta.ts` or `og-image.png`                                   | By inspection | Guide          |
 | 11  | Guide 1.4                | It doesn't say which exported names stay                                                | Confirmed     | Guide, fixed   |
 | 12  | Guide "What you need"    | `playwright install chromium` appears only in `AGENTS.md`                               | By inspection | Guide          |
@@ -419,21 +419,24 @@ So the order for a fork with a two-file library is: restamp, apply, foundations 
 
 On this branch, with the issue's number and what it took:
 
-| #      | Fix                                                                                                                                                                                   | Commit    |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| 29     | Guide 4.5 and the skill give the Libraries path, and the skill gains a read that confirms the library is on                                                                           | `pending` |
-| 31     | `pnpm figma:restamp <old namespace>` moves a fork's stamps before its first apply, with the duplication it prevents held in a test                                                    | `pending` |
-| 13, 27 | Guide 4.3 states both preconditions as requirements, and 4.2 gives the two placement constraints that decide 4.5, with what does not matter                                           | `pending` |
-| 15     | Guide 4.6 says it is the longest step, what the sheet stands for, and how to work it: nested-first, checked in groups, against `use_figma`'s character limit                          | `pending` |
-| 26     | `pnpm figma:apply-scripts`, and neither `AGENTS.md` nor the skill asks permission for a generator that writes only to `.figma/`                                                       | `pending` |
-| 28     | Fossil's two font descriptions name no face, and guide 2.1 says to read every `$description` while rebranding                                                                         | `pending` |
-| 30     | `sheet.ts` names the text style a layer with no typography of its own takes, and says why the check accepts any                                                                       | `pending` |
-| 19     | `AGENTS.md`, `packages/react/AGENTS.md` and ADR 0016 call the script with `pnpm run docs`                                                                                             | `8244a2c` |
-| 1      | `rewrites()` also rewrites `%40<scope>`, with a case for it in `tests/rename.test.ts`                                                                                                 | `0e61106` |
-| 20     | The Stylelint config's tests take a primitive colour from the built `lint.json`                                                                                                       | `a79062a` |
-| 2, 18  | `scripts/fonts.ts` checks each stylesheet against the faces and weights the text styles use                                                                                           | `0ab2c06` |
-| 11     | The config file is `brand.config.json` and both lint configs export `brand()`, so the question is removed rather than answered: [ADR 0020](./decisions/0020-what-a-fork-renames.md)   | `15d5df9` |
-| 8      | Thirteen strings resolved by kind, under [ADR 0020](./decisions/0020-what-a-fork-renames.md): prose reads `brand.config.json`, format identifiers stay, Figma-side messages rephrased | `pending` |
+| #             | Fix                                                                                                                                                                                                         | Commit    |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| 4, 5, 6, 7, 9 | Guide 1.4 is a checklist of every file that still says Fossil, grouped by [ADR 0020](./decisions/0020-what-a-fork-renames.md)'s three kinds of name, and `tests/adopting.test.ts` holds it against the grep | `pending` |
+| 29            | Guide 4.5 and the skill give the Libraries path, and the skill gains a read that confirms the library is on                                                                                                 | `pending` |
+| 31            | `pnpm figma:restamp <old namespace>` moves a fork's stamps before its first apply, with the duplication it prevents held in a test                                                                          | `pending` |
+| 13, 27        | Guide 4.3 states both preconditions as requirements, and 4.2 gives the two placement constraints that decide 4.5, with what does not matter                                                                 | `pending` |
+| 15            | Guide 4.6 says it is the longest step, what the sheet stands for, and how to work it: nested-first, checked in groups, against `use_figma`'s character limit                                                | `pending` |
+| 26            | `pnpm figma:apply-scripts`, and neither `AGENTS.md` nor the skill asks permission for a generator that writes only to `.figma/`                                                                             | `pending` |
+| 28            | Fossil's two font descriptions name no face, and guide 2.1 says to read every `$description` while rebranding                                                                                               | `pending` |
+| 30            | `sheet.ts` names the text style a layer with no typography of its own takes, and says why the check accepts any                                                                                             | `pending` |
+| 19            | `AGENTS.md`, `packages/react/AGENTS.md` and ADR 0016 call the script with `pnpm run docs`                                                                                                                   | `8244a2c` |
+| 1             | `rewrites()` also rewrites `%40<scope>`, with a case for it in `tests/rename.test.ts`                                                                                                                       | `0e61106` |
+| 20            | The Stylelint config's tests take a primitive colour from the built `lint.json`                                                                                                                             | `a79062a` |
+| 2, 18         | `scripts/fonts.ts` checks each stylesheet against the faces and weights the text styles use                                                                                                                 | `0ab2c06` |
+| 11            | The config file is `brand.config.json` and both lint configs export `brand()`, so the question is removed rather than answered: [ADR 0020](./decisions/0020-what-a-fork-renames.md)                         | `15d5df9` |
+| 8             | Thirteen strings resolved by kind, under [ADR 0020](./decisions/0020-what-a-fork-renames.md): prose reads `brand.config.json`, format identifiers stay, Figma-side messages rephrased                       | `pending` |
+
+Step 1.4's rewrite was sized on Fossil itself: 119 mentions in 53 files, against the 117 in 50 that issue 4 measured as the old seven categories' leftovers. The checklist names all 53, and `tests/adopting.test.ts` runs the step's own grep and fails when a file it finds isn't named there, so the list can't decay the way the list of seven did. It earned that on the first draft, which named the Storybook chrome as `.storybook/manager.ts` when those files are in `packages/react/.storybook/`, a gap a fork would have had to close by searching.
 
 Issue 20's fix was proved against what broke it: the new test file, copied into the fork where `base.color.blue.600` no longer exists, passes with no reference to it.
 

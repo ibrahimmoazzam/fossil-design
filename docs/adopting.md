@@ -50,15 +50,66 @@ pnpm build && pnpm lint && pnpm typecheck && pnpm test
 
 ### 1.4 Rewrite what describes Fossil
 
-This lists what still says Fossil in prose:
+`pnpm rename` changed the names things are addressed by. What it leaves is prose: the sentences that say what this system is, in the files your team, your designers and your agents read. Three kinds of name sit in that prose, and each has one rule ([ADR 0020](./decisions/0020-what-a-fork-renames.md)). Almost all of it is the first kind, the system's name, which is yours now.
+
+Work through the checklist below rather than a grep. A grep comes at the end, as a check: the hardest cases describe Fossil without naming it, so nothing finds them by searching for the name.
+
+**What people read before they install anything:**
+
+- `README.md`: the title, the opening, the layer table, the section offering the repository as a template, and the paragraph on rebuilding a component on a headless library.
+- Each package's `README.md`, which is its npm page: `tokens`, `react`, `eslint-config` and `stylelint-config`.
+- Each `package.json`'s `description`, the workspace root's and `figma-sync`'s included.
+- `.github/ISSUE_TEMPLATE/gap.yml`: the form's prose, and the **What Fossil offered** field your own team fills in.
+
+**Your docs site,** which step 6 publishes:
+
+- `packages/react/docs-site/Landing.tsx`, the front page: its heading, its eyebrow and three sentences of body.
+- `packages/react/docs-site/meta.ts`: `siteUrl` is your domain, or the `https://<owner>.github.io/<name>` your repository is served from, and `siteTitle`, `siteDescription` and `ogImage.alt` are your positioning. `pnpm rename` leaves all four alone, because a domain isn't a name and the rest is prose. Each export's JSDoc says what it has to do.
+- `packages/react/docs-site/AdoptFossil.mdx`, and its title in `packages/react/.storybook/preview.tsx`'s page order: the page that offers your system as a template to fork, which is what yours now is to anyone who copies it.
+- `packages/react/docs-site/links.ts`, which autolinks the system's name wherever a page mentions it.
+- `packages/react/.storybook/manager.ts`, `packages/react/.storybook/theme.ts` and `packages/react/.storybook/preview-head.html`: `homeTitle`, and comments. The site's name, its tab titles and its Getting Started page already read `brand.config.json`.
+
+**Your agent files,** which your agents read every session:
+
+- `AGENTS.md`: its title and opening paragraph, and then `pnpm escapes`, the layout list, the gap fields and the definition of done. The foundations block between the `fossil:foundations` markers is generated, so leave it to the token build.
+- `packages/react/AGENTS.md` and `packages/figma-sync/AGENTS.md`.
+- `.claude/skills/fossil-figma-sync/SKILL.md`: its description and its prose.
+- The component contracts in `packages/react/src/components/`: sixteen JSDoc lines, such as "Classes from the app's own stylesheet, added to Fossil's". These travel furthest of anything here. They reach `packages/react/docs/`, the `AGENTS.md` block of every app that installs your package, and your editor's tooltips.
+
+**Comments and test fixtures,** which only your own contributors read, and which an agent working in the repository reads with them: `scripts/rename.ts`, `tests/rename.test.ts`, `.github/workflows/ci.yml`, `packages/react/vite.config.ts`, `packages/react/scripts/docs.test.ts`, `packages/react/scripts/fonts.test.ts`, `packages/tokens/scripts/build.ts` and `packages/figma-sync/src/`.
+
+**Three things a grep can't find,** because they say what Fossil is without naming it:
+
+- `Landing.tsx`'s eyebrow, `Open-source agentic design system`.
+- `siteTitle`'s second half, `: Open-Source Agentic Design System`, and `siteDescription`, which names neither the system nor "agentic" on purpose, because the title sits above it.
+- The opening line of each package's `README.md`, "an open-source agentic design system".
+
+**Claims the rename makes yours.** Each of these was true of Fossil and reads, once renamed, as though it had been written about your system. Settle each one: reword it, keep it and say whose it is, or drop it. It isn't a find-and-replace, which is why it's listed apart.
+
+- `AGENTS.md`: that the published packages "are the reference brand, harvested from the author's portfolio site".
+- `README.md`: the market research and competitive analysis behind the workflow, and the drift eval that "is designed and will run in a later release".
+- `docs/`, which `pnpm rename` leaves alone and 1.5 tells you to keep: Fossil's spec, its research, its decision records and its measured numbers. They explain the system you now have, and they are its history rather than yours.
+
+**What keeps Fossil's name.** One thing has to:
+
+- `com.ibrahimmoazzam.fossil`, the key under `$extensions` in every token file, with `VENDOR` and the tests that cover it in `packages/tokens/scripts/`. A reverse-DNS key names the author of the extension format rather than the system using it, and your token files use that format unchanged.
+
+Two more keep it because nothing outside this repository reads them, so renaming them would buy nothing: the `fossil:foundations` markers the token build writes into `AGENTS.md`, and the `fossil-figma-sync` skill's folder. The Figma stamp is not one of them any more. It is your CSS prefix, and a fork with Figma files built before that needs `pnpm figma:restamp` once (step 4).
+
+**Where a library's own name belongs.** If you rebuild a component on Base UI, Radix or React Aria, name it in that component's JSDoc contract and in the package's dependencies, and nowhere else. The tokens, the Figma library, the lint configs and the sync can't tell what a component is built on, which is what keeps the swap cheap.
+
+Then read the diff, for the two things a replacement gets wrong:
+
+- **Grammar.** An article before the name: "a Fossil token" becomes "a Acme Design token".
+- **Reflowed tables.** A longer or shorter name moves a Markdown table's borders, so end with `pnpm format`. Without it `pnpm lint` fails on Prettier before it reaches a rule.
+
+Last, the grep, now that it is a check rather than the method:
 
 ```sh
 git grep -n Fossil -- . ':!docs' ':!**/CHANGELOG.md'
 ```
 
-Rewrite what describes your system: the README, the opening of `AGENTS.md`, each package's README and `description`, the docs site's front page (`packages/react/docs-site/Landing.tsx`) and its title (`homeTitle` in `.storybook/manager.ts`), the gap form, and the few component prop descriptions that say "Fossil's". The docs site's name, tab titles and Getting Started page already read `brand.config.json`.
-
-Some names stay, on purpose: the `fossil` namespace the Figma sync stamps on variables, the `com.ibrahimmoazzam.fossil` key in the token files, the token build's `fossil:foundations` markers in `AGENTS.md`, and the `fossil-figma-sync` skill. The first two are written into your Figma file and your token files, so renaming them would be a migration rather than a rename, and a vendor key is meant to name the format's author. What isn't named after Fossil in the first place needs no thought: the brand lives in `brand.config.json`, and both lint configs export `brand()` ([ADR 0020](./decisions/0020-what-a-fork-renames.md)).
+What's left should be the vendor key, the two local names above, and the `.changeset/` files that 1.5 deletes.
 
 ### 1.5 Make the rest yours
 
