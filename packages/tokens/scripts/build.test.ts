@@ -306,7 +306,7 @@ describe('building the token source', () => {
   });
 
   it('writes the foundations into AGENTS.md', () => {
-    expect(agents).toMatch(/^# Agents\n\n<!-- fossil:foundations:start -->/);
+    expect(agents.startsWith(`# Agents\n\n${BLOCK_START}`)).toBe(true);
     expect(agents).toContain('For padding and `gap`. Never margin.');
     expect(agents).toContain('| `space.m` | `--fossil-space-m` | 16px |');
     expect(agents).toContain(
@@ -641,10 +641,8 @@ describe('the AGENTS.md block', () => {
       agents: file,
     });
     const agents = readFileSync(file, 'utf8');
-    expect(agents).toMatch(/^# Agents\n\n<!-- fossil:foundations:start -->/);
-    expect(agents).toMatch(
-      /<!-- fossil:foundations:end -->\n\n## Boundaries\n$/,
-    );
+    expect(agents.startsWith(`# Agents\n\n${BLOCK_START}`)).toBe(true);
+    expect(agents.endsWith(`${BLOCK_END}\n\n## Boundaries\n`)).toBe(true);
     expect(agents).not.toContain('Stale.');
   });
 
