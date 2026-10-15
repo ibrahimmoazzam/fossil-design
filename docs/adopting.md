@@ -23,9 +23,12 @@ On GitHub, choose **Use this template** or **Fork**.
 - A template copy starts a fresh history, and can be private.
 - A fork keeps the link to Fossil, so you can pull its later fixes and send changes back. A fork of a public repository stays public.
 
-### 1.2 Turn off releases for now
+### 1.2 Turn off the Release and Docs workflows for now
 
-In your repository's **Actions** tab, open the **Release** workflow and choose **Disable workflow**. Every push to `main` runs it, and until your scope exists on npm and trusts your repository ([step 3A](#3a-publish-under-your-scope)), it would open version pull requests for Fossil's pending changes or try to publish and fail.
+In your repository's **Actions** tab, open each of **Release** and **Docs** and choose **Disable workflow**. Every push to `main` runs both, and neither can do its job yet.
+
+- **Release** publishes, or opens a version pull request, as soon as a changeset exists. On a copy that inherited none it runs and succeeds, doing nothing, so leaving it on looks safe until your first change to a package. Your scope doesn't exist on npm or trust your repository until [step 3A](#3a-publish-under-your-scope), and any changeset your copy did inherit describes someone else's release, which 1.5 deletes.
+- **Docs** fails its deploy job until Pages is configured: `Failed to create deployment (status: 404). Ensure GitHub Pages has been enabled`. Nothing in the repository fixes that, and [step 6](#6-publish-the-docs-site) is where you set Pages up, once the site carries your brand rather than Fossil's. Disabling it also stops the build that checks the site on a pull request, so until step 6 check it yourself with `pnpm --filter react build-storybook`.
 
 ### 1.3 Rename it
 
@@ -288,6 +291,8 @@ Read node_modules/@acme-design/react/guidelines/Guidelines.md before writing any
 ## 6. Publish the docs site
 
 The docs site is Storybook's static build, and `.github/workflows/docs.yml` deploys it from `main`. In **Settings › Pages**, set the source to **GitHub Actions**. A custom domain is optional, and set there too.
+
+Then re-enable the **Docs** workflow, which 1.2 turned off, and run it from the **Actions** tab: it otherwise waits for your next push to `main`. From now on it deploys every push to `main` and builds on every pull request.
 
 ## Check your copy
 
