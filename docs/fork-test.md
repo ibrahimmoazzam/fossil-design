@@ -401,6 +401,12 @@ check:       The library matches the spec from adc90f1.
 
 A prediction made before the run was wrong in a way worth keeping: it expected roughly 136 `code syntax` updates, on the grounds that the live variables would still read `var(--fossil-…)`. They did not. Code syntax comes from `tokens.json`, and the fork's library was built _after_ the CSS prefix was renamed and _before_ the stamp followed the brand, so the prefix had already reached Figma and only the stamp lagged. The apply was therefore a pure no-op, which is the strongest evidence the migration moved the library rather than replacing it.
 
+**The migration crosses a published library, which is the part that could not be asserted from a test.** A restamp changes nothing visible — no variable, style or component differs in any property a designer can see — so whether Figma treats it as publishable was open. It does. The foundations file offered **23 changes, every one "modified"**: 12 text styles, 3 effect styles, 6 icon components and 2 variable collections, which is exactly the set of publishable items the restamp touched, and the 136 variables travel with their collections. The components file then listed **17 updates** under Libraries › Updates, the subset it imports, and accepting them carried the new stamps in: the components check that follows reports all 13 components matching the spec, with no problems and no foundations problems, which it could only do by resolving every binding through an `acme`-stamped variable, text style and effect style.
+
+So the order for a fork with a two-file library is: restamp, apply, foundations check, publish the foundations file, accept the update in the components file, components check, publish the components file. The `fossil-figma-sync` skill's migration section states the first three; the last four are its existing publish steps, unchanged.
+
+**One more thing the run earned.** Saving the components check result by hand transposed two components, `Popover` and `SkipLink`, which changes nothing a reader would notice and invalidates the hash. `figma:library-check report` refused it: "check-1.json doesn't match its hash: it was cut off or changed." The rule that every result carries a hash exists because an agent retypes these results, and on this run it caught exactly that, in the one place where a silent slip would have been recorded as a passing check.
+
 ## Fixed so far
 
 On this branch, with the issue's number and what it took:
