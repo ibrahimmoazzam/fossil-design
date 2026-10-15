@@ -303,7 +303,7 @@ describe('modes', () => {
           },
         }),
       ]),
-    ).toContain('Unknown mode "dim"; Fossil\'s modes are dark');
+    ).toContain('Unknown mode "dim"; the modes are dark');
   });
 });
 
