@@ -43,7 +43,7 @@ pnpm rename --name "Acme Design" --prefix acme --scope @acme-design --repo acme/
 `brand.config.json` holds the name, prefix and scope, and the token build, the class names and the agent docs read them from there. But package names, imports, stylesheets and repository URLs spell the old values out, so `pnpm rename` rewrites them too:
 
 - `@fossil-design` becomes your scope, in package names, dependencies, imports and pending changesets;
-- `--fossil-` becomes your prefix in every custom property, and `fossil-agents-md` becomes `acme-agents-md`;
+- `--fossil-` becomes your prefix in every custom property, `fossil-agents-md` becomes `acme-agents-md`, and `AGENTS.md`'s `fossil:foundations` markers become `acme:foundations`, which is where the token build writes the foundations block and what it looks for by prefix;
 - the repository becomes yours in every `repository`, `homepage` and `bugs` URL, which the gap form's link and npm's trusted publishing both read.
 
 It leaves `docs/` and the changelogs alone, because they record Fossil's history. It refuses to run with uncommitted changes, so the rename is a diff of its own. Then it updates `pnpm-lock.yaml` and formats what it changed. Check the result:
@@ -75,7 +75,7 @@ Work through the checklist below rather than a grep. A grep comes at the end, as
 
 **Your agent files,** which your agents read every session:
 
-- `AGENTS.md`: its title and opening paragraph, and then `pnpm escapes`, the layout list, the gap fields and the definition of done. The foundations block between the `fossil:foundations` markers is generated, so leave it to the token build.
+- `AGENTS.md`: its title and opening paragraph, and then `pnpm escapes`, the layout list, the gap fields and the definition of done. The foundations block between the `acme:foundations` markers is generated, so leave it to the token build.
 - `packages/react/AGENTS.md` and `packages/figma-sync/AGENTS.md`.
 - `.claude/skills/fossil-figma-sync/SKILL.md`: its description and its prose.
 - The component contracts in `packages/react/src/components/`: sixteen JSDoc lines, such as "Classes from the app's own stylesheet, added to Fossil's". These travel furthest of anything here. They reach `packages/react/docs/`, the `AGENTS.md` block of every app that installs your package, and your editor's tooltips.
@@ -98,7 +98,7 @@ Work through the checklist below rather than a grep. A grep comes at the end, as
 
 - `com.ibrahimmoazzam.fossil`, the key under `$extensions` in every token file, with `VENDOR` and the tests that cover it in `packages/tokens/scripts/`. A reverse-DNS key names the author of the extension format rather than the system using it, and your token files use that format unchanged.
 
-Two more keep it because nothing outside this repository reads them, so renaming them would buy nothing: the `fossil:foundations` markers the token build writes into `AGENTS.md`, and the `fossil-figma-sync` skill's folder. The Figma stamp is not one of them any more. It is your CSS prefix, and a fork with Figma files built before that needs `pnpm figma:restamp` once (step 4).
+One more keeps it because nothing outside this repository reads it, so renaming it would buy nothing: the `fossil-figma-sync` skill's folder. Neither of the other two local names is one any more. The Figma stamp is your CSS prefix, and a fork with Figma files built before that needs `pnpm figma:restamp` once (step 4); `AGENTS.md`'s foundations markers are your prefix too, and 1.3 has already rewritten them.
 
 **Where a library's own name belongs.** If you rebuild a component on Base UI, Radix or React Aria, name it in that component's JSDoc contract and in the package's dependencies, and nowhere else. The tokens, the Figma library, the lint configs and the sync can't tell what a component is built on, which is what keeps the swap cheap.
 

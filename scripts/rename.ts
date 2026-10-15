@@ -90,6 +90,16 @@ export function rewrites(from: Identity, to: Identity): Rewrite[] {
         '(?![\\w-])',
       ),
     );
+    // The token build names AGENTS.md's foundations markers after the prefix, and refuses a file
+    // whose markers it can't find, so a fork that kept Fossil's would fail its first build.
+    list.push(
+      rewrite(
+        `${from.cssPrefix}:foundations`,
+        `${to.cssPrefix}:foundations`,
+        '(?<![\\w-])',
+        '(?![\\w-])',
+      ),
+    );
   }
   return list;
 }

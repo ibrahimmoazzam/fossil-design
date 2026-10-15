@@ -53,6 +53,15 @@ describe('rename', () => {
     ).toBe(`<!-- BEGIN:${acme.npmScope.slice(1)}-agent-rules -->`);
   });
 
+  it('renames the foundations markers, which the token build names after the prefix', () => {
+    expect(toAcme(`<!-- ${fossil.cssPrefix}:foundations:start -->`)).toBe(
+      `<!-- ${acme.cssPrefix}:foundations:start -->`,
+    );
+    expect(toAcme(`<!-- ${fossil.cssPrefix}:foundations:end -->`)).toBe(
+      `<!-- ${acme.cssPrefix}:foundations:end -->`,
+    );
+  });
+
   it('renames the scope where a badge label spells it percent-encoded', () => {
     expect(
       toAcme(
