@@ -41,7 +41,7 @@ Run it once, before the first apply under the new name. An apply that goes first
 
 In the foundations file.
 
-1. If the file was stamped under another namespace, move the stamps first, as above. Then run `pnpm figma:apply`. It refuses if the token source has uncommitted changes, because it stamps the current commit on Figma as the base for the next diff. It writes `packages/figma-sync/.figma/apply-1.js` up to `apply-N.js`.
+1. If the file was stamped under another namespace, move the stamps first, as above. Then run `pnpm figma:apply-scripts`. It writes `packages/figma-sync/.figma/apply-1.js` up to `apply-N.js` and nothing else — no `figma:*` command touches Figma, so a refusal here is never a sign that something was about to be written. It needs `pnpm build` first, because it reads `packages/tokens/dist/tokens.json`, and it refuses an uncommitted token source, because it stamps the current commit on Figma as the base for the next diff.
 2. Send each script to `use_figma`, in order, waiting for each result:
    - every script but the last returns the variables it `created`, `renamed` and `updated`;
    - the last returns `commit`, `missing`, `orphans` and `unstamped`, and stamps the commit only when nothing is missing.

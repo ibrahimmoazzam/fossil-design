@@ -636,6 +636,15 @@ describe('the library spec', () => {
     expect(sheet).toContain('- An instance of `Glyph` with size=s.');
   });
 
+  // The check requires a text style on every text layer, including one the spec gives no
+  // typography for, so the sheet has to name which. fork-test.md issue 30.
+  it('names the text style a layer with no typography of its own takes', () => {
+    const sheet = buildSheet(library, stylesSpec(TOKENS, []).spec);
+    expect(sheet).toContain(
+      'still needs a text style, because the check requires one on every text layer. Give it `text/body`',
+    );
+  });
+
   it('writes what Figma draws without a token into the sheet', () => {
     const sheet = buildSheet(
       build({

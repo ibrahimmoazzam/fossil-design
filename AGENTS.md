@@ -33,7 +33,7 @@ pnpm rename --name … --scope …   # rename a fork: name, CSS prefix, npm scop
 - Check the token source without building: `pnpm --filter tokens validate`. Token files live in `packages/tokens/src/primitive/` and `src/semantic/`; ADR 0005 holds their rules.
 - The token build writes `tokens.css`, `tokens.json`, `lint.json`, `foundations.md` and `tokens.md` to `packages/tokens/dist/`, the TypeScript in `src/generated/`, and the foundations block in this file. Commit the block with the token change; CI fails if the build changes it. ADR 0006 covers each output, and ADR 0016 the two Markdown files.
 - List deprecated tokens and their replacements: `pnpm --filter tokens deprecations`, after a build.
-- Sync tokens with Figma: `pnpm figma:apply`, `pnpm figma:read` and `pnpm figma:diff` write scripts and compare their results. Run a sync through the `fossil-figma-sync` skill in `.claude/skills/`, which needs the Figma MCP server. `packages/figma-sync/AGENTS.md` covers working on the sync itself.
+- Sync tokens with Figma: `pnpm figma:apply-scripts`, `pnpm figma:read` and `pnpm figma:diff` write scripts and compare their results. Every `figma:*` command only reads the repository and writes generated scripts to `packages/figma-sync/.figma/`; nothing reaches Figma until an agent carries a script there. Run a sync through the `fossil-figma-sync` skill in `.claude/skills/`, which needs the Figma MCP server. `packages/figma-sync/AGENTS.md` covers working on the sync itself.
 - A Figma file built before the stamp followed the brand needs `pnpm figma:restamp <old namespace>` once, before its next apply. Without it the apply owns nothing in the file and builds a second copy of the library beside the first. ADR 0020.
 - Build the Figma library, in two files (ADR 0018): `pnpm figma:library-spec` writes the spec, a build sheet and the styles script for the foundations file; `pnpm figma:library-check` writes the components file's check, `pnpm figma:library-check foundations` the foundations file's, and `pnpm figma:library-check report` verifies the results. Follow the same skill's library workflow.
 - Build before linting and type-checking. A package's types resolve through the built declarations of the packages it depends on, and the Stylelint config reads the built token lists.
@@ -270,7 +270,7 @@ Each text style is five custom properties. Set all five, and never the `font` sh
 - Any margin other than `0`. If approved, it gets a lint-disable comment with the reason.
 - Adding a dependency.
 - Adding, renaming or deleting a token.
-- Running `figma:apply`, or any `use_figma` write, against the real Figma file.
+- Any `use_figma` write against the real Figma file. Generating the scripts needs no permission, because it touches nothing but `.figma/`.
 - Changing a decision recorded in `docs/PRD.md`, `docs/Learnings.md` or `docs/key-decisions.md`.
 - Anything that publishes to npm or changes the release workflow.
 

@@ -125,6 +125,14 @@ function component(c: ComponentFacts): string {
   return lines.join('\n');
 }
 
+/** The text style a text layer takes when the spec names none: what running text uses. */
+function inherited(styles: StylesSpec): string {
+  const body =
+    styles.textStyles.find((s) => s.path === 'text.body') ??
+    styles.textStyles[0];
+  return body ? `\`${body.name}\`` : 'a text style from the library';
+}
+
 /** The build sheet: what to build for each component, in Figma's names. */
 export function buildSheet(library: Library, styles: StylesSpec): string {
   return [
@@ -140,6 +148,7 @@ export function buildSheet(library: Library, styles: StylesSpec): string {
     '- Name each layer listed below exactly as written: it is the CSS class, or the state selector, it stands for.',
     '- Bind what each line names, and nothing to a raw value: every fill, stroke, padding, gap and radius uses a variable.',
     '- Text and icons inside a layer take the colour and text style it names, unless a layer inside names its own.',
+    `- Text no line here names typography for still needs a text style, because the check requires one on every text layer. Give it ${inherited(styles)}, unless the text around it in the app is another size. The check accepts any of the library's text styles there, because in code the component inherits the text style of whatever surrounds it, and Figma cannot inherit.`,
     '- Layout values are for the agent to follow; the check reads only bindings, names, variants and instances.',
     '',
     `Text styles: ${styles.textStyles.map((t) => `\`${t.name}\``).join(', ')}. Effect styles: ${styles.effectStyles.map((e) => `\`${e.name}\``).join(', ')}. Icons: ${styles.icons.map((i) => `\`${i.name}\``).join(', ')}.`,

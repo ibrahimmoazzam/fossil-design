@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "apply": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts apply",
+    "apply-scripts": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts apply",
     "read": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts read",
     "diff": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts diff",
     "restamp": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts restamp",
